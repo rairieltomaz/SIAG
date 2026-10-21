@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>SIAG – Sistema Integrado de Aferição de Gás</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#1061A6}a:hover{color:#0B4A80}
+input,select,textarea,button{font-family:inherit;font-size:16px}
+input:focus,select:focus,textarea:focus{outline:3px solid #9CC8EC;outline-offset:1px}
+button:focus-visible{outline:3px solid #9CC8EC;outline-offset:2px}
+button:disabled{cursor:not-allowed}
+
+/* ---- responsivo: celular pequeno ---- */
+.app-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom)) !important}
+@media (max-width: 899px){ input,select,textarea{font-size:16px !important} }
+@media (max-width: 380px){
+  .faixa-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+  .app-main,.login-main{padding:12px !important}
+}
+/* ---- computador ---- */
+@media (min-width: 900px){
+  .app-root{max-width:none !important}
+  .app-shell{display:grid !important;grid-template-columns:232px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .app-header{grid-column:1 / -1}
+  .app-nav{grid-column:1;grid-row:2;display:flex !important;flex-direction:column;gap:2px !important;padding:16px 0 !important;border-top:0 !important;border-right:1px solid #C9D5E2;overflow-y:auto}
+  .nav-btn{flex-direction:row !important;justify-content:flex-start !important;gap:12px !important;height:52px !important;padding:0 20px !important;font-size:14px !important;border-top:0 !important;border-left:4px solid transparent !important;text-align:left}
+  .nav-btn[aria-current="page"]{border-left-color:#1061A6 !important}
+  .app-main{grid-column:2;grid-row:2;padding:28px 36px !important}
+  .page{max-width:1180px;width:100%;margin:0 auto}
+  .prog-grid{display:grid !important;grid-template-columns:400px minmax(0,1fr);align-items:start;column-gap:24px !important}
+  .prog-grid > *{grid-column:1}
+  .prog-grid > h1{grid-column:1 / -1}
+  .prog-grid > .prog-table{grid-column:2;grid-row:2 / span 6}
+  .ver-body{display:grid !important;grid-template-columns:420px minmax(0,1fr);align-items:start;column-gap:24px !important}
+  .ver-body > *{grid-column:2}
+  .ver-body > .ver-inputs{grid-column:1;grid-row:1 / span 8;position:sticky;top:0}
+  .tt-grid{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  .tt-grid > .span-all{grid-column:1 / -1}
+  .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important}
+  .kpi-grid > .kpi-total{grid-column:1 / -1 !important}
+  .cfg-grid{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  .cfg-grid > h1{grid-column:1 / -1}
+  .pw-page{max-width:520px}
+  .login-main{align-items:center;justify-content:center;padding:48px 24px !important}
+  .login-main > *{width:100%;max-width:460px;box-sizing:border-box}
+  .login-main > div[style*="margin-top: auto"]{margin-top:24px !important}
+}
+</style>
+</helmet>
+<div class="app-root" style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #EEF1F5; color: #0C2340; font-family: Roboto, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; overflow: hidden">
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ notLogged }}" hint-placeholder-val="{{ false }}">
+    <div class="login-shell" style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column">
+      <header style="flex: 0 0 auto; display: flex; flex-direction: column">
+        <div style="background: #FFFFFF; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+          <img src="/_blob/cbe12028f7d29173e2ddc80441aa61d0" alt="CEA – Companhia Energética Amazonense" style="height: 28px; width: auto; display: block">
+          <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-size: 12px; color: #33475E; font-variant-numeric: tabular-nums">{{ dateLabel }} · {{ clockStr }}</span><span style="font-size: 10px; font-weight: 700; color: #FFFFFF; background: #B54708; padding: 1px 6px; letter-spacing: 0.4px">HORÁRIO DE BRASÍLIA</span></span>
+        </div>
+        <div style="background: #1061A6; color: #FFFFFF; padding: 0 14px; display: flex; align-items: center; gap: 10px; min-height: 44px">
+          <span style="font-size: 14px; font-weight: 700; letter-spacing: 1px">SIAG</span>
+          <span style="font-size: 12px; color: #D6E7F7">Sistema Integrado de Aferição de Gás</span>
+        </div>
+      </header>
+
+      <main class="login-main" style="flex: 1 1 auto; overflow-y: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 16px; background: #EEF1F5">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Acesso ao sistema</h1>
+
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #1061A6; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="l-user" style="font-size: 13px; font-weight: 600; color: #33475E">Login</label>
+            <div style="position: relative">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6B7E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; left: 13px; top: 15px"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+              <input id="l-user" type="text" autoComplete="username" autoCapitalize="none" value="{{ loginU }}" onChange="{{ onLoginU }}" style="height: 50px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 14px 0 44px; color: #0C2340; background: #FFFFFF">
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="l-pass" style="font-size: 13px; font-weight: 600; color: #33475E">Senha</label>
+            <div style="position: relative">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6B7E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; left: 13px; top: 15px"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              <input id="l-pass" type="{{ passType }}" autoComplete="current-password" value="{{ loginP }}" onChange="{{ onLoginP }}" onKeyDown="{{ onLoginKey }}" style="height: 50px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 54px 0 44px; color: #0C2340; background: #FFFFFF">
+              <button type="button" onClick="{{ togglePass }}" aria-label="{{ passToggleLabel }}" style="position: absolute; right: 3px; top: 3px; width: 44px; height: 44px; border: 0; background: transparent; color: #1061A6; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+          <sc-if value="{{ hasLoginErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8A1A12; background: #FDECEA; border-left: 4px solid #B42318; padding: 10px 12px">{{ loginErr }}</div>
+          </sc-if>
+          <button type="button" onClick="{{ doLoginBtn }}" style="height: 52px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px">
+            ENTRAR
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+          </button>
+        </div>
+
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.1</div>
+      </main>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ logged }}" hint-placeholder-val="{{ true }}">
+  <div class="app-shell" style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column">
+  <header class="app-header" style="flex: 0 0 auto; display: flex; flex-direction: column">
+    <div style="background: #FFFFFF; padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+      <img src="/_blob/cbe12028f7d29173e2ddc80441aa61d0" alt="CEA – Companhia Energética Amazonense" style="height: 28px; width: auto; display: block">
+      <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px"><span style="font-size: 12px; color: #33475E; font-variant-numeric: tabular-nums">{{ dateLabel }} · {{ clockStr }}</span><span style="font-size: 10px; font-weight: 700; color: #FFFFFF; background: #B54708; padding: 1px 6px; letter-spacing: 0.4px">HORÁRIO DE BRASÍLIA</span></span>
+    </div>
+    <div style="background: #1061A6; color: #FFFFFF; padding: 0 0 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px">
+      <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+        <span style="font-size: 14px; font-weight: 700; letter-spacing: 1px">SIAG</span>
+        <span style="font-size: 11px; color: #D6E7F7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ userName }} · {{ roleLabel }}</span>
+      </div>
+      <div style="display: flex; align-items: stretch">
+      <button type="button" onClick="{{ openPw }}" aria-label="Trocar minha senha" style="height: 44px; border: 0; border-left: 1px solid #3C82BF; background: #1061A6; color: #FFFFFF; padding: 0 12px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M10.8 12.2L20 3"></path><path d="M16 7l3 3"></path></svg>SENHA</button>
+      <button type="button" onClick="{{ logout }}" style="height: 44px; border: 0; border-left: 1px solid #3C82BF; background: #0B4A80; color: #FFFFFF; padding: 0 16px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer">SAIR</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" style="flex: 1 1 auto; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+
+    <!-- ============ TROCA DE SENHA ============ -->
+    <sc-if value="{{ pwView }}" hint-placeholder-val="{{ false }}">
+      <div class="page pw-page" style="display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">{{ pwTitle }}</h1>
+        <sc-if value="{{ mustChange }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; font-size: 14px; color: #6B3A00; line-height: 1.4">Primeiro acesso com a senha padrão. Crie uma senha pessoal para continuar.</div>
+        </sc-if>
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #1061A6; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px">
+          <div style="font-size: 14px; color: #33475E">Usuário: <b>{{ userName }}</b></div>
+          <sc-if value="{{ askCurrent }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="pw-cur" style="font-size: 13px; font-weight: 600; color: #33475E">Senha atual</label>
+              <input id="pw-cur" type="password" autoComplete="current-password" value="{{ pwCur }}" onChange="{{ onPwCur }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+            </div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="pw-new" style="font-size: 13px; font-weight: 600; color: #33475E">Nova senha (mín. 6 caracteres)</label>
+            <input id="pw-new" type="password" autoComplete="new-password" value="{{ pwNew }}" onChange="{{ onPwNew }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="pw-new2" style="font-size: 13px; font-weight: 600; color: #33475E">Repita a nova senha</label>
+            <input id="pw-new2" type="password" autoComplete="new-password" value="{{ pwNew2 }}" onChange="{{ onPwNew2 }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+          </div>
+          <sc-if value="{{ pwMsgErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size: 14px; color: #8A1A12; background: #FDECEA; border-left: 4px solid #B42318; padding: 10px 12px">{{ pwMsg }}</div>
+          </sc-if>
+          <button type="button" onClick="{{ savePw }}" style="height: 50px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer">SALVAR NOVA SENHA</button>
+          <sc-if value="{{ canCancelPw }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ closePw }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Cancelar</button>
+          </sc-if>
+          <sc-if value="{{ mustChange }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ logout }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Sair</button>
+          </sc-if>
+        </div>
+        <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">A senha fica gravada neste aparelho. Em outro celular, a troca precisa ser feita nele também.</div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROGRAMA ============ -->
+    <sc-if value="{{ isProg }}" hint-placeholder-val="{{ true }}">
+      <div class="page prog-grid" style="display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Programação do ONS</h1>
+
+        <div style="background: #FFFFFF; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #C9D5E2">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+            <label for="f-date" style="font-size: 14px; font-weight: 600">Data do PDP <span style="color: #B42318">*</span></label>
+            <input id="f-date" type="date" value="{{ date }}" onChange="{{ onDate }}" style="height: 44px; border: 1px solid {{ dateBorder }}; border-radius: 2px; padding: 0 10px; background: #FFFFFF; color: #0C2340">
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #8A4300">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+            Horários de Brasília (Manaus −1 h)
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+              <label for="f-pcs" style="font-size: 14px; font-weight: 600; line-height: 1.3">PCS médio medido<br><span style="font-size: 12px; font-weight: 400; color: #4A5B6E">kcal/m³ · opcional</span></label>
+              <input id="f-pcs" type="text" inputMode="decimal" placeholder="Ex.: 8435" value="{{ pcsReal }}" onChange="{{ onPcs }}" style="height: 44px; width: 150px; box-sizing: border-box; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums">
+            </div>
+            <span style="font-size: 12px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 6px 10px; line-height: 1.4">{{ pcsProgInfo }}</span>
+          </div>
+          <div style="height: 8px; background: #E3EAF2; border-radius: 2px; overflow: hidden">
+            <div style="height: 8px; width: {{ progPct }}%; background: {{ progColor }}; border-radius: 2px"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+            <sc-if value="{{ complete }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 14px; font-weight: 600; color: #0B7A3E">✓ Programação completa</span>
+            </sc-if>
+            <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 14px; font-weight: 600; color: #B42318">{{ lockReason }}</span>
+            </sc-if>
+            <span style="font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 600; color: {{ progColor }}">{{ doneCount }}/48</span>
+          </div>
+        </div>
+
+        <div style="background: #FFFFFF; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #C9D5E2">
+          <div style="font-size: 15px; font-weight: 700">Lançar faixa</div>
+          <div class="faixa-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <label for="f-de" style="font-size: 12px; color: #4A5B6E">De</label>
+              <select id="f-de" value="{{ fillDeStr }}" onChange="{{ onFillDe }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums; font-size: 15px">
+                <sc-for list="{{ startOpts }}" as="o" hint-placeholder-count="48"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <label for="f-ate" style="font-size: 12px; color: #4A5B6E">Até</label>
+              <select id="f-ate" value="{{ fillAteStr }}" onChange="{{ onFillAte }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums; font-size: 15px">
+                <sc-for list="{{ endOpts }}" as="o" hint-placeholder-count="48"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <label for="f-mw" style="font-size: 12px; color: #4A5B6E">MW</label>
+              <input id="f-mw" type="text" inputMode="decimal" placeholder="114" value="{{ fillMw }}" onChange="{{ onFillMw }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 8px; font-variant-numeric: tabular-nums; color: #0C2340">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <label for="f-gt" style="font-size: 12px; color: #4A5B6E">GTs *</label>
+              <select id="f-gt" value="{{ fillGt }}" onChange="{{ onFillGt }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-size: 15px">
+                <sc-for list="{{ gtOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+          <button type="button" onClick="{{ applyFill }}" style="height: 50px; border: 0; border-radius: 0px; background: {{ accent }}; color: #FFFFFF; font-weight: 700; letter-spacing: 0.5px; cursor: pointer">APLICAR</button>
+          <div style="display: flex; justify-content: space-between; gap: 8px">
+            <button type="button" onClick="{{ togglePaste }}" style="height: 44px; border: 0; background: transparent; color: #1061A6; font-weight: 600; padding: 0 4px; cursor: pointer">Colar coluna do PDPW</button>
+            <button type="button" onClick="{{ askClear }}" style="height: 44px; border: 0; background: transparent; color: #B42318; font-weight: 600; padding: 0 4px; cursor: pointer">Zerar</button>
+          </div>
+          <sc-if value="{{ confirmClear }}" hint-placeholder-val="{{ false }}">
+            <div style="background: #FDECEA; border-radius: 2px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+              <div style="font-size: 14px; color: #6E140E">Apagar os 48 intervalos (MW e GTs) e as leituras do dia?</div>
+              <div style="display: flex; gap: 8px">
+                <button type="button" onClick="{{ doClear }}" style="flex: 1; height: 44px; border: 0; border-radius: 2px; background: #B42318; color: #FFFFFF; font-weight: 600; cursor: pointer">Sim, apagar</button>
+                <button type="button" onClick="{{ cancelClear }}" style="flex: 1; height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Cancelar</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showPaste }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label for="f-paste" style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Cole os 48 valores de MW (00:00 a 24:00). Depois lance as GTs por faixa com o MW em branco.</label>
+              <textarea id="f-paste" rows="4" value="{{ paste }}" onChange="{{ onPaste }}" placeholder="91&#10;91&#10;45&#10;…" style="border: 1px solid #C9D5E2; border-radius: 2px; padding: 10px; font-variant-numeric: tabular-nums; color: #0C2340; resize: vertical"></textarea>
+              <button type="button" onClick="{{ applyPaste }}" style="height: 46px; border: 0; border-radius: 2px; background: #0B4A80; color: #FFFFFF; font-weight: 600; cursor: pointer">Aplicar colagem</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ msgOk }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 14px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 10px 12px">{{ msg }}</div>
+          </sc-if>
+          <sc-if value="{{ msgErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size: 14px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 10px 12px">{{ msg }}</div>
+          </sc-if>
+        </div>
+
+        <div class="prog-table" style="background: #FFFFFF; border-radius: 0px; overflow: hidden; border: 1px solid #C9D5E2">
+          <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: end; padding: 10px 8px; font-size: 12px; font-weight: 600; color: #4A5B6E; background: #EEF3F8">
+            <span>Até<br><span style="font-size: 10px; font-weight: 500">BSB</span></span><span>MW *</span><span>GTs *</span>
+            <span style="text-align: right; display: flex; flex-direction: column; gap: 1px"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">PCS {{ pcsHdr }}</span></span>
+            <span style="text-align: right; display: flex; flex-direction: column; gap: 1px; color: #0B4A80"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">contrato {{ pcsRefStr }}</span></span>
+          </div>
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="48">
+            <div style="display: flex; flex-direction: column; border-top: 1px solid #EDF2F7; background: {{ r.bg }}">
+              <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: center; padding: 6px 8px">
+                <span style="font-variant-numeric: tabular-nums; font-size: 14px; color: #33475E">{{ r.end }}</span>
+                <input type="text" inputMode="decimal" aria-label="{{ r.ariaMw }}" placeholder="MW" value="{{ r.mwStr }}" onChange="{{ r.onMw }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px solid {{ r.mwBorder }}; border-radius: 2px; padding: 0 8px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340; background: #FFFFFF">
+                <select aria-label="{{ r.ariaGt }}" value="{{ r.gtVal }}" onChange="{{ r.onGt }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px solid {{ r.gtBorder }}; border-radius: 2px; padding: 0 4px; font-size: 15px; color: #0C2340; background: #FFFFFF">
+                  <sc-for list="{{ gtOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+                </select>
+                <span style="font-variant-numeric: tabular-nums; font-size: 12px; text-align: right; color: #4A5B6E">{{ r.accMedStr }}</span>
+                <span style="font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 600; text-align: right; color: #0B4A80">{{ r.acc94Str }}</span>
+              </div>
+              <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 0 8px 8px 54px; font-size: 12px; font-weight: 500; color: {{ r.noteColor }}">{{ r.note }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ complete }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ goVer }}" style="height: 54px; border: 0; border-radius: 0px; background: {{ accent }}; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Ir para Verificar →</button>
+        </sc-if>
+        <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ true }}">
+          <button type="button" disabled="{{ true }}" style="height: 54px; border: 0; border-radius: 0px; background: #DCE3EA; color: #4A5B6E; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+            {{ lockBtn }}
+          </button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ TON / TOFF ============ -->
+    <sc-if value="{{ isTt }}" hint-placeholder-val="{{ false }}">
+      <div class="page tt-grid" style="display: flex; flex-direction: column; gap: 14px">
+        <div class="span-all" style="display: flex; justify-content: space-between; align-items: baseline">
+          <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Ton / Toff</h1>
+          <span style="font-variant-numeric: tabular-nums; font-size: 12px; color: #4A5B6E">agora {{ nowStr }} (Brasília)</span>
+        </div>
+        <div class="span-all" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <div style="background: #1061A6; color: #FFFFFF; border-radius: 0px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 12px; color: #D6E7F7">Ton · mínimo ligado</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600">{{ tonStr }}</span>
+          </div>
+          <div style="background: #0B4A80; color: #FFFFFF; border-radius: 0px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 12px; color: #D6E7F7">Toff · mínimo desligado</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600">{{ toffStr }}</span>
+          </div>
+        </div>
+
+        <sc-for list="{{ units }}" as="u" hint-placeholder-count="2">
+          <div class="tt-unit" style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+            <div style="font-size: 16px; font-weight: 700">{{ u.name }}</div>
+            <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 8px">
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="{{ u.idSt }}" style="font-size: 12px; color: #4A5B6E">Estado</label>
+                <select id="{{ u.idSt }}" value="{{ u.st }}" onChange="{{ u.onSt }}" style="height: 46px; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 6px; background: #FFFFFF; color: #0C2340">
+                  <option value="">Selecionar</option>
+                  <option value="on">Ligada</option>
+                  <option value="off">Desligada</option>
+                </select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="{{ u.idSince }}" style="font-size: 12px; color: #4A5B6E">{{ u.sinceLabel }}</label>
+                <input id="{{ u.idSince }}" type="datetime-local" value="{{ u.since }}" onChange="{{ u.onSince }}" style="height: 46px; box-sizing: border-box; width: 100%; min-width: 0; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 6px; background: #FFFFFF; color: #0C2340; font-size: 14px">
+              </div>
+            </div>
+            <div style="font-size: 14px; font-weight: 600; line-height: 1.4; color: {{ u.color }}; background: {{ u.bg }}; border-radius: 2px; padding: 10px 12px">{{ u.result }}</div>
+            <sc-if value="{{ u.hasSub }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 13px; color: #4A5B6E">{{ u.sub }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <div class="span-all" style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 15px; font-weight: 700">Na programação do dia</span>
+          <sc-if value="{{ ttOk }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size: 14px; color: #0B7A3E; font-weight: 600">✓ Nenhum conflito de Ton ou Toff nas partidas e paradas programadas.</div>
+          </sc-if>
+          <sc-for list="{{ ttIssues }}" as="t" hint-placeholder-count="0">
+            <div style="font-size: 13px; color: #8A4300; display: flex; gap: 8px"><span style="font-variant-numeric: tabular-nums; flex: 0 0 auto">{{ t.when }}</span><span>{{ t.text }}</span></div>
+          </sc-for>
+        </div>
+
+        <div class="span-all" style="background: #FFFFFF; border-radius: 0px; border: 1px solid #C9D5E2; overflow: hidden">
+          <button type="button" onClick="{{ toggleNota }}" aria-expanded="{{ notaExpanded }}" style="width: 100%; min-height: 52px; border: 0; background: #FFFFFF; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; cursor: pointer; color: #0C2340">
+            <span style="display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 15px; font-weight: 700">Nota operacional</span>
+              <span style="font-size: 12px; color: #4A5B6E">DESSEM (ONS) · CER-D nº 464/22, subcl. 5.12.1</span>
+            </span>
+            <span style="font-size: 13px; font-weight: 600; color: #1061A6; flex: 0 0 auto">{{ notaBtn }}</span>
+          </button>
+          <sc-if value="{{ showNota }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 14px 14px; display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #33475E; line-height: 1.45">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                <div style="background: #EEF3F8; border-radius: 2px; padding: 10px; display: flex; flex-direction: column; gap: 3px">
+                  <span style="font-weight: 700; color: #0C2340">1 turbina a gás</span>
+                  <span>Mínima: <b style="font-variant-numeric: tabular-nums">45,914 MW</b></span>
+                  <span>Máxima: <b style="font-variant-numeric: tabular-nums">57,393 MW</b></span>
+                  <span>Tempo mín.: 720 min (12 h)</span>
+                </div>
+                <div style="background: #EEF3F8; border-radius: 2px; padding: 10px; display: flex; flex-direction: column; gap: 3px">
+                  <span style="font-weight: 700; color: #0C2340">2 turbinas a gás</span>
+                  <span>Mínima: <b style="font-variant-numeric: tabular-nums">91,828 MW</b></span>
+                  <span>Máxima: <b style="font-variant-numeric: tabular-nums">114,786 MW</b></span>
+                  <span>Tempo mín.: 720 min (12 h)</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <span style="font-weight: 700; color: #0C2340">Parâmetros de referência (teto contratual)</span>
+                <span><b>Ton ≤ 12 h</b> — tempo mínimo LIGADO, incluindo as rampas.</span>
+                <span><b>Toff ≤ 4 h</b> — tempo mínimo DESLIGADO antes de nova partida.</span>
+                <span><b>R-up ≤ 7 h</b> — rampa de acionamento, da partida à plena carga.</span>
+                <span><b>R-dn ≤ 1 h</b> — rampa de desligamento até a máquina fora de serviço.</span>
+                <span><b>Gmin/Gmax ≤ 80%</b> — até onde a usina reduz carga sem desligar.</span>
+              </div>
+              <div style="background: #FFF4E5; border-radius: 2px; padding: 10px; color: #6B3A00">Após parada da usina ou retirada de uma turbina, a nova rampa de subida só pode ser feita depois de 4 h.</div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <span style="font-weight: 700; color: #0C2340">Rampas</span>
+                <span>Subida 1 GT: <span style="font-variant-numeric: tabular-nums">0 → 30 → 45,914 → 57,393</span></span>
+                <span>Subida 2 GTs: <span style="font-variant-numeric: tabular-nums">0 → 60 → 91,828 → 114,786</span></span>
+                <span>Descida 1 GT: <span style="font-variant-numeric: tabular-nums">57,393 → 45,914 → 0</span></span>
+                <span>Descida 2 GTs: <span style="font-variant-numeric: tabular-nums">114,786 → 91,828 → 0</span></span>
+              </div>
+              <div style="border: 1px solid #F0B46A; border-radius: 2px; padding: 10px; color: #6B3A00"><b>Leia como TETO, não como meta.</b> Declarar qualquer valor acima da referência gera penalidade.</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ VERIFICAR ============ -->
+    <sc-if value="{{ isVer }}" hint-placeholder-val="{{ false }}">
+      <div class="page" style="display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Verificar consumo</h1>
+
+        <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="background: #FFFFFF; border: 2px solid #B42318; border-radius: 0px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 10px; color: #8A1A12">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              <span style="font-size: 20px; font-weight: 700">Verificação bloqueada</span>
+            </div>
+            <div style="font-size: 15px; color: #33475E; line-height: 1.45">{{ lockReason }} Complete os 48 intervalos (MW e GTs) para liberar.</div>
+            <button type="button" onClick="{{ goProg }}" style="height: 50px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Ir para Programa</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ complete }}" hint-placeholder-val="{{ true }}">
+          <div class="ver-body" style="display: flex; flex-direction: column; gap: 14px">
+            <div class="ver-inputs" style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="v-op" style="font-size: 14px; font-weight: 600">Operador <span style="color: #B42318">*</span></label>
+                <input id="v-op" type="text" placeholder="Nome ou matrícula" value="{{ operador }}" onChange="{{ onOp }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid {{ opBorder }}; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="v-hora" style="font-size: 14px; font-weight: 600">Horário da leitura <span style="color: #0B7A3E">(Manaus)</span> <span style="color: #B42318">*</span></label>
+                <select id="v-hora" value="{{ selStr }}" onChange="{{ onSel }}" style="height: 52px; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums; font-size: 18px">
+                  <sc-for list="{{ selOpts }}" as="o" hint-placeholder-count="48"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+                </select>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 12px">
+                  <span style="font-size: 13px; color: #6B3A00; line-height: 1.3">Convertido para Brasília<br><span style="font-size: 11px">horário usado no PDP (Manaus + 1 h)</span></span>
+                  <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 700; color: #6B3A00">{{ selLabel }}</span>
+                </div>
+                <span style="font-size: 12px; color: #4A5B6E; font-variant-numeric: tabular-nums">Agora: Manaus {{ clockMaoStr }} · Brasília {{ clockStr }}</span>
+              </div>
+              <div style="background: #E8F1FA; border-radius: 2px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+                <span style="font-size: 14px; color: #0B4A80; line-height: 1.3">Previsto até {{ selMaoLabel }} Manaus ({{ selLabel }} Brasília) · {{ selGtStr }}</span>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                  <div style="display: flex; flex-direction: column; gap: 2px">
+                    <span style="font-size: 11px; color: #33475E">Gás real · PCS {{ pcsMedShort }}</span>
+                    <span style="font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 600; color: #0C2340">{{ prevRealBox }}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 2px; text-align: right">
+                    <span style="font-size: 11px; color: #0B4A80; font-weight: 600">Contrato · PCS {{ pcsRefStr }}</span>
+                    <span style="font-variant-numeric: tabular-nums; font-size: 18px; font-weight: 700; color: #0B4A80">{{ prev94Str }} m³</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="v-pcs" style="font-size: 14px; font-weight: 600">PCS médio medido (kcal/m³) <span style="color: #B42318">*</span></label>
+                <input id="v-pcs" type="text" inputMode="decimal" placeholder="Ex.: 8400" value="{{ pcsReal }}" onChange="{{ onPcs }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid {{ pcsBorder }}; border-radius: 2px; padding: 0 12px; font-variant-numeric: tabular-nums; font-size: 17px; color: #0C2340; background: #FFFFFF">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="v-med" style="font-size: 14px; font-weight: 600">Totalizador GRMS (m³ no dia) <span style="color: #B42318">*</span><br><span style="font-size: 12px; font-weight: 400; color: #4A5B6E">Digite o valor lido no GRMS, sem conversão. O app converte para {{ pcsRefStr }}.</span></label>
+                <input id="v-med" type="text" inputMode="numeric" maxLength="6" placeholder="Até 6 dígitos · ex.: 163700" value="{{ med }}" onChange="{{ onMed }}" style="height: 60px; box-sizing: border-box; width: 100%; border: 2px solid {{ medBorder }}; border-radius: 0px; padding: 0 14px; font-variant-numeric: tabular-nums; font-size: 24px; font-weight: 600; color: #0C2340; background: #FFFFFF">
+              </div>
+              <sc-if value="{{ showConv }}" hint-placeholder-val="{{ true }}">
+                <div style="border: 1px solid #1061A6; display: flex; flex-direction: column">
+                  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+                    <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid #C9D5E2">
+                      <span style="font-size: 11px; color: #33475E">Lido (gás real · PCS {{ pcsMedShort }})</span>
+                      <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600; color: #0C2340">{{ medRealStr }} m³</span>
+                    </div>
+                    <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; background: #E8F1FA">
+                      <span style="font-size: 11px; color: #0B4A80; font-weight: 600">Convertido · PCS {{ pcsRefStr }}</span>
+                      <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 700; color: #0B4A80">{{ med94Str }} m³</span>
+                    </div>
+                  </div>
+                  <div style="padding: 6px 12px; border-top: 1px solid #C9D5E2; font-size: 12px; color: #4A5B6E; font-variant-numeric: tabular-nums">{{ convFormula }}</div>
+                </div>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ vNoProg }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 2px dashed #A9BACB; border-radius: 0px; padding: 20px; text-align: center; color: #4A5B6E; font-size: 15px">Não há gás previsto até este horário.</div>
+            </sc-if>
+            <sc-if value="{{ vWait }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 2px dashed #A9BACB; border-radius: 0px; padding: 20px; text-align: center; color: #4A5B6E; font-size: 15px">{{ waitMsg }}</div>
+            </sc-if>
+            <sc-if value="{{ vOk }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="background: #E5F4EA; border: 2px solid #0B7A3E; border-radius: 0px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; align-items: center; gap: 10px; color: #075C2E">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.5l3 3 6-6"></path></svg>
+                  <span style="font-size: 22px; font-weight: 700">DENTRO DA TOLERÂNCIA</span>
+                </div>
+                <div style="font-variant-numeric: tabular-nums; font-size: 32px; font-weight: 600; color: #075C2E">{{ devStr }}</div>
+                <div style="font-size: 14px; color: #1F4D33">{{ diffStr }} · limite ±{{ tolStr }}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ vFail }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="background: #FDECEA; border: 2px solid #B42318; border-radius: 0px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; align-items: center; gap: 10px; color: #8A1A12">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"></path><path d="M12 10v5"></path><path d="M12 18h.01"></path></svg>
+                  <span style="font-size: 22px; font-weight: 700">FORA DA TOLERÂNCIA</span>
+                </div>
+                <div style="font-variant-numeric: tabular-nums; font-size: 32px; font-weight: 600; color: #8A1A12">{{ devStr }}</div>
+                <div style="font-size: 14px; color: #6E140E">{{ diffStr }} · limite ±{{ tolStr }}</div>
+                <div style="font-size: 15px; font-weight: 600; color: #6E140E; line-height: 1.4">{{ failHint }}</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showCorr }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+                <div style="font-size: 14px; font-weight: 600">Comparação nas duas bases</div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) 64px; gap: 6px 8px; font-size: 12px; color: #4A5B6E; align-items: baseline">
+                  <span></span><span style="text-align: right">Previsto</span><span style="text-align: right">Medido</span><span style="text-align: right">Desvio</span>
+                  <span>Gás real · PCS {{ pcsMedShort }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340">{{ prevRealStr }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340">{{ medRealStr }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 600; color: {{ devColor }}">{{ devStr }}</span>
+                  <span style="color: #0B4A80; font-weight: 600">Contrato · PCS {{ pcsRefStr }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; color: #0B4A80; font-weight: 600">{{ prev94Str }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; color: #0B4A80; font-weight: 600">{{ med94Str }}</span><span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 600; color: {{ devColor }}">{{ devStr }}</span>
+                </div>
+                <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">{{ convNote }}</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ canSave }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ saveReading }}" style="height: 54px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Salvar leitura</button>
+            </sc-if>
+            <sc-if value="{{ cannotSave }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <button type="button" disabled="{{ true }}" style="height: 54px; border: 0; border-radius: 0px; background: #DCE3EA; color: #4A5B6E; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                  Salvar leitura
+                </button>
+                <div style="background: #FFF4E5; border-radius: 2px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+                  <div style="font-size: 13px; font-weight: 600; color: #6B3A00">Para salvar, falta:</div>
+                  <sc-for list="{{ saveIssues }}" as="s" hint-placeholder-count="2">
+                    <div style="font-size: 13px; color: #6B3A00">• {{ s.text }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ hasLog }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; overflow: hidden">
+                <div style="padding: 12px 14px; font-size: 15px; font-weight: 600">Leituras de hoje</div>
+                <div style="display: grid; grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) 60px; gap: 8px; padding: 0 14px 6px; font-size: 11px; color: #4A5B6E">
+                  <span>Manaus / BSB</span><span>Lido (real)</span><span style="color: #0B4A80">PCS {{ pcsRefStr }}</span><span style="text-align: right">Desvio</span>
+                </div>
+                <sc-for list="{{ log }}" as="l" hint-placeholder-count="3">
+                  <div style="display: grid; grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) 60px; gap: 8px; align-items: center; padding: 10px 14px; border-top: 1px solid #EDF2F7; font-size: 14px">
+                    <span style="font-variant-numeric: tabular-nums; line-height: 1.25"><b>{{ l.horaMao }}</b><br><span style="font-size: 11px; color: #4A5B6E">BSB {{ l.hora }}</span></span>
+                    <span style="font-variant-numeric: tabular-nums; color: #33475E">{{ l.medStr }} m³</span>
+                    <span style="font-variant-numeric: tabular-nums; color: #0B4A80; font-weight: 600">{{ l.med94Str }} m³</span>
+                    <span style="font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; color: {{ l.color }}">{{ l.devStr }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ RESUMO ============ -->
+    <sc-if value="{{ isRes }}" hint-placeholder-val="{{ false }}">
+      <div class="page" style="display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Resumo do dia</h1>
+        <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="background: #FDECEA; color: #6E140E; border-radius: 0px; padding: 12px 14px; font-size: 14px; line-height: 1.4">Valores parciais: {{ lockReason }}</div>
+        </sc-if>
+        <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <div class="kpi-total" style="background: #1061A6; color: #FFFFFF; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 4px; grid-column: span 2">
+            <span style="font-size: 13px; color: #D6E7F7">Gás previsto no dia · base contrato {{ pcsRefStr }} kcal/m³</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 28px; font-weight: 600">{{ totalStr }} m³</span>
+            <span style="font-size: 13px; color: #D6E7F7">{{ totalRealStr }} · média {{ avgMwStr }} MW</span>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #4A5B6E">Energia programada</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600">{{ energyStr }} MWh</span>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #4A5B6E">Consumo específico</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600">{{ specStr }} m³/MWh</span>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #4A5B6E">Partidas de GT</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600">{{ startsStr }}</span>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 13px; color: #4A5B6E">Intervalos com aviso</span>
+            <span style="font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600; color: {{ alertColor }}">{{ alertsStr }}</span>
+          </div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="font-size: 15px; font-weight: 600">Gás previsto a cada 30 min</div>
+          <div style="display: flex; gap: 14px; font-size: 12px; color: #4A5B6E; flex-wrap: wrap">
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #0B4A80"></span>2 GTs</span>
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3BA3CF"></span>1 GT</span>
+            <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D9822B"></span>Aviso / erro</span>
+          </div>
+          <div style="height: 120px; display: flex; align-items: flex-end; gap: 1px; border-bottom: 1px solid #A9BACB">
+            <sc-for list="{{ bars }}" as="b" hint-placeholder-count="48">
+              <div title="{{ b.tip }}" style="flex: 1 1 0; min-width: 0; height: {{ b.h }}px; background: {{ b.c }}; border-radius: 0"></div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; font-size: 11px; color: #4A5B6E">
+            <span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>24h</span>
+          </div>
+          <div style="font-size: 12px; color: #4A5B6E">Maior volume em 30 min: {{ maxVolStr }} m³</div>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; overflow: hidden">
+          <div style="padding: 12px 14px; font-size: 15px; font-weight: 600">Leituras registradas</div>
+          <sc-if value="{{ noLog }}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 0 14px 14px; font-size: 14px; color: #4A5B6E">Nenhuma leitura salva ainda.</div>
+          </sc-if>
+          <sc-for list="{{ log }}" as="l" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-top: 1px solid #EDF2F7">
+              <div style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 76px; gap: 8px; align-items: center; font-size: 14px">
+                <span style="font-variant-numeric: tabular-nums">{{ l.hora }}</span>
+                <span style="font-variant-numeric: tabular-nums; color: #33475E">{{ l.medStr }} / {{ l.prevStr }}</span>
+                <span style="font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; color: {{ l.color }}">{{ l.devStr }}</span>
+              </div>
+              <div style="font-size: 12px; color: #4A5B6E; padding-left: 64px">{{ l.info }}</div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ hasLog }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 10px 14px 14px; display: flex; justify-content: flex-end">
+              <button type="button" onClick="{{ clearLog }}" style="height: 40px; border: 1px solid #E3B4AE; border-radius: 2px; background: #FFFFFF; color: #9B1C14; padding: 0 14px; cursor: pointer">Apagar leituras</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ AJUSTES ============ -->
+    <sc-if value="{{ isCfg }}" hint-placeholder-val="{{ false }}">
+      <div class="page cfg-grid" style="display: flex; flex-direction: column; gap: 14px">
+        <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Ajustes</h1>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 600">Usuários</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Administrador: acesso total e cadastro de usuários. Regulação: altera os Ajustes, sem cadastro. Operação: sem acesso aos Ajustes.</div>
+          </div>
+          <sc-for list="{{ userList }}" as="u" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid #EDF2F7">
+              <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                <span style="font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ u.login }}</span>
+                <span style="font-size: 12px; color: #4A5B6E">{{ u.roleLabel }}</span>
+              </div>
+              <sc-if value="{{ u.canRemove }}" hint-placeholder-val="{{ false }}">
+                <button type="button" onClick="{{ u.remove }}" style="height: 40px; border: 1px solid #E3B4AE; border-radius: 2px; background: #FFFFFF; color: #9B1C14; padding: 0 12px; cursor: pointer">Remover</button>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EDF2F7; padding-top: 12px">
+            <div style="font-size: 14px; font-weight: 600">Redefinir senha de um usuário</div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px">
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="r-user" style="font-size: 12px; color: #4A5B6E">Usuário</label>
+                <select id="r-user" value="{{ resetLogin }}" onChange="{{ onResetLogin }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 6px; background: #FFFFFF; color: #0C2340">
+                  <option value="">Selecionar</option>
+                  <sc-for list="{{ userList }}" as="u" hint-placeholder-count="3"><option value="{{ u.login }}">{{ u.login }}</option></sc-for>
+                </select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="r-pass" style="font-size: 12px; color: #4A5B6E">Nova senha (mín. 6)</label>
+                <input id="r-pass" type="password" autoComplete="new-password" value="{{ resetP }}" onChange="{{ onResetP }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340">
+              </div>
+            </div>
+            <button type="button" onClick="{{ doReset }}" style="height: 48px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Redefinir senha</button>
+            <div style="font-size: 12px; color: #4A5B6E">O usuário precisará criar uma senha pessoal no próximo acesso.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EDF2F7; padding-top: 12px">
+            <div style="font-size: 14px; font-weight: 600">Cadastrar novo usuário</div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <label for="n-user" style="font-size: 12px; color: #4A5B6E">Login</label>
+              <input id="n-user" type="text" autoCapitalize="none" autoComplete="off" value="{{ newU }}" onChange="{{ onNewU }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340">
+            </div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 8px">
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="n-pass" style="font-size: 12px; color: #4A5B6E">Senha (mín. 6)</label>
+                <input id="n-pass" type="password" autoComplete="new-password" value="{{ newP }}" onChange="{{ onNewP }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <label for="n-role" style="font-size: 12px; color: #4A5B6E">Perfil</label>
+                <select id="n-role" value="{{ newRole }}" onChange="{{ onNewRole }}" style="height: 46px; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 6px; background: #FFFFFF; color: #0C2340">
+                  <option value="oper">Operação</option>
+                  <option value="reg">Regulação</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+            </div>
+            <button type="button" onClick="{{ addUser }}" style="height: 48px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Cadastrar</button>
+            <sc-if value="{{ userMsgOk }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="font-size: 14px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 10px 12px">{{ userMsg }}</div>
+            </sc-if>
+            <sc-if value="{{ userMsgErr }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="font-size: 14px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 10px 12px">{{ userMsg }}</div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-if>
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="font-size: 15px; font-weight: 600">Verificação</div>
+          <sc-for list="{{ cfgBasic }}" as="f" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
+              <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 600">Limites DESSEM / contrato</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Potência líquida, igual à do PDP. Para 2 GTs o app usa o dobro.</div>
+          </div>
+          <sc-for list="{{ cfgDess }}" as="f" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
+              <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 600">Modelo da usina (engenharia)</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Valores do teste de 96 h e do heat balance. Só altere com orientação da engenharia.</div>
+          </div>
+          <sc-for list="{{ cfgAdv }}" as="f" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
+              <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340">
+            </div>
+          </sc-for>
+          <button type="button" onClick="{{ resetCfg }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Restaurar valores padrão</button>
+        </div>
+        <div style="background: #EEF3F8; border-radius: 0px; padding: 14px; font-size: 13px; color: #33475E; line-height: 1.5; display: flex; flex-direction: column; gap: 6px">
+          <div style="font-weight: 600; color: #0C2340">Como o app calcula</div>
+          <div>1. Potência bruta = MW do ONS × relação bruta/líquida.</div>
+          <div>2. GTs: definidas pelo operador (obrigatório). Bloqueia potência sem GT e acima da máxima DESSEM arredondada para MW inteiro (1 GT: 57,393 MW; 2 GTs: 115 MW).</div>
+          <div>3. Vazão (m³/h) = k × (nº GTs × a + b × potência bruta).</div>
+          <div>4. Volume em 30 min = vazão × 0,5, acumulado desde 00:00.</div>
+          <div>5. Desvio = (medido − previsto) ÷ previsto; dentro se |desvio| ≤ tolerância.</div>
+          <div>6. Ton/Toff: avisa parada antes de 12 h ligada ou partida antes de 4 h desligada.</div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <nav class="app-nav" aria-label="Navegação" style="flex: 0 0 auto; display: grid; grid-template-columns: repeat({{ navCols }}, minmax(0, 1fr)); gap: 0; background: #FFFFFF; border-top: 1px solid #C9D5E2; padding: 0 0 8px">
+    <button type="button" onClick="{{ goProg }}" class="nav-btn" aria-current="{{ nav.progCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.progBd }}; border-radius: 0; background: {{ nav.progBg }}; color: {{ nav.progFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 2v4"></path><path d="M16 2v4"></path></svg>
+      Programa
+    </button>
+    <button type="button" onClick="{{ goTt }}" class="nav-btn" aria-current="{{ nav.ttCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.ttBd }}; border-radius: 0; background: {{ nav.ttBg }}; color: {{ nav.ttFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l3 2"></path><path d="M9 2h6"></path></svg>
+      Ton/Toff
+    </button>
+    <button type="button" onClick="{{ goVer }}" class="nav-btn" aria-current="{{ nav.verCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.verBd }}; border-radius: 0; background: {{ nav.verBg }}; color: {{ nav.verFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
+      <sc-if value="{{ complete }}" hint-placeholder-val="{{ true }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9"></path><path d="M12 12l4-4"></path><path d="M16 19l2 2 4-4"></path></svg>
+      </sc-if>
+      <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ false }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+      </sc-if>
+      Verificar
+    </button>
+    <button type="button" onClick="{{ goRes }}" class="nav-btn" aria-current="{{ nav.resCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.resBd }}; border-radius: 0; background: {{ nav.resBg }}; color: {{ nav.resFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"></path><path d="M10 20V4"></path><path d="M16 20v-7"></path><path d="M22 20H2"></path></svg>
+      Resumo
+    </button>
+    <sc-if value="{{ canCfg }}" hint-placeholder-val="{{ true }}">
+    <button type="button" onClick="{{ goCfg }}" class="nav-btn" aria-current="{{ nav.cfgCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.cfgBd }}; border-radius: 0; background: {{ nav.cfgBg }}; color: {{ nav.cfgFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10"></path><path d="M18 6h2"></path><circle cx="16" cy="6" r="2"></circle><path d="M4 12h4"></path><path d="M12 12h8"></path><circle cx="10" cy="12" r="2"></circle><path d="M4 18h12"></path><circle cx="18" cy="18" r="2"></circle></svg>
+      Ajustes
+    </button>
+    </sc-if>
+  </nav>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1061A6","options":["#1061A6","#0375BC","#0B4A80"]},"$preview":{"width":390,"height":844}}'>
+var KEY = 'gas-do-dia-ute-v2';
+var DEFCFG = {
+  tol: '3', pcsRef: '9400', pcsTeste: '8500.79', partida: '0',
+  gmax1: '57.393', gmin1: '45.914', ton: '12', toff: '4',
+  rel: '1.0177849601', nMax: '2',
+  a: '3903.1183550', b: '194.9803447', k: '1.1171045962'
+};
+var BASIC = [
+  { k: 'tol', label: 'Tolerância de desvio', unit: '%' },
+  { k: 'pcsRef', label: 'PCS de referência', unit: 'kcal/m³' },
+  { k: 'partida', label: 'Gás adicional por partida', unit: 'm³' }
+];
+var DESS = [
+  { k: 'gmax1', label: 'Geração máxima por GT (DESSEM)', unit: 'MW' },
+  { k: 'gmin1', label: 'Geração mínima por GT (DESSEM)', unit: 'MW' },
+  { k: 'ton', label: 'Ton — tempo mínimo ligado', unit: 'h' },
+  { k: 'toff', label: 'Toff — tempo mínimo desligado', unit: 'h' }
+];
+var ADV = [
+  { k: 'pcsTeste', label: 'PCS do gás do modelo (teste 96 h)', unit: 'kcal/m³' },
+  { k: 'rel', label: 'Relação potência bruta / líquida', unit: '–' },
+  { k: 'nMax', label: 'Nº máximo de GTs', unit: '–' },
+  { k: 'a', label: 'Consumo em vazio por GT (a)', unit: 'm³/h' },
+  { k: 'b', label: 'Coeficiente marginal (b)', unit: 'm³/MWh' },
+  { k: 'k', label: 'Fator de calibração (k)', unit: '–' }
+];
+var PCS_MIN = 6000, PCS_MAX = 12000;
+var H123 = '92c1e6482d582964130d7863ebd8eca2b5d5057308b91f695885a707e56b35ba'; // senha padrão de primeiro acesso
+var DEFAULT_USERS = [
+  { login: 'CEA-ADM', hash: H123, role: 'admin', fixed: true },
+  { login: 'CEA-REG', hash: H123, role: 'reg', fixed: true },
+  { login: 'CEA-OPE', hash: H123, role: 'oper', fixed: true }
+];
+function norm(s) {
+  return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+}
+function roleName(r) { return r === 'admin' ? 'Administrador' : (r === 'reg' ? 'Regulação' : 'Operação'); }
+function sha256Sync(ascii) {
+  var bytes = unescape(encodeURIComponent(String(ascii)));
+  var K = [], H = [], isP = {}, c = 0, n = 2;
+  while (c < 64) {
+    if (!isP[n]) { for (var m = n * n; m < 313; m += n) isP[m] = 1; if (c < 8) H[c] = (Math.pow(n, 0.5) * 4294967296) | 0; K[c++] = (Math.pow(n, 1 / 3) * 4294967296) | 0; }
+    n++;
+  }
+  var w = [], L = bytes.length * 8, i, j;
+  bytes += '\x80';
+  while (bytes.length % 64 - 56) bytes += '\x00';
+  for (i = 0; i < bytes.length; i++) { j = bytes.charCodeAt(i); w[i >> 2] |= j << ((3 - i) % 4) * 8; }
+  w[w.length] = (L / 4294967296) | 0;
+  w[w.length] = L | 0;
+  function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+  for (j = 0; j < w.length;) {
+    var W = w.slice(j, j += 16), old = H.slice(0);
+    for (i = 0; i < 64; i++) {
+      var w15 = W[i - 15], w2 = W[i - 2], a = H[0], e = H[4];
+      if (i >= 16) W[i] = (W[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + W[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0;
+      var t1 = H[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & H[5]) ^ (~e & H[6])) + K[i] + W[i];
+      var t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+      H = [(t1 + t2) | 0].concat(H);
+      H[4] = (H[4] + t1) | 0;
+      H.length = 8;
+    }
+    for (i = 0; i < 8; i++) H[i] = (H[i] + old[i]) | 0;
+  }
+  var out = '';
+  for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) { var b = (H[i] >> (j * 8)) & 255; out += (b < 16 ? '0' : '') + b.toString(16); }
+  return out;
+}
+function sha256Hex(text) {
+  try { return Promise.resolve(sha256Sync(text)); } catch (e) { return Promise.reject(e); }
+}
+
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function hhmm(m) { return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+function blank48() { var a = []; for (var i = 0; i < 48; i++) a.push(''); return a; }
+function isBlank(s) { return s === null || s === undefined || String(s).trim() === ''; }
+function num(s) {
+  if (isBlank(s)) return NaN;
+  var t = String(s).trim().replace(/\s/g, '');
+  if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  if (!/^-?\d*\.?\d+$/.test(t)) return NaN;
+  var v = parseFloat(t);
+  return isFinite(v) ? v : NaN;
+}
+function fmt(x, d) {
+  if (typeof x !== 'number' || !isFinite(x)) return '—';
+  d = d || 0;
+  return x.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function fmtMw(x) {
+  if (typeof x !== 'number' || !isFinite(x)) return '—';
+  return x.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+}
+function pct(x, d) {
+  if (!isFinite(x)) return '—';
+  var s = fmt(Math.abs(x) * 100, d === undefined ? 1 : d) + '%';
+  return (x > 0 ? '+' : x < 0 ? '−' : '') + s;
+}
+function parseDT(s) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(s || ''));
+  if (!m) return NaN;
+  return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime();
+}
+function fmtDT(t) {
+  var d = new Date(t);
+  return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function durMin(m) {
+  m = Math.max(0, Math.round(m));
+  return Math.floor(m / 60) + 'h' + pad(m % 60);
+}
+// Horário de Brasília (UTC−3, sem horário de verão desde 2019), independente do fuso do celular.
+// Retorna um carimbo cujos campos locais (getHours etc.) mostram a hora de Brasília.
+function brNow() {
+  var u = new Date(Date.now() - 3 * 3600000);
+  return new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), u.getUTCHours(), u.getUTCMinutes(), u.getUTCSeconds()).getTime();
+}
+function today() {
+  var d = new Date(brNow());
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function defaultSel() {
+  var d = new Date(brNow());
+  var m = d.getHours() * 60 + d.getMinutes();
+  return Math.max(0, Math.floor(m / 30) - 1);
+}
+function freshState() {
+  return {
+    tab: 'prog', date: today(), prog: blank48(), gts: blank48(),
+    cfg: Object.assign({}, DEFCFG), log: [], sel: defaultSel(), med: '', pcsReal: '', operador: '',
+    fillDe: 0, fillAte: 48, fillMw: '', fillGt: '', paste: '', showPaste: false, confirmClear: false, msg: '', msgKind: '',
+    units: [{ s: '', since: '' }, { s: '', since: '' }], showNota: false, now: brNow(),
+    pcsBase: 'contrato', session: null, users: [], loginU: '', loginP: '', loginErr: '',
+    newU: '', newP: '', newRole: 'oper', userMsg: '', userMsgKind: '',
+    pwOver: {}, forceChange: {}, mustChange: false, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', resetLogin: '', resetP: ''
+  };
+}
+
+class Component extends DCLogic {
+  cur() { return Object.assign(freshState(), this.state || {}); }
+  componentDidMount() {
+    var saved = null;
+    try { saved = JSON.parse(window.localStorage.getItem(KEY) || 'null'); } catch (e) { saved = null; }
+    var base = freshState();
+    if (saved && Array.isArray(saved.prog) && saved.prog.length === 48) {
+      this.setState(Object.assign(base, {
+        date: saved.date || base.date,
+        prog: saved.prog.map(function (v) { return v === null || v === undefined ? '' : String(v); }),
+        gts: Array.isArray(saved.gts) && saved.gts.length === 48 ? saved.gts.map(function (v) { return v === null || v === undefined ? '' : String(v); }) : blank48(),
+        cfg: Object.assign({}, DEFCFG, saved.cfg || {}),
+        log: Array.isArray(saved.log) ? saved.log : [],
+        operador: saved.operador || '',
+        units: Array.isArray(saved.units) ? saved.units : base.units,
+        session: saved.session && saved.session.login ? saved.session : null,
+        pwOver: saved.pwOver || {}, forceChange: saved.forceChange || {}, mustChange: !!saved.mustChange,
+        users: Array.isArray(saved.users) ? saved.users : [],
+        pcsBase: saved.pcsBase === 'medido' ? 'medido' : 'contrato',
+        pcsReal: saved.pcsReal || ''
+      }));
+    } else {
+      if (saved) {
+        base.session = saved.session && saved.session.login ? saved.session : null;
+        base.users = Array.isArray(saved.users) ? saved.users : [];
+        base.pwOver = saved.pwOver || {}; base.forceChange = saved.forceChange || {}; base.mustChange = !!saved.mustChange;
+      }
+      this.setState(base);
+    }
+    var self = this;
+    this._tick = setInterval(function () { self.setState({ now: brNow() }); }, 30000);
+  }
+  componentWillUnmount() { if (this._tick) clearInterval(this._tick); }
+  componentDidUpdate() {
+    var s = this.cur();
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfg: s.cfg, log: s.log, operador: s.operador, units: s.units, session: s.session, users: s.users, pwOver: s.pwOver, forceChange: s.forceChange, mustChange: s.mustChange, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
+    } catch (e) {}
+  }
+
+  renderVals() {
+    var self = this;
+    var st = this.cur();
+    var accent = this.props.accent ?? '#1061A6';
+    var cfgRaw = Object.assign({}, DEFCFG, st.cfg || {});
+    var c = {};
+    Object.keys(DEFCFG).forEach(function (k) {
+      var v = num(cfgRaw[k]);
+      c[k] = isFinite(v) ? v : num(DEFCFG[k]);
+    });
+    var nMax = Math.max(1, Math.round(c.nMax));
+    var tol = c.tol / 100;
+    function pcsValid(v) { return isFinite(v) && v >= PCS_MIN && v <= PCS_MAX; }
+    // energia prevista = volume do modelo × PCS do gás do teste (o modelo foi calibrado com esse gás)
+    var pcsRow = num(st.pcsReal);
+    var pcsMissing = !pcsValid(pcsRow);
+    var pcsT = c.pcsTeste > 0 ? c.pcsTeste : 8500.79;
+    var pcsUse = pcsMissing ? pcsT : pcsRow;
+    var f94 = pcsT / c.pcsRef;      // volume do modelo -> volume equivalente a 9.400
+    var fMed = pcsT / pcsUse;       // volume do modelo -> volume de gás com o PCS medido
+    var pcsBase = st.pcsBase === 'medido' ? 'medido' : 'contrato';
+
+    var gtOpts = [{ v: '', t: 'Definir' }];
+    for (var g = 0; g <= nMax; g++) gtOpts.push({ v: String(g), t: g + ' GT' + (g === 1 ? '' : 's') });
+
+    function checkRow(mwOk, mw, gOk, n) {
+      var sug = mw === 0 ? 0 : Math.min(nMax, Math.max(1, Math.ceil(mw / c.gmax1 - 1e-9)));
+      if (!mwOk && !gOk) return { err: 'Falta potência e GTs' };
+      if (!mwOk) return { err: 'Falta potência (MW)' };
+      if (!gOk) return { err: 'Falta definir GTs (sugestão: ' + sug + ')' };
+      if (n > nMax) return { err: 'Mais GTs que o máximo da usina (' + nMax + ')' };
+      if (mw > 0 && n === 0) return { err: 'Tem potência, mas nenhuma GT em operação' };
+      var lim = n > 0 ? Math.max(n * c.gmax1, Math.round(n * c.gmax1)) : 0;
+      if (n > 0 && mw > lim + 0.001) return { err: n + ' GT' + (n === 1 ? '' : 's') + ' não atende' + (n === 1 ? '' : 'm') + ' ' + fmtMw(mw) + ' MW (máx. aceito ' + fmtMw(lim) + ' MW)' };
+      if (n > 0 && mw === 0) return { warn: 'GT ligada sem carga: conta só o consumo em vazio' };
+      return {};
+    }
+
+    // ---- modelo: 48 semi-horas ----
+    var rows = [], bars = [], acc = 0, accArr = [], energy = 0, mwSum = 0, prevN = 0, starts = 0, warns = 0, maxVol = 0;
+    var vols = [], ns = [], flagged = [], issues = [], done = 0;
+
+    // ---- Ton / Toff ----
+    var now = brNow();
+    var tonMin = c.ton * 60, toffMin = c.toff * 60;
+    var unitsRaw = [];
+    for (var uu = 0; uu < nMax; uu++) unitsRaw.push(Object.assign({ s: '', since: '' }, (st.units || [])[uu] || {}));
+    var units = unitsRaw.map(function (u, idx) {
+      var t = parseDT(u.since);
+      var res = 'Selecione o estado e informe desde quando.', color = '#4A5B6E', bg = '#EEF3F8', sub = '';
+      if (u.s && !isFinite(t)) { res = 'Informe a data e hora ' + (u.s === 'on' ? 'da partida.' : 'da parada.'); color = '#8A4300'; bg = '#FFF4E5'; }
+      else if (u.s && t > now + 60000) { res = 'Horário no futuro. Confira a data e a hora.'; color = '#8A1A12'; bg = '#FDECEA'; }
+      else if (u.s === 'on') {
+        var endOn = t + tonMin * 60000;
+        sub = 'Ligada há ' + durMin((now - t) / 60000) + '.';
+        if (now >= endOn) { res = '✓ Ton cumprido desde ' + fmtDT(endOn) + '. Pode desligar.'; color = '#075C2E'; bg = '#E5F4EA'; }
+        else { res = 'Não desligar antes de ' + fmtDT(endOn) + ' (faltam ' + durMin((endOn - now) / 60000) + ').'; color = '#8A1A12'; bg = '#FDECEA'; }
+      } else if (u.s === 'off') {
+        var endOff = t + toffMin * 60000;
+        sub = 'Desligada há ' + durMin((now - t) / 60000) + '.';
+        if (now >= endOff) { res = '✓ Toff cumprido desde ' + fmtDT(endOff) + '. Liberada para partir.'; color = '#075C2E'; bg = '#E5F4EA'; }
+        else { res = 'Não partir antes de ' + fmtDT(endOff) + ' (faltam ' + durMin((endOff - now) / 60000) + ').'; color = '#8A1A12'; bg = '#FDECEA'; }
+      }
+      return {
+        name: 'GT ' + (idx + 1), idSt: 'gt-st-' + idx, idSince: 'gt-since-' + idx,
+        st: u.s, since: u.since,
+        sinceLabel: (u.s === 'off' ? 'Desligada desde' : 'Ligada desde') + ' (Brasília)',
+        result: res, color: color, bg: bg, sub: sub, hasSub: !!sub,
+        onSt: function (e) { var a = unitsRaw.map(function (x) { return Object.assign({}, x); }); a[idx].s = e.target.value; self.setState({ units: a }); },
+        onSince: function (e) { var a = unitsRaw.map(function (x) { return Object.assign({}, x); }); a[idx].since = e.target.value; self.setState({ units: a }); }
+      };
+    });
+    // simulação das partidas/paradas da programação do dia
+    var dayStart = parseDT(String(st.date || '') + 'T00:00');
+    var onL = [], offL = [], unknown = 0;
+    unitsRaw.forEach(function (u) {
+      var t = parseDT(u.since);
+      var rel = isFinite(t) && isFinite(dayStart) ? (t - dayStart) / 60000 : null;
+      if (u.s === 'on') onL.push(rel); else if (u.s === 'off') offL.push(rel); else unknown++;
+    });
+    var g0 = parseInt(st.gts[0], 10);
+    var n0 = isFinite(g0) ? g0 : 0;
+    while (onL.length < n0 && unknown > 0) { onL.push(null); unknown--; }
+    while (unknown > 0) { offL.push(null); unknown--; }
+    var ttNote = [], ttIssues = [];
+    var curN = onL.length;
+    for (var ti = 0; ti < 48; ti++) {
+      var gv = parseInt(st.gts[ti], 10);
+      if (!isFinite(gv)) continue;
+      var tm = ti * 30;
+      while (curN < gv) {
+        var pick = -1;
+        for (var a1 = 0; a1 < offL.length; a1++) { if (offL[a1] === null) { pick = a1; break; } if (pick < 0 || offL[a1] < offL[pick]) pick = a1; }
+        var stop = pick >= 0 ? offL.splice(pick, 1)[0] : null;
+        if (stop !== null && tm - stop < toffMin) {
+          var tx = 'Toff: partida às ' + hhmm(tm) + ', só ' + durMin(tm - stop) + ' após a parada (mín. ' + fmt(c.toff, 0) + ' h)';
+          ttNote[ti] = tx; ttIssues.push({ when: hhmm(tm), text: tx });
+        }
+        onL.push(tm); curN++;
+      }
+      while (curN > gv) {
+        var pk = 0;
+        for (var a2 = 0; a2 < onL.length; a2++) { if (onL[a2] === null) { pk = a2; break; } if (onL[a2] < onL[pk]) pk = a2; }
+        var start = onL.splice(pk, 1)[0];
+        if (start !== null && tm - start < tonMin) {
+          var ty = 'Ton: parada às ' + hhmm(tm) + ' com a GT ligada há só ' + durMin(tm - start) + ' (mín. ' + fmt(c.ton, 0) + ' h)';
+          ttNote[ti] = ty; ttIssues.push({ when: hhmm(tm), text: ty });
+        }
+        offL.push(tm); curN--;
+      }
+    }
+
+    for (var i = 0; i < 48; i++) {
+      var mwRaw = st.prog[i], gRaw = st.gts[i];
+      var mwNum = num(mwRaw);
+      var mwOk = isFinite(mwNum) && mwNum >= 0;
+      var mw = mwOk ? mwNum : 0;
+      var gOk = !isBlank(gRaw) && isFinite(parseInt(gRaw, 10));
+      var n = gOk ? parseInt(gRaw, 10) : 0;
+      var chk = checkRow(mwOk, mw, gOk, n);
+      if (ttNote[i] && !chk.err) chk = { warn: chk.warn ? chk.warn + ' · ' + ttNote[i] : ttNote[i] };
+      var F = mw * c.rel;
+      var H = (mwOk && gOk && n > 0) ? c.k * (n * c.a + c.b * F) : 0;
+      var vol = H * 0.5;
+      acc += vol; accArr.push(acc);
+      energy += mw * 0.5; mwSum += mw;
+      if (gOk) { if (n > prevN) starts += (n - prevN); prevN = n; }
+      if (chk.err) issues.push({ when: hhmm(i * 30) + '–' + hhmm((i + 1) * 30), text: chk.err });
+      else done++;
+      if (chk.warn) warns++;
+      if (vol > maxVol) maxVol = vol;
+      vols.push(vol); ns.push(n); flagged.push(!!(chk.err || chk.warn));
+      (function (idx, chk, mwOk, gOk) {
+        rows.push({
+          end: hhmm((idx + 1) * 30),
+          ariaMw: 'Potência ONS de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30) + ' em MW',
+          ariaGt: 'Quantidade de GTs de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30),
+          mwStr: isBlank(st.prog[idx]) ? '' : String(st.prog[idx]),
+          gtVal: isBlank(st.gts[idx]) ? '' : String(st.gts[idx]),
+          onMw: function (e) {
+            var p = self.cur().prog.slice();
+            p[idx] = e.target.value;
+            self.setState({ prog: p });
+          },
+          onGt: function (e) {
+            var gg = self.cur().gts.slice();
+            gg[idx] = e.target.value;
+            self.setState({ gts: gg });
+          },
+          mwBorder: chk.err && !mwOk ? '#B42318' : '#C9D5E2',
+          gtBorder: chk.err && (!gOk || mwOk) ? '#B42318' : '#C9D5E2',
+          accStr: fmt(accArr[idx], 0),
+          accMedStr: fmt(accArr[idx] * fMed, 0),
+          acc94Str: fmt(accArr[idx] * f94, 0),
+          bg: chk.err ? '#FDF1EF' : (chk.warn ? '#FFF7EE' : '#FFFFFF'),
+          hasNote: !!(chk.err || chk.warn),
+          note: chk.err || chk.warn || '',
+          noteColor: chk.err ? '#9B1C14' : '#8A4300'
+        });
+      })(i, chk, mwOk, gOk);
+    }
+    var startGas = starts * c.partida;
+    var total = acc + startGas;
+    for (var j = 0; j < 48; j++) {
+      bars.push({
+        h: maxVol > 0 ? Math.max(vols[j] > 0 ? 3 : 0, Math.round(vols[j] / maxVol * 116)) : 0,
+        c: flagged[j] ? '#D9822B' : (ns[j] === 1 ? '#3BA3CF' : '#0B4A80'),
+        tip: hhmm(j * 30) + '–' + hhmm((j + 1) * 30) + ': ' + fmt(vols[j], 0) + ' m³'
+      });
+    }
+
+    // ---- intertravamento da programação ----
+    var noDate = isBlank(st.date);
+    var complete = issues.length === 0 && !noDate;
+    var lockParts = [];
+    if (issues.length) lockParts.push(issues.length + ' de 48 intervalos com pendência');
+    if (noDate) lockParts.push('falta a data do PDP');
+    var lockReason = lockParts.length ? lockParts.join(', ').replace(/^./, function (ch) { return ch.toUpperCase(); }) + '.' : '';
+    var progPct = Math.round(done / 48 * 100);
+
+    // ---- opções de horário ----
+    var startOpts = [], endOpts = [];
+    for (var q = 0; q < 48; q++) {
+      startOpts.push({ v: String(q), t: hhmm(q * 30) });
+      endOpts.push({ v: String(q + 1), vSel: String(q), t: hhmm((q + 1) * 30) });
+    }
+
+    // ---- verificação ----
+    var sel = Math.min(47, Math.max(0, st.sel | 0));
+    var prevModel = accArr[sel];
+    var prev = prevModel;
+    var med = num(st.med);
+    var hasMed = isFinite(med) && med > 0;
+    // O totalizador é digitado como lido (gás real, PCS medido) e convertido para o PCS de referência.
+    var pcsReal = num(st.pcsReal);
+    var pcsOk = isFinite(pcsReal) && pcsReal >= PCS_MIN && pcsReal <= PCS_MAX;
+    // comparação em energia: previsto (modelo × PCS do teste) × medido (GRMS × PCS medido)
+    var prevReal = pcsOk ? prevModel * pcsT / pcsReal : NaN;   // m³ de gás real esperados
+    var prev94 = prevModel * pcsT / c.pcsRef;                   // m³ equivalentes a 9.400
+    var med94 = hasMed && pcsOk ? med * pcsReal / c.pcsRef : NaN;
+    var dev = hasMed && pcsOk && prevReal > 0 ? (med - prevReal) / prevReal : NaN;
+    var ok = isFinite(dev) && Math.abs(dev) <= tol + 1e-12;
+    var corr = pcsOk ? 1 : NaN;
+    var diff = med - prevReal;
+    var diff94 = med94 - prev94;
+    function maoOf(idx) { var m = (idx + 1) * 30 - 60; return m < 0 ? hhmm(m + 1440) + ' (dia ant.)' : hhmm(m); }
+    var selOpts = [];
+    for (var so = 0; so < 48; so++) selOpts.push({ v: String(so), t: maoOf(so) + '   (Brasília ' + hhmm((so + 1) * 30) + ')' });
+    function sgn(x) { return (x >= 0 ? '+' : '−') + fmt(Math.abs(x), 0); }
+    var opOk = !isBlank(st.operador);
+
+    var saveIssues = [];
+    if (!opOk) saveIssues.push({ text: 'Nome ou matrícula do operador' });
+    if (!hasMed) saveIssues.push({ text: isBlank(st.med) ? 'Leitura do totalizador do GRMS' : 'Leitura do totalizador inválida (use só números)' });
+    if (!pcsOk) saveIssues.push({ text: isBlank(st.pcsReal) ? 'PCS médio medido (kcal/m³)' : 'PCS fora da faixa válida (' + fmt(PCS_MIN, 0) + ' a ' + fmt(PCS_MAX, 0) + ' kcal/m³)' });
+    if (!(prev > 0)) saveIssues.push({ text: 'Horário sem gás previsto — escolha outro horário' });
+    if (hasMed) {
+      (st.log || []).forEach(function (l) {
+        if (l.idx < sel && l.med > med) saveIssues.push({ text: 'Leitura menor que a das ' + l.hora + ' (' + fmt(l.med, 0) + ' m³). O totalizador não diminui: confira.' });
+        if (l.idx > sel && l.med < med) saveIssues.push({ text: 'Leitura maior que a das ' + l.hora + ' (' + fmt(l.med, 0) + ' m³). Confira o horário.' });
+      });
+    }
+    var canSave = complete && saveIssues.length === 0;
+
+    var log = (st.log || []).map(function (l) {
+      return {
+        hora: l.hora, horaMao: l.horaMao || maoOf(l.idx), medStr: fmt(l.med, 0), prevStr: fmt(l.prev, 0), devStr: pct(l.dev),
+        med94Str: fmt(isFinite(l.med94) ? l.med94 : l.med * l.pcs / c.pcsRef, 0),
+        color: l.ok ? '#075C2E' : '#B42318',
+        info: (l.ok ? 'Dentro' : 'Fora') + ' · Manaus ' + (l.horaMao || maoOf(l.idx)) + ' · PCS ' + fmt(l.pcs, 0) + ' · base ' + fmt(c.pcsRef, 0) + ': ' + fmt(isFinite(l.med94) ? l.med94 : l.med * l.pcs / c.pcsRef, 0) + ' m³ · ' + (l.op || '—')
+      };
+    });
+
+    var tab = st.tab;
+    function navC(t) { return tab === t ? { bg: '#E8F1FA', fg: '#1061A6', bd: '#1061A6', cur: 'page' } : { bg: '#FFFFFF', fg: '#5A6B7E', bd: '#FFFFFF', cur: null }; }
+    var nT = navC('tt'), nP = navC('prog'), nV = navC('ver'), nR = navC('res'), nC = navC('cfg');
+
+    function cfgList(list) {
+      return list.map(function (f) {
+        return {
+          id: 'cfg-' + f.k, label: f.label, unit: f.unit, val: String(cfgRaw[f.k]),
+          onChange: function (e) {
+            var cf = Object.assign({}, DEFCFG, self.cur().cfg || {});
+            cf[f.k] = e.target.value;
+            self.setState({ cfg: cf });
+          }
+        };
+      });
+    }
+
+    var dParts = String(st.date || '').split('-');
+    var dateLabel = dParts.length === 3 ? dParts[2] + '/' + dParts[1] + '/' + dParts[0] : 'sem data';
+
+    function setMsg(kind, text) { self.setState({ msg: text, msgKind: kind }); }
+
+    // ---- acesso ----
+    var allUsers = DEFAULT_USERS.concat(st.users || []);
+    var session = st.session;
+    var sessUser = session ? allUsers.filter(function (u) { return norm(u.login) === norm(session.login); })[0] : null;
+    var logged = !!sessUser;
+    var isAdmin = logged && sessUser.role === 'admin';
+    var canCfg = logged && (sessUser.role === 'admin' || sessUser.role === 'reg');
+    if (tab === 'cfg' && !canCfg) tab = 'prog';
+    var pwView = logged && (!!st.mustChange || !!st.showPw);
+    if (pwView) tab = '__pw';
+    var doLogin = function () {
+      var s = self.cur();
+      var u = DEFAULT_USERS.concat(s.users || []).filter(function (x) { return norm(x.login) === norm(s.loginU); })[0];
+      if (isBlank(s.loginU) || isBlank(s.loginP)) { self.setState({ loginErr: 'Digite o login e a senha.' }); return; }
+      sha256Hex(String(s.loginP).trim()).then(function (h) {
+        var cur = self.cur();
+        var uh = u ? ((cur.pwOver || {})[norm(u.login)] || u.hash) : null;
+        if (!u || uh !== h) { self.setState({ loginErr: 'Login ou senha incorretos.', loginP: '' }); return; }
+        var must = h === H123 || !!(cur.forceChange || {})[norm(u.login)];
+        var patch = { session: { login: u.login, role: u.role }, loginErr: '', loginP: '', loginU: '', tab: 'prog', mustChange: must, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' };
+        if (isBlank(self.cur().operador)) patch.operador = u.login;
+        self.setState(patch);
+      }, function () { self.setState({ loginErr: 'Este navegador não permite o login seguro. Use Chrome ou Safari atualizado.' }); });
+    };
+    var userList = allUsers.map(function (u) {
+      return {
+        login: u.login, roleLabel: roleName(u.role) + (u.fixed ? ' · padrão' : ''),
+        canRemove: !u.fixed && !(session && norm(session.login) === norm(u.login)),
+        remove: function () {
+          var cs = self.cur();
+          var us = (cs.users || []).filter(function (x) { return norm(x.login) !== norm(u.login); });
+          var po = Object.assign({}, cs.pwOver || {}); delete po[norm(u.login)];
+          var fc = Object.assign({}, cs.forceChange || {}); delete fc[norm(u.login)];
+          self.setState({ users: us, pwOver: po, forceChange: fc, userMsgKind: 'ok', userMsg: 'Usuário ' + u.login + ' removido.' });
+        }
+      };
+    });
+
+    return {
+      logged: logged, notLogged: !logged, isAdmin: isAdmin, canCfg: canCfg,
+      navCols: canCfg ? 5 : 4,
+      userName: logged ? sessUser.login : '',
+      roleLabel: logged ? roleName(sessUser.role) : '',
+      loginU: st.loginU, loginP: st.loginP,
+      onLoginU: function (e) { self.setState({ loginU: e.target.value, loginErr: '' }); },
+      onLoginP: function (e) { self.setState({ loginP: e.target.value, loginErr: '' }); },
+      doLoginBtn: function () { doLogin(); },
+      passType: st.showPass ? 'text' : 'password',
+      passToggleLabel: st.showPass ? 'Ocultar senha' : 'Mostrar senha',
+      togglePass: function () { self.setState({ showPass: !self.cur().showPass }); },
+      onLoginKey: function (e) { if (e && e.key === 'Enter') { if (e.preventDefault) e.preventDefault(); doLogin(); } },
+      hasLoginErr: !!st.loginErr, loginErr: st.loginErr,
+      logout: function () { self.setState({ session: null, tab: 'prog', loginU: '', loginP: '', loginErr: '', showPass: false, mustChange: false, showPw: false }); },
+      pwView: pwView, mustChange: logged && !!st.mustChange, askCurrent: !st.mustChange, canCancelPw: !st.mustChange,
+      pwTitle: st.mustChange ? 'Criar senha pessoal' : 'Trocar minha senha',
+      openPw: function () { self.setState({ showPw: true, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' }); },
+      closePw: function () { self.setState({ showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' }); },
+      pwCur: st.pwCur, pwNew: st.pwNew, pwNew2: st.pwNew2,
+      onPwCur: function (e) { self.setState({ pwCur: e.target.value, pwMsg: '' }); },
+      onPwNew: function (e) { self.setState({ pwNew: e.target.value, pwMsg: '' }); },
+      onPwNew2: function (e) { self.setState({ pwNew2: e.target.value, pwMsg: '' }); },
+      pwMsgErr: !!st.pwMsg, pwMsg: st.pwMsg,
+      savePw: function () {
+        var cs = self.cur();
+        if (!sessUser) return;
+        var key = norm(sessUser.login);
+        var curHash = (cs.pwOver || {})[key] || sessUser.hash;
+        if (!cs.mustChange && sha256Sync(String(cs.pwCur).trim()) !== curHash) { self.setState({ pwMsg: 'Senha atual incorreta.' }); return; }
+        var np = String(cs.pwNew).trim();
+        if (np.length < 6) { self.setState({ pwMsg: 'A nova senha precisa ter pelo menos 6 caracteres.' }); return; }
+        if (np !== String(cs.pwNew2).trim()) { self.setState({ pwMsg: 'As duas senhas novas não são iguais.' }); return; }
+        var nh = sha256Sync(np);
+        if (nh === H123) { self.setState({ pwMsg: 'Não use a senha padrão. Escolha uma senha pessoal.' }); return; }
+        if (nh === curHash) { self.setState({ pwMsg: 'A nova senha precisa ser diferente da atual.' }); return; }
+        var po = Object.assign({}, cs.pwOver || {}), us = (cs.users || []).slice();
+        if (sessUser.fixed) po[key] = nh;
+        else us = us.map(function (x) { return norm(x.login) === key ? Object.assign({}, x, { hash: nh }) : x; });
+        var fc = Object.assign({}, cs.forceChange || {}); delete fc[key];
+        self.setState({ pwOver: po, users: us, forceChange: fc, mustChange: false, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', msgKind: 'ok', msg: 'Senha alterada com sucesso.' });
+      },
+      resetLogin: st.resetLogin, resetP: st.resetP,
+      onResetLogin: function (e) { self.setState({ resetLogin: e.target.value, userMsg: '' }); },
+      onResetP: function (e) { self.setState({ resetP: e.target.value, userMsg: '' }); },
+      doReset: function () {
+        var cs = self.cur();
+        if (!isAdmin) return;
+        var tu = DEFAULT_USERS.concat(cs.users || []).filter(function (x) { return norm(x.login) === norm(cs.resetLogin); })[0];
+        if (!tu) { self.setState({ userMsgKind: 'err', userMsg: 'Escolha o usuário.' }); return; }
+        var np = String(cs.resetP || '').trim();
+        if (np.length < 6) { self.setState({ userMsgKind: 'err', userMsg: 'A senha precisa ter pelo menos 6 caracteres.' }); return; }
+        var nh = sha256Sync(np), key = norm(tu.login);
+        var po = Object.assign({}, cs.pwOver || {}), us = (cs.users || []).slice();
+        if (tu.fixed) po[key] = nh;
+        else us = us.map(function (x) { return norm(x.login) === key ? Object.assign({}, x, { hash: nh }) : x; });
+        var fc = Object.assign({}, cs.forceChange || {});
+        if (!(session && norm(session.login) === key)) fc[key] = true;
+        self.setState({ pwOver: po, users: us, forceChange: fc, resetLogin: '', resetP: '', userMsgKind: 'ok', userMsg: 'Senha de ' + tu.login + ' redefinida neste aparelho.' });
+      },
+      userList: userList,
+      newU: st.newU, newP: st.newP, newRole: st.newRole,
+      onNewU: function (e) { self.setState({ newU: e.target.value, userMsg: '' }); },
+      onNewP: function (e) { self.setState({ newP: e.target.value, userMsg: '' }); },
+      onNewRole: function (e) { self.setState({ newRole: e.target.value }); },
+      addUser: function () {
+        var s = self.cur();
+        var lg = String(s.newU || '').trim();
+        if (!isAdmin) return;
+        if (lg.length < 3) { self.setState({ userMsgKind: 'err', userMsg: 'O login precisa ter pelo menos 3 caracteres.' }); return; }
+        if (DEFAULT_USERS.concat(s.users || []).some(function (x) { return norm(x.login) === norm(lg); })) { self.setState({ userMsgKind: 'err', userMsg: 'Já existe um usuário com esse login.' }); return; }
+        if (String(s.newP || '').length < 6) { self.setState({ userMsgKind: 'err', userMsg: 'A senha precisa ter pelo menos 6 caracteres.' }); return; }
+        var role = s.newRole === 'admin' ? 'admin' : (s.newRole === 'reg' ? 'reg' : 'oper');
+        sha256Hex(s.newP).then(function (h) {
+          var us = (self.cur().users || []).concat([{ login: lg, hash: h, role: role }]);
+          self.setState({ users: us, newU: '', newP: '', newRole: 'oper', userMsgKind: 'ok', userMsg: 'Usuário ' + lg + ' cadastrado como ' + roleName(role) + '.' });
+        }, function () { self.setState({ userMsgKind: 'err', userMsg: 'Este navegador não permite cadastrar senha com segurança.' }); });
+      },
+      userMsgOk: !!st.userMsg && st.userMsgKind !== 'err', userMsgErr: !!st.userMsg && st.userMsgKind === 'err', userMsg: st.userMsg,
+
+      accent: accent,
+      dateLabel: dateLabel,
+      date: st.date,
+      noDate: noDate,
+      dateBorder: noDate ? '#B42318' : '#C9D5E2',
+      isTt: tab === 'tt', isProg: tab === 'prog', isVer: tab === 'ver', isRes: tab === 'res', isCfg: tab === 'cfg',
+      nav: { ttCur: nT.cur, progCur: nP.cur, verCur: nV.cur, resCur: nR.cur, cfgCur: nC.cur, ttBg: nT.bg, ttFg: nT.fg, ttBd: nT.bd, progBg: nP.bg, progFg: nP.fg, progBd: nP.bd, verBg: nV.bg, verFg: nV.fg, verBd: nV.bd, resBg: nR.bg, resFg: nR.fg, resBd: nR.bd, cfgBg: nC.bg, cfgFg: nC.fg, cfgBd: nC.bd },
+      goProg: function () { self.setState({ tab: 'prog', showPw: false }); },
+      goVer: function () { self.setState({ tab: 'ver', showPw: false }); },
+      goTt: function () { self.setState({ tab: 'tt', showPw: false }); },
+      goRes: function () { self.setState({ tab: 'res', showPw: false }); },
+      goCfg: function () { self.setState({ tab: 'cfg', showPw: false }); },
+
+      // intertravamento
+      complete: complete, incomplete: !complete,
+      lockReason: lockReason,
+      lockBtn: issues.length > 0 ? 'Faltam ' + issues.length + ' intervalo(s)' : 'Falta a data do PDP',
+      pcsHdr: pcsMissing ? fmt(pcsT, 0) : fmt(pcsRow, 0),
+      pcsProgInfo: 'Contrato ' + fmt(c.pcsRef, 0) + ': volume do modelo × ' + fmt(pcsT, 0) + ' ÷ ' + fmt(c.pcsRef, 0) + ' = fator ' + fmt(f94, 4) + '. ' + (pcsMissing ? 'Sem PCS medido, a coluna do meio usa o PCS do gás do modelo (' + fmt(pcsT, 0) + ').' : 'PCS medido ' + fmt(pcsRow, 0) + ': fator ' + fmt(pcsT, 0) + ' ÷ ' + fmt(pcsRow, 0) + ' = ' + fmt(fMed, 4) + '.'),
+      pcsMedLabel: pcsMissing ? 'informe o PCS' : fmt(pcsRow, 0) + ' kcal/m³',
+      pcsMedShort: pcsMissing ? 'medido' : fmt(pcsRow, 0),
+      baseShort: pcsBase === 'contrato' ? 'base contrato ' + fmt(c.pcsRef, 0) + ' kcal/m³' : 'gás real · PCS ' + (pcsMissing ? 'medido' : fmt(pcsRow, 0)),
+      baseContratoPressed: pcsBase === 'contrato' ? 'true' : 'false', baseMedidoPressed: pcsBase === 'medido' ? 'true' : 'false',
+      baseContratoBg: pcsBase === 'contrato' ? '#1061A6' : '#FFFFFF', baseContratoFg: pcsBase === 'contrato' ? '#FFFFFF' : '#1061A6',
+      baseMedidoBg: pcsBase === 'medido' ? '#1061A6' : '#FFFFFF', baseMedidoFg: pcsBase === 'medido' ? '#FFFFFF' : '#1061A6',
+      setBaseContrato: function () { self.setState({ pcsBase: 'contrato' }); },
+      setBaseMedido: function () { self.setState({ pcsBase: 'medido' }); },
+      doneCount: String(done),
+      progPct: progPct,
+      progColor: complete ? '#0B7A3E' : (done > 0 ? '#B54708' : '#B42318'),
+      issuesTop: issues.slice(0, 4),
+      hasMoreIssues: issues.length > 4,
+      moreIssues: String(Math.max(0, issues.length - 4)),
+
+      // passo 1
+      onDate: function (e) { self.setState({ date: e.target.value }); },
+      startOpts: startOpts, endOpts: endOpts, gtOpts: gtOpts,
+      fillDeStr: String(st.fillDe), fillAteStr: String(st.fillAte), fillMw: st.fillMw, fillGt: st.fillGt,
+      units: units,
+      ttIssues: ttIssues, ttOk: ttIssues.length === 0,
+      tonStr: fmt(c.ton, 0) + ' h', toffStr: fmt(c.toff, 0) + ' h',
+      nowStr: fmtDT(now),
+      clockStr: (function () { var dd = new Date(now); return pad(dd.getHours()) + ':' + pad(dd.getMinutes()); })(),
+      showNota: !!st.showNota,
+      notaExpanded: st.showNota ? 'true' : 'false',
+      notaBtn: st.showNota ? 'Ocultar' : 'Ver',
+      toggleNota: function () { self.setState({ showNota: !self.cur().showNota }); },
+      onFillDe: function (e) { self.setState({ fillDe: parseInt(e.target.value, 10) || 0 }); },
+      onFillAte: function (e) { self.setState({ fillAte: parseInt(e.target.value, 10) || 48 }); },
+      onFillMw: function (e) { self.setState({ fillMw: e.target.value }); },
+      onFillGt: function (e) { self.setState({ fillGt: e.target.value }); },
+      applyFill: function () {
+        var s = self.cur();
+        var a = s.fillDe, b = s.fillAte;
+        if (b <= a) { setMsg('err', 'O horário "Até" precisa ser depois do "De".'); return; }
+        if (isBlank(s.fillGt)) { setMsg('err', 'Escolha a quantidade de GTs em operação nesta faixa.'); return; }
+        var nn = parseInt(s.fillGt, 10);
+        var mwBlank = isBlank(s.fillMw);
+        var v = num(s.fillMw);
+        if (!mwBlank && (!isFinite(v) || v < 0)) { setMsg('err', 'Potência inválida. Use só números (0 para máquina parada).'); return; }
+        var x;
+        if (mwBlank) {
+          for (x = a; x < b; x++) {
+            if (!(isFinite(num(s.prog[x])) && num(s.prog[x]) >= 0)) { setMsg('err', 'Há intervalos sem potência nessa faixa (' + hhmm(x * 30) + '). Digite a potência em MW.'); return; }
+          }
+        }
+        for (x = a; x < b; x++) {
+          var mwx = mwBlank ? num(s.prog[x]) : v;
+          var r = checkRow(true, mwx, true, nn);
+          if (r.err) { setMsg('err', 'Não aplicado — ' + hhmm(x * 30) + ': ' + r.err + '.'); return; }
+        }
+        var p = s.prog.slice(), gg = s.gts.slice();
+        for (x = a; x < b; x++) { if (!mwBlank) p[x] = String(s.fillMw).trim(); gg[x] = String(nn); }
+        self.setState({
+          prog: p, gts: gg, msgKind: 'ok',
+          msg: 'Aplicado: ' + hhmm(a * 30) + ' às ' + hhmm(b * 30) + (mwBlank ? '' : ' = ' + String(s.fillMw).trim() + ' MW') + ' com ' + nn + ' GT' + (nn === 1 ? '' : 's') + '.',
+          fillDe: b < 48 ? b : a, fillAte: 48, fillMw: '', fillGt: ''
+        });
+      },
+      showPaste: !!st.showPaste,
+      togglePaste: function () { self.setState({ showPaste: !self.cur().showPaste, msg: '' }); },
+      paste: st.paste,
+      onPaste: function (e) { self.setState({ paste: e.target.value }); },
+      applyPaste: function () {
+        var toks = String(self.cur().paste || '').split(/[\s;]+/).filter(function (t) { return t !== ''; });
+        var vals = toks.map(function (t) { var v = num(t); return isFinite(v) && v >= 0 ? String(v).replace('.', ',') : null; });
+        if (vals.some(function (v) { return v === null; })) { setMsg('err', 'Há algo que não é número no texto colado. Cole só a coluna de MW.'); return; }
+        var p;
+        if (vals.length === 48) p = vals;
+        else if (vals.length === 24) { p = []; vals.forEach(function (v) { p.push(v, v); }); }
+        else { setMsg('err', 'Encontrei ' + vals.length + ' valores. São necessários 48 (meia em meia hora) ou 24 (hora a hora).'); return; }
+        self.setState({ prog: p, paste: '', showPaste: false, msgKind: 'ok', msg: 'Potências coladas (' + vals.length + ' valores). Agora defina as GTs por faixa, deixando a potência em branco.' });
+      },
+      confirmClear: !!st.confirmClear,
+      askClear: function () { self.setState({ confirmClear: true }); },
+      cancelClear: function () { self.setState({ confirmClear: false }); },
+      doClear: function () { self.setState({ prog: blank48(), gts: blank48(), log: [], confirmClear: false, med: '', pcsReal: '', msgKind: 'ok', msg: 'Programação apagada. Lance as faixas do dia.' }); },
+      msgOk: !!st.msg && st.msgKind !== 'err', msgErr: !!st.msg && st.msgKind === 'err', msg: st.msg,
+      rows: rows,
+      totalLabel: complete ? 'Gás previsto no dia' : 'Gás previsto (parcial)',
+      totalStr: fmt(total * f94, 0),
+      totalRealStr: fmt(total * fMed, 0) + ' m³ de gás com PCS ' + fmt(pcsUse, 0),
+      avgMwStr: fmt(mwSum / 48, 0),
+
+      // passo 2
+      operador: st.operador,
+      onOp: function (e) { self.setState({ operador: e.target.value }); },
+      opBorder: opOk ? '#C9D5E2' : '#B42318',
+      selStr: String(sel),
+      selLabel: hhmm((sel + 1) * 30),
+      selGtStr: (isBlank(st.gts[sel]) ? '—' : st.gts[sel]) + ' GT',
+      onSel: function (e) { self.setState({ sel: parseInt(e.target.value, 10) || 0 }); },
+      prevStr: pcsBase === 'contrato' ? fmt(prev94, 0) + ' m³' : (pcsOk ? fmt(prevReal, 0) + ' m³' : 'informe o PCS'),
+      med: st.med,
+      onMed: function (e) { self.setState({ med: String(e.target.value || '').replace(/\D/g, '').slice(0, 6) }); },
+      medBorder: hasMed ? '#1061A6' : '#B42318',
+      pcsReal: st.pcsReal,
+      onPcs: function (e) { self.setState({ pcsReal: e.target.value }); },
+      pcsBorder: pcsOk ? '#C9D5E2' : '#B42318',
+      selOpts: selOpts,
+      selMaoLabel: maoOf(sel),
+      clockMaoStr: (function () { var dd = new Date(now - 3600000); return pad(dd.getHours()) + ':' + pad(dd.getMinutes()); })(),
+      prevRealBox: pcsOk ? fmt(prevReal, 0) + ' m³' : 'informe o PCS',
+      showConv: hasMed && pcsOk,
+      convFormula: hasMed && pcsOk ? fmt(med, 0) + ' × ' + fmt(pcsReal, 0) + ' ÷ ' + fmt(c.pcsRef, 0) + ' = ' + fmt(med94, 0) + ' m³ (fator ' + fmt(pcsReal / c.pcsRef, 4) + ')' : '',
+      devColor: ok ? '#075C2E' : '#B42318',
+      pcsLocked: pcsBase === 'contrato', pcsLockedStr: pcsBase === 'contrato' ? 'true' : 'false',
+      vPcsVal: pcsBase === 'contrato' ? fmt(c.pcsRef, 0) : st.pcsReal,
+      vPcsTag: pcsBase === 'contrato' ? '· travado no contrato' : '',
+      vPcsBg: pcsBase === 'contrato' ? '#E8F1FA' : '#FFFFFF', vPcsColor: pcsBase === 'contrato' ? '#0B4A80' : '#0C2340', vPcsWeight: pcsBase === 'contrato' ? '700' : '400',
+      vNoProg: !(prev > 0),
+      vWait: prev > 0 && !(hasMed && pcsOk),
+      waitMsg: !hasMed && !pcsOk ? 'Digite a leitura do totalizador e o PCS médio medido para ver o resultado.' : (!hasMed ? 'Digite a leitura do totalizador para ver o resultado.' : 'Digite o PCS médio medido (6.000 a 12.000 kcal/m³) para ver o resultado.'),
+      vOk: prev > 0 && hasMed && pcsOk && ok,
+      vFail: prev > 0 && hasMed && pcsOk && !ok,
+      devStr: pct(dev),
+      diffStr: isFinite(diff) ? (sgn(diff) + ' m³ gás real · ' + sgn(diff94) + ' m³ na base ' + fmt(c.pcsRef, 0) + ' em relação ao previsto') : '',
+      tolStr: fmt(c.tol, 1) + '%',
+      failHint: dev > 0 ? 'Consumo ACIMA do previsto. Confira a leitura e avise o supervisor.' : 'Consumo ABAIXO do previsto. Confira a leitura e a geração real e avise o supervisor.',
+      showCorr: prev > 0 && hasMed && pcsOk,
+      prevRealStr: fmt(prevReal, 0), prev94Str: fmt(prev94, 0), medRealStr: fmt(med, 0), med94Str: fmt(med94, 0),
+      convNote: 'Conversão para ' + fmt(c.pcsRef, 0) + ': volume × (PCS medido ÷ ' + fmt(c.pcsRef, 0) + '), aplicada igualmente ao previsto e ao medido. Por isso o desvio % é o mesmo nas duas bases.',
+      pcsRefStr: fmt(c.pcsRef, 0),
+      canSave: canSave, cannotSave: !canSave,
+      saveIssues: saveIssues,
+      saveReading: function () {
+        if (!canSave) return;
+        var s = self.cur();
+        var lg = (s.log || []).filter(function (l) { return l.idx !== sel; });
+        lg.push({ idx: sel, hora: hhmm((sel + 1) * 30), horaMao: maoOf(sel), med: med, med94: med94, prev: prevReal, prev94: prev94, dev: dev, ok: ok, pcs: pcsReal, op: String(s.operador).trim(), gts: s.gts[sel] });
+        lg.sort(function (x, y) { return x.idx - y.idx; });
+        self.setState({ log: lg, med: '', sel: Math.min(47, sel + 2) });
+      },
+      hasLog: log.length > 0, noLog: log.length === 0, log: log,
+      clearLog: function () { self.setState({ log: [] }); },
+
+      // resumo
+      energyStr: fmt(energy, 1),
+      specStr: energy > 0 ? fmt(total / energy, 1) : '—',
+      startsStr: String(starts),
+      alertsStr: String(warns + issues.length),
+      alertColor: (warns + issues.length) > 0 ? '#B54708' : '#0C2340',
+      bars: bars,
+      maxVolStr: fmt(maxVol, 0),
+
+      // ajustes
+      cfgBasic: cfgList(BASIC),
+      cfgDess: cfgList(DESS),
+      cfgAdv: cfgList(ADV),
+      resetCfg: function () { self.setState({ cfg: Object.assign({}, DEFCFG) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>
