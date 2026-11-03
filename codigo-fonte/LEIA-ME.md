@@ -1,4 +1,4 @@
-# SIAG – Sistema Integrado de Aferição de Gás · versão 1.3
+# SIAG – Sistema Integrado de Aferição de Gás · versão 1.4
 
 Data da versão: 03/11/2026
 Endereço publicado: https://rairieltomaz.github.io/SIAG/
@@ -10,6 +10,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 | `index.html` (raiz) | O aplicativo completo (um arquivo só). Abre em qualquer navegador. |
 | `manifest.json`, `sw.js`, `icon-*.png` (raiz) | Permitem instalar no celular ("Adicionar à tela inicial") e usar sem internet. |
 | `usuarios.json` (raiz) | **Lista central de usuários e senhas** (senhas guardadas só como hash PBKDF2 com sal). É gravada pelo próprio app (Ajustes, perfil Administrador). Não edite à mão nem apague. |
+| `ajustes.json` (raiz) | **Ajustes de cálculo centrais** (tolerância, PCS, limites DESSEM, Ton/Toff, modelo da usina). Gravado pelo app (Ajustes › Publicar). Não edite à mão nem apague. |
 | `codigo-fonte/SIAG-app.dc.html` | Fonte do app (telas + lógica). É dele que o `index.html` é gerado. |
 | `codigo-fonte/runtime.js` | Motor que desenha as telas no navegador. |
 | `codigo-fonte/build.py` | Script que gera a pasta `codigo-fonte/siag/` a partir da fonte. |
@@ -18,9 +19,18 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 ## Como publicar / atualizar
 
 1. Gere o app: dentro de `codigo-fonte/`, rode `python3 build.py` (requer Python 3). Ele grava a pasta `codigo-fonte/siag/`.
-2. Copie `index.html`, `sw.js`, `manifest.json` e os ícones dessa pasta para a raiz do repositório e publique. **Não substitua nem apague o `usuarios.json` da raiz** – ele guarda os usuários e senhas atuais.
-3. Antes de publicar uma versão nova, puxe as alterações do GitHub (`git pull`): cada troca de senha feita no app vira um commit no repositório.
+2. Copie `index.html`, `sw.js`, `manifest.json` e os ícones dessa pasta para a raiz do repositório e publique. **Não substitua nem apague o `usuarios.json` nem o `ajustes.json` da raiz** – eles guardam os usuários, as senhas e os ajustes atuais.
+3. Antes de publicar uma versão nova, puxe as alterações do GitHub (`git pull`): cada troca de senha ou de ajuste feita no app vira um commit no repositório.
 4. Os celulares baixam a versão nova ao abrir o app com internet.
+
+## Ajustes de cálculo centralizados (desde a 1.4)
+
+- Os valores de Ajustes ficam no arquivo `ajustes.json` do repositório. Todos os aparelhos usam **os valores publicados**, baixados junto com a lista de usuários (ao abrir o app, ao voltar para ele e antes de cada login); sem internet, usam os últimos baixados.
+- Quem pode alterar: **Administrador** e **Regulação**, num aparelho com o token do GitHub configurado (card "Publicação no GitHub", no topo de Ajustes).
+- Ao editar um campo, a alteração fica como **rascunho** (campo em laranja, com o valor publicado ao lado). Os cálculos continuam com o valor publicado até tocar em **Publicar para todos os aparelhos**. **Descartar** volta aos valores publicados.
+- A publicação grava só os campos alterados por cima da versão mais nova do arquivo, então duas pessoas mexendo em campos diferentes não desfazem a alteração uma da outra.
+- Valores inválidos (texto, zero/negativo, PCS fora de 6.000–12.000, tolerância acima de 50%) não são publicados.
+- Migração: se um aparelho tinha ajustes próprios da versão anterior, diferentes dos centrais, eles aparecem para o Administrador/Regulação como rascunho ("Este aparelho tinha ajustes próprios…") para publicar ou descartar. Nos aparelhos de operação esses valores antigos são ignorados.
 
 ## Usuários e senhas centralizados (desde a 1.3)
 
@@ -38,6 +48,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 ## Histórico
 
+- **1.4 (03/11/2026)** – Ajustes de cálculo centralizados no `ajustes.json` do GitHub: os cálculos de todos os aparelhos usam os valores publicados. Edição vira rascunho até publicar; ajustes antigos do aparelho viram rascunho para conferência. Token do GitHub passa para o card "Publicação no GitHub" (Administrador e Regulação).
 - **1.3 (03/11/2026)** – Usuários e senhas centralizados no `usuarios.json` do GitHub: uma senha criada ou trocada vale em todos os aparelhos. Administrador publica as alterações com token do GitHub; troca de senha desconecta as sessões antigas; operação e regulação não trocam a própria senha (pedem ao administrador).
 - **1.2.1 (21/10/2026)** – Comprovante sem assinaturas e com a programação de geração simulada.
 - **1.2 (21/10/2026)** – Comprovante de leitura (imprimir / salvar PDF) na aba Verificar.
@@ -50,11 +61,11 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 | Login | Perfil | O que acessa |
 |---|---|---|
 | CEA-ADM | Administrador principal | Tudo, inclusive Ajustes, cadastro de usuários e troca de senhas (publicadas para todos os aparelhos) |
-| CEA-REG | Regulação | Tudo, inclusive Ajustes; sem gestão de usuários |
+| CEA-REG | Regulação | Tudo, inclusive publicar Ajustes de cálculo (com token); sem gestão de usuários |
 | CEA-OPE | Operação | Programa, Ton/Toff, Verificar e Resumo (sem Ajustes) |
 
 - Senha padrão inicial das três contas: **Siag@2026**. No primeiro acesso do CEA-ADM o app obriga a criar a senha do administrador (e pede o token do GitHub). Em seguida, defina em Ajustes as senhas do CEA-REG e do CEA-OPE – enquanto isso não for feito, elas continuam com a senha padrão e o app mostra o aviso "AINDA COM SENHA PADRÃO".
-- Usuários e senhas valem em todos os aparelhos (lista central). Programação, leituras e Ajustes de cálculo continuam gravados **no próprio aparelho**.
+- Usuários, senhas e Ajustes de cálculo valem em todos os aparelhos (centrais no GitHub). Programação e leituras continuam gravadas **no próprio aparelho**.
 - O login separa perfis, mas não é proteção contra quem tem conhecimento técnico.
 
 ## Telas
@@ -63,7 +74,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 2. **Ton/Toff** – calculadora por GT (ligada/desligada desde) e conferência das partidas/paradas da programação. Inclui a nota operacional DESSEM / CER-D nº 464/22.
 3. **Verificar** – operador, horário da leitura **em Manaus** (o app converte sozinho para Brasília, +1 h, e mostra o horário convertido), PCS médio medido, totalizador GRMS **digitado como lido, sem conversão** (até 6 dígitos). O app converte o totalizador para o PCS 9.400 e mostra os dois valores (lido e convertido), o previsto nas duas bases e o desvio. Para salvar exige operador, totalizador e PCS; bloqueia leituras que diminuem com o tempo. O botão **"Salvar e gerar comprovante"** e o ícone de documento em cada leitura salva abrem o **comprovante da leitura** (A4, pronto para imprimir ou salvar em PDF), com código da leitura, horários de Manaus e Brasília, operador, usuário, potência e GTs do PDP, totalizador lido e convertido para 9.400, previsto, desvio e resultado. A 2ª página traz a **programação de geração simulada** do dia (48 intervalos: horário Brasília/Manaus, MW, GTs, gás a cada 30 min e acumulado nas bases PCS medido e 9.400), com o intervalo da leitura destacado. A programação fica registrada no momento em que a leitura é gravada.
 4. **Resumo** – gás previsto no dia, energia, consumo específico, partidas, avisos, gráfico de 30 min e leituras registradas.
-5. **Ajustes** (ADM e REG) – tolerância, PCS de referência, limites DESSEM, Ton/Toff, modelo da usina e usuários.
+5. **Ajustes** (ADM e REG) – tolerância, PCS de referência, limites DESSEM, Ton/Toff e modelo da usina (centrais: publicados para todos os aparelhos) e usuários (só ADM).
 
 A programação (PDP) usa horários de **Brasília (UTC−3)**, independentemente do fuso do celular. Na aba Verificar o operador escolhe o horário de **Manaus (UTC−4)** e o app converte.
 
@@ -81,5 +92,5 @@ A programação (PDP) usa horários de **Brasília (UTC−3)**, independentement
 
 ## Limitações conhecidas
 
-- Programação, leituras e Ajustes de cálculo não são compartilhados entre celulares (cada aparelho tem seu próprio registro). Usuários e senhas, sim (desde a 1.3).
+- Programação e leituras não são compartilhadas entre celulares (cada aparelho tem seu próprio registro). Usuários, senhas (1.3) e Ajustes de cálculo (1.4), sim.
 - O consumo previsto é extrapolado da reta do teste de 96 h fora do ponto de 114 MW.

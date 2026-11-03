@@ -102,7 +102,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.3</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.4</div>
       </main>
     </div>
   </sc-if>
@@ -654,21 +654,19 @@ button:disabled{cursor:not-allowed}
     <sc-if value="{{ isCfg }}" hint-placeholder-val="{{ false }}">
       <div class="page cfg-grid" style="display: flex; flex-direction: column; gap: 14px">
         <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Ajustes</h1>
-        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
-        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #1061A6; padding: 14px; display: flex; flex-direction: column; gap: 10px">
           <div style="display: flex; flex-direction: column; gap: 4px">
-            <div style="font-size: 15px; font-weight: 600">Usuários</div>
-            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Administrador: acesso total e cadastro de usuários. Regulação: altera os Ajustes, sem cadastro. Operação: sem acesso aos Ajustes.</div>
-            <div style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">Usuários e senhas são centrais: o que for cadastrado ou trocado aqui vale em todos os aparelhos.</div>
+            <div style="font-size: 15px; font-weight: 600">Publicação no GitHub</div>
+            <div style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">Os ajustes de cálculo e as senhas são centrais: o que for publicado aqui vale em todos os aparelhos. Os cálculos sempre usam os valores publicados.</div>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
-            <span style="font-size: 12px; color: #4A5B6E; line-height: 1.4">{{ udbInfo }}</span>
+            <span style="font-size: 12px; color: #4A5B6E; line-height: 1.4">{{ cfgInfo }}</span>
             <button type="button" onClick="{{ syncNow }}" style="flex: 0 0 auto; height: 36px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #1061A6; padding: 0 10px; font-size: 13px; cursor: pointer">Atualizar</button>
           </div>
           <sc-if value="{{ noTok }}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; gap: 8px; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 12px">
-            <div style="font-size: 14px; font-weight: 600">Token do GitHub (publicação das senhas)</div>
-            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
+            <div style="font-size: 14px; font-weight: 600">Token do GitHub</div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários e os ajustes no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
             <input id="tk-cfg" type="password" autoComplete="off" autoCapitalize="none" placeholder="github_pat_…" value="{{ tokIn }}" onChange="{{ onTokIn }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
             <button type="button" onClick="{{ saveTok }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Salvar token</button>
           </div>
@@ -688,6 +686,32 @@ button:disabled{cursor:not-allowed}
           <sc-if value="{{ tokMsgErr }}" hint-placeholder-val="{{ false }}">
             <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
           </sc-if>
+        </div>
+        <sc-if value="{{ cfgPending }}" hint-placeholder-val="{{ false }}">
+          <div style="background: #FFF8EE; border: 1px solid #F0C48A; border-left: 4px solid #B54708; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+            <div style="font-size: 15px; font-weight: 600; color: #6B3A00">{{ cfgPendingTxt }}</div>
+            <sc-if value="{{ draftOld }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 13px; color: #6B3A00; line-height: 1.4">Este aparelho tinha ajustes próprios (da versão anterior do app) diferentes dos centrais. Confira: publique para valerem em todos os aparelhos, ou descarte.</div>
+            </sc-if>
+            <sc-for list="{{ cfgPendingList }}" as="d" hint-placeholder-count="2">
+              <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: #33475E; border-top: 1px solid #F0DCC0; padding-top: 6px">
+                <span>{{ d.label }}</span><span style="font-variant-numeric: tabular-nums; white-space: nowrap">{{ d.from }} → <b style="color: #6B3A00">{{ d.to }}</b></span>
+              </div>
+            </sc-for>
+            <div style="font-size: 12px; color: #6B3A00">Enquanto não publicar, os cálculos continuam com os valores publicados.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 600">Usuários</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Administrador: acesso total e cadastro de usuários. Regulação: altera os Ajustes, sem cadastro. Operação: sem acesso aos Ajustes.</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">O que for cadastrado ou trocado aqui vale em todos os aparelhos.</div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-size: 12px; color: #4A5B6E; line-height: 1.4">{{ udbInfo }}</span>
+          </div>
+
           <sc-for list="{{ userList }}" as="u" hint-placeholder-count="2">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid #EDF2F7">
               <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
@@ -758,7 +782,8 @@ button:disabled{cursor:not-allowed}
           <sc-for list="{{ cfgBasic }}" as="f" hint-placeholder-count="3">
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
               <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
-              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+              <sc-if value="{{ f.changed }}" hint-placeholder-val="{{ false }}"><span style="grid-column: 1 / -1; margin-top: -6px; font-size: 11px; color: #B54708; text-align: right">publicado: {{ f.pubVal }} · não publicado</span></sc-if>
             </div>
           </sc-for>
         </div>
@@ -770,7 +795,8 @@ button:disabled{cursor:not-allowed}
           <sc-for list="{{ cfgDess }}" as="f" hint-placeholder-count="4">
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
               <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
-              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340">
+              <sc-if value="{{ f.changed }}" hint-placeholder-val="{{ false }}"><span style="grid-column: 1 / -1; margin-top: -6px; font-size: 11px; color: #B54708; text-align: right">publicado: {{ f.pubVal }} · não publicado</span></sc-if>
             </div>
           </sc-for>
         </div>
@@ -782,11 +808,17 @@ button:disabled{cursor:not-allowed}
           <sc-for list="{{ cfgAdv }}" as="f" hint-placeholder-count="5">
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
               <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }} <span style="color: #4A5B6E">({{ f.unit }})</span></label>
-              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340">
+              <input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340">
+              <sc-if value="{{ f.changed }}" hint-placeholder-val="{{ false }}"><span style="grid-column: 1 / -1; margin-top: -6px; font-size: 11px; color: #B54708; text-align: right">publicado: {{ f.pubVal }} · não publicado</span></sc-if>
             </div>
           </sc-for>
           <button type="button" onClick="{{ resetCfg }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Restaurar valores padrão</button>
+          <div style="font-size: 12px; color: #4A5B6E">Os valores restaurados também precisam ser publicados.</div>
         </div>
+        <sc-if value="{{ cfgMsgOk }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="grid-column: 1 / -1; font-size: 14px; color: #075C2E; background: #E5F4EA; padding: 10px 12px">{{ cfgMsg }}</div>
+        </sc-if>
+
         <div style="background: #EEF3F8; border-radius: 0px; padding: 14px; font-size: 13px; color: #33475E; line-height: 1.5; display: flex; flex-direction: column; gap: 6px">
           <div style="font-weight: 600; color: #0C2340">Como o app calcula</div>
           <div>1. Potência bruta = MW do ONS × relação bruta/líquida.</div>
@@ -796,6 +828,21 @@ button:disabled{cursor:not-allowed}
           <div>5. Desvio = (medido − previsto) ÷ previsto; dentro se |desvio| ≤ tolerância.</div>
           <div>6. Ton/Toff: avisa parada antes de 12 h ligada ou partida antes de 4 h desligada.</div>
         </div>
+        <sc-if value="{{ cfgPending }}" hint-placeholder-val="{{ false }}">
+          <div class="cfg-pub" style="grid-column: 1 / -1; position: sticky; bottom: 0; z-index: 3; margin: 0 -16px -16px; background: #FFFFFF; border-top: 2px solid #B54708; box-shadow: 0 -4px 12px rgba(12,35,64,0.12); padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px">
+            <div style="font-size: 13px; font-weight: 600; color: #6B3A00">{{ cfgPendingTxt }}</div>
+            <sc-if value="{{ cfgMsgErr }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; padding: 8px 10px; line-height: 1.4">{{ cfgMsg }}</div>
+            </sc-if>
+            <sc-if value="{{ cfgMsgInfo }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; padding: 8px 10px">{{ cfgMsg }}</div>
+            </sc-if>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px">
+              <button type="button" onClick="{{ publishCfg }}" disabled="{{ busy }}" style="height: 48px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; cursor: pointer">{{ pubCfgLabel }}</button>
+              <button type="button" onClick="{{ discardCfg }}" disabled="{{ busy }}" style="height: 48px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Descartar</button>
+            </div>
+          </div>
+        </sc-if>
       </div>
     </sc-if>
   </main>
@@ -865,6 +912,8 @@ var PCS_MIN = 6000, PCS_MAX = 12000;
 var GH_REPO = 'rairieltomaz/SIAG', GH_BRANCH = 'main', GH_FILE = 'usuarios.json';
 var GH_API = 'https://api.github.com/repos/' + GH_REPO;
 var UKEY = 'siag-usuarios-v1';   // última lista baixada (para uso sem internet)
+var CFG_FILE = 'ajustes.json';    // ajustes de cálculo centrais
+var CKEY = 'siag-ajustes-v1';    // últimos ajustes baixados
 var TKEY = 'siag-gh-token';      // token do GitHub (só no aparelho do administrador)
 var DEF_PASS = 'Siag@2026';      // senha padrão de primeiro acesso
 var PBKDF2_ITER = 150000;
@@ -953,17 +1002,58 @@ function ghHeaders(token, raw) {
   if (token) h['Authorization'] = 'Bearer ' + token;
   return h;
 }
-// baixa a lista central: 1º API do GitHub (sempre atualizada), 2º arquivo publicado no site
-function fetchUdb() {
+// baixa um arquivo central: 1º API do GitHub (sempre atualizada), 2º arquivo publicado no site
+function fetchCentral(file, parse) {
   var tok = getToken();
-  var viaApi = timeout(fetch(GH_API + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(tok, true) }), 7000)
-    .then(function (r) { if (!r.ok) throw new Error('api ' + r.status); return r.json(); })
-    .then(function (j) { var d = parseUdb(j); if (!d) throw new Error('inválido'); return { udb: d, src: 'github' }; });
+  var viaApi = timeout(fetch(GH_API + '/contents/' + file + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(tok, true) }), 7000)
+    .then(function (r) { if (r.status === 404) return { data: null, src: 'github' }; if (!r.ok) throw new Error('api ' + r.status); return r.json().then(function (j) { var d = parse(j); if (!d) throw new Error('inválido'); return { data: d, src: 'github' }; }); });
   return viaApi.catch(function () {
-    return timeout(fetch(GH_FILE + '?t=' + Date.now(), { cache: 'no-store' }), 7000)
+    return timeout(fetch(file + '?t=' + Date.now(), { cache: 'no-store' }), 7000)
       .then(function (r) { if (!r.ok) throw new Error('site ' + r.status); return r.json(); })
-      .then(function (j) { var d = parseUdb(j); if (!d) throw new Error('inválido'); return { udb: d, src: 'site' }; });
+      .then(function (j) { var d = parse(j); if (!d) throw new Error('inválido'); return { data: d, src: 'site' }; });
   });
+}
+function fetchUdb() {
+  return fetchCentral(GH_FILE, parseUdb).then(function (r) { if (!r.data) throw new Error('sem lista'); return { udb: r.data, src: r.src }; });
+}
+// ---- ajustes de cálculo centrais ----
+function parseCdb(obj) {
+  if (!obj || !obj.ajustes || typeof obj.ajustes !== 'object') return null;
+  var cfg = {};
+  Object.keys(DEFCFG).forEach(function (k) { if (obj.ajustes[k] !== undefined && obj.ajustes[k] !== null && String(obj.ajustes[k]).trim() !== '') cfg[k] = String(obj.ajustes[k]).trim(); });
+  return { at: obj.atualizado_em || '', by: obj.atualizado_por || '', cfg: cfg };
+}
+function cdbToFile(cfg, by) {
+  var aj = {};
+  Object.keys(DEFCFG).forEach(function (k) { aj[k] = String(cfg[k] !== undefined ? cfg[k] : DEFCFG[k]); });
+  return { sistema: 'SIAG – ajustes de cálculo centrais. Não edite à mão: use Ajustes no app (Administrador ou Regulação).', atualizado_em: new Date().toISOString(), atualizado_por: by || '', ajustes: aj };
+}
+function fetchCdb() { return fetchCentral(CFG_FILE, parseCdb).then(function (r) { return { cdb: r.data, src: r.src }; }); }
+function readCdbCache() {
+  try { var c = JSON.parse(window.localStorage.getItem(CKEY) || 'null'); return c && c.cdb && c.cdb.cfg ? c : null; } catch (e) { return null; }
+}
+function writeCdbCache(cdb) { try { window.localStorage.setItem(CKEY, JSON.stringify({ cdb: cdb, got: Date.now() })); } catch (e) {} }
+function sameVal(a, b) {
+  var x = num(a), y = num(b);
+  if (isFinite(x) && isFinite(y)) return Math.abs(x - y) < 1e-12;
+  return String(a == null ? '' : a).trim() === String(b == null ? '' : b).trim();
+}
+// chaves do rascunho que diferem dos ajustes publicados
+function cfgDiff(draft, central) {
+  if (!draft) return [];
+  return Object.keys(DEFCFG).filter(function (k) { return draft[k] !== undefined && !sameVal(draft[k], central[k]); });
+}
+var CFG_LABEL = {};
+BASIC.concat(DESS, ADV).forEach(function (f) { CFG_LABEL[f.k] = f.label; });
+function cfgCheck(k, v) {
+  var x = num(v);
+  if (!isFinite(x)) return 'não é um número';
+  if (k === 'partida') return x >= 0 ? '' : 'não pode ser negativo';
+  if (x <= 0) return 'precisa ser maior que zero';
+  if ((k === 'pcsRef' || k === 'pcsTeste') && (x < PCS_MIN || x > PCS_MAX)) return 'fora da faixa ' + PCS_MIN + '–' + PCS_MAX;
+  if (k === 'tol' && x > 50) return 'acima de 50%';
+  if (k === 'nMax' && (x !== Math.round(x) || x > 6)) return 'precisa ser inteiro de 1 a 6';
+  return '';
 }
 function ghErr(status, body) {
   if (status === 401) return 'Token do GitHub inválido ou vencido. Gere um novo e salve em Ajustes.';
@@ -972,24 +1062,23 @@ function ghErr(status, body) {
   return 'Falha ao publicar no GitHub (' + status + ')' + (body && body.message ? ': ' + body.message : '') + '.';
 }
 // lê a versão mais nova do arquivo, aplica a alteração e grava de volta (um commit no GitHub)
-function ghPublish(token, mutate, by, msg, tries) {
+function ghPublishFile(file, parse, build, token, msg, tries) {
   tries = tries || 0;
-  var url = GH_API + '/contents/' + GH_FILE;
+  var url = GH_API + '/contents/' + file;
   return timeout(fetch(url + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(token) }), 10000)
     .then(function (r) {
-      if (r.status === 404) return { sha: null, udb: null };
+      if (r.status === 404) return { sha: null, data: null };
       if (!r.ok) return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
-      return r.json().then(function (j) { return { sha: j.sha, udb: parseUdb(JSON.parse(b64dec(j.content))) }; });
+      return r.json().then(function (j) { return { sha: j.sha, data: parse(JSON.parse(b64dec(j.content))) }; });
     })
     .then(function (curr) {
-      var users = mutate(curr.udb ? curr.udb.users.map(function (u) { return Object.assign({}, u); }) : []);
-      var file = udbToFile(users, by);
-      var body = { message: 'SIAG: ' + msg, content: b64enc(JSON.stringify(file, null, 2) + '\n'), branch: GH_BRANCH };
+      var fileObj = build(curr.data);
+      var body = { message: 'SIAG: ' + msg, content: b64enc(JSON.stringify(fileObj, null, 2) + '\n'), branch: GH_BRANCH };
       if (curr.sha) body.sha = curr.sha;
       return timeout(fetch(url, { method: 'PUT', headers: Object.assign(ghHeaders(token), { 'Content-Type': 'application/json' }), body: JSON.stringify(body) }), 15000)
         .then(function (r) {
-          if (r.ok) return parseUdb(file);
-          if ((r.status === 409 || r.status === 422) && tries < 1) return ghPublish(token, mutate, by, msg, tries + 1);
+          if (r.ok) return parse(fileObj);
+          if ((r.status === 409 || r.status === 422) && tries < 1) return ghPublishFile(file, parse, build, token, msg, tries + 1);
           return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
         });
     })
@@ -997,6 +1086,11 @@ function ghPublish(token, mutate, by, msg, tries) {
       if (e && (e.message === 'timeout' || e instanceof TypeError)) throw new Error('Sem conexão com o GitHub. Verifique a internet e tente de novo.');
       throw e;
     });
+}
+function ghPublish(token, mutate, by, msg) {
+  return ghPublishFile(GH_FILE, parseUdb, function (curr) {
+    return udbToFile(mutate(curr ? curr.users.map(function (u) { return Object.assign({}, u); }) : []), by);
+  }, token, msg);
 }
 function brOfIso(iso) {
   var t = Date.parse(iso);
@@ -1186,7 +1280,8 @@ function freshState() {
     pcsBase: 'contrato', session: null, loginU: '', loginP: '', loginErr: '', loginBusy: false,
     newU: '', newP: '', newRole: 'oper', userMsg: '', userMsgKind: '',
     showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', resetLogin: '', resetP: '',
-    udb: null, udbSrc: '', udbGot: 0, udbSyncing: false, busy: false, tokIn: '', tokMsg: '', tokMsgKind: '', hasTok: false
+    udb: null, udbSrc: '', udbGot: 0, udbSyncing: false, busy: false, tokIn: '', tokMsg: '', tokMsgKind: '', hasTok: false,
+    cdb: null, cdbSrc: '', cfgDraft: null, draftOld: false, cfgMsg: '', cfgMsgKind: ''
   };
 }
 
@@ -1201,7 +1296,8 @@ class Component extends DCLogic {
         date: saved.date || base.date,
         prog: saved.prog.map(function (v) { return v === null || v === undefined ? '' : String(v); }),
         gts: Array.isArray(saved.gts) && saved.gts.length === 48 ? saved.gts.map(function (v) { return v === null || v === undefined ? '' : String(v); }) : blank48(),
-        cfg: Object.assign({}, DEFCFG, saved.cfg || {}),
+        cfgDraft: saved.cfgDraft && typeof saved.cfgDraft === 'object' ? saved.cfgDraft : null,
+        draftOld: !!saved.draftOld,
         log: Array.isArray(saved.log) ? saved.log : [],
         operador: saved.operador || '',
         units: Array.isArray(saved.units) ? saved.units : base.units,
@@ -1213,8 +1309,15 @@ class Component extends DCLogic {
       if (saved) base.session = saved.session && saved.session.login && saved.session.stamp ? saved.session : null;
       this.setState(base);
     }
-    var cache = readUdbCache();
-    this.setState({ udb: cache ? cache.udb : null, udbSrc: cache ? 'cache' : '', udbGot: cache ? cache.got : 0, hasTok: !!getToken() });
+    var cache = readUdbCache(), ccache = readCdbCache();
+    var mig = {};
+    // versão anterior: os ajustes ficavam só no aparelho. Se eram diferentes do padrão, viram rascunho para publicar.
+    if (saved && saved.cfg && !saved.cfgDraft) {
+      var legacy = Object.assign({}, DEFCFG, saved.cfg);
+      if (cfgDiff(legacy, DEFCFG).length) { mig.cfgDraft = legacy; mig.draftOld = true; }
+    }
+    this.setState(Object.assign(mig, { udb: cache ? cache.udb : null, udbSrc: cache ? 'cache' : '', udbGot: cache ? cache.got : 0, hasTok: !!getToken(),
+      cdb: ccache ? ccache.cdb : null, cdbSrc: ccache ? 'cache' : '' }));
     var self = this;
     this._tick = setInterval(function () { self.setState({ now: brNow() }); }, 30000);
     this._sync = setInterval(function () { if (document.visibilityState !== 'hidden') self.syncUsers(); }, 5 * 60000);
@@ -1241,21 +1344,28 @@ class Component extends DCLogic {
     }
     this.setState(patch);
   }
+  applyCdb(cdb, src) {
+    if (cdb) writeCdbCache(cdb);
+    var patch = { cdb: cdb, cdbSrc: src };
+    var st = this.cur();
+    // rascunho que ficou igual ao publicado deixa de existir
+    if (st.cfgDraft && !cfgDiff(st.cfgDraft, Object.assign({}, DEFCFG, cdb ? cdb.cfg : {})).length) { patch.cfgDraft = null; patch.draftOld = false; }
+    this.setState(patch);
+  }
+  // baixa usuários e ajustes centrais; a promessa diz se a lista de usuários veio
   syncUsers() {
     var self = this;
     if (this._syncP) return this._syncP;
     this.setState({ udbSyncing: true });
-    this._syncP = fetchUdb().then(function (r) {
-      self._syncP = null; self.applyUdb(r.udb, r.src); self.setState({ udbSyncing: false }); return true;
-    }, function () {
-      self._syncP = null; self.setState({ udbSyncing: false }); return false;
-    });
+    var pc = fetchCdb().then(function (r) { self.applyCdb(r.cdb, r.src); }, function () {});
+    var pu = fetchUdb().then(function (r) { self.applyUdb(r.udb, r.src); return true; }, function () { return false; });
+    this._syncP = Promise.all([pu, pc]).then(function (res) { self._syncP = null; self.setState({ udbSyncing: false }); return res[0]; });
     return this._syncP;
   }
   componentDidUpdate() {
     var s = this.cur();
     try {
-      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfg: s.cfg, log: s.log, operador: s.operador, units: s.units, session: s.session, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
+      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfgDraft: s.cfgDraft, draftOld: s.draftOld, log: s.log, operador: s.operador, units: s.units, session: s.session, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
     } catch (e) {}
   }
 
@@ -1263,7 +1373,9 @@ class Component extends DCLogic {
     var self = this;
     var st = this.cur();
     var accent = this.props.accent ?? '#1061A6';
-    var cfgRaw = Object.assign({}, DEFCFG, st.cfg || {});
+    var cfgRaw = Object.assign({}, DEFCFG, st.cdb ? st.cdb.cfg : {});   // vale o que está publicado
+    var draftKeys = cfgDiff(st.cfgDraft, cfgRaw);
+    var cfgForm = Object.assign({}, cfgRaw, draftKeys.length ? st.cfgDraft : {});
     var c = {};
     Object.keys(DEFCFG).forEach(function (k) {
       var v = num(cfgRaw[k]);
@@ -1512,11 +1624,15 @@ class Component extends DCLogic {
     function cfgList(list) {
       return list.map(function (f) {
         return {
-          id: 'cfg-' + f.k, label: f.label, unit: f.unit, val: String(cfgRaw[f.k]),
+          id: 'cfg-' + f.k, label: f.label, unit: f.unit, val: String(cfgForm[f.k]),
+          changed: draftKeys.indexOf(f.k) >= 0, ro: !canEditCfg,
+          bd: draftKeys.indexOf(f.k) >= 0 ? '#B54708' : '#C9D5E2', bg: draftKeys.indexOf(f.k) >= 0 ? '#FFF8EE' : '#FFFFFF',
+          pubVal: String(cfgRaw[f.k]),
           onChange: function (e) {
-            var cf = Object.assign({}, DEFCFG, self.cur().cfg || {});
+            var cs = self.cur();
+            var cf = Object.assign({}, DEFCFG, cs.cdb ? cs.cdb.cfg : {}, cs.cfgDraft || {});
             cf[f.k] = e.target.value;
-            self.setState({ cfg: cf });
+            self.setState({ cfgDraft: cf, cfgMsg: '' });
           }
         };
       });
@@ -1542,6 +1658,7 @@ class Component extends DCLogic {
     if (pwView) tab = '__pw';
     var hasTok = !!st.hasTok;
     var busy = !!st.busy;
+    var canEditCfg = canCfg;
     var doLogin = function () {
       var s = self.cur();
       if (s.loginBusy) return;
@@ -1567,7 +1684,7 @@ class Component extends DCLogic {
       var tok = getToken();
       var kindF = msgField === 'pw' ? null : 'userMsgKind', txtF = msgField === 'pw' ? 'pwMsg' : 'userMsg';
       function say(kind, text) { var p = {}; p[txtF] = text; if (kindF) p[kindF] = kind; self.setState(p); }
-      if (!tok) { say('err', 'Configure o token do GitHub (campo "Publicação das senhas") antes de alterar usuários.'); return Promise.resolve(false); }
+      if (!tok) { say('err', 'Configure o token do GitHub (card "Publicação no GitHub", no topo de Ajustes) antes de alterar usuários.'); return Promise.resolve(false); }
       self.setState({ busy: true });
       say('info', 'Publicando…');
       var me = self.cur().session ? self.cur().session.login : '';
@@ -1670,8 +1787,8 @@ class Component extends DCLogic {
       },
       clearTok: function () { setToken(''); self.setState({ hasTok: false, tokMsgKind: 'ok', tokMsg: 'Token removido deste aparelho.' }); },
       syncNow: function () {
-        self.setState({ userMsg: '', tokMsg: '' });
-        self.syncUsers().then(function (ok) { self.setState(ok ? { userMsgKind: 'ok', userMsg: 'Lista de usuários atualizada.' } : { userMsgKind: 'err', userMsg: 'Sem conexão: não foi possível atualizar agora.' }); });
+        self.setState({ userMsg: '', tokMsgKind: 'info', tokMsg: 'Atualizando…' });
+        self.syncUsers().then(function (ok) { self.setState(ok ? { tokMsgKind: 'ok', tokMsg: 'Usuários e ajustes atualizados.' } : { tokMsgKind: 'err', tokMsg: 'Sem conexão: não foi possível atualizar agora.' }); });
       },
       resetLogin: st.resetLogin, resetP: st.resetP,
       onResetLogin: function (e) { self.setState({ resetLogin: e.target.value, userMsg: '' }); },
@@ -1908,7 +2025,42 @@ class Component extends DCLogic {
       cfgBasic: cfgList(BASIC),
       cfgDess: cfgList(DESS),
       cfgAdv: cfgList(ADV),
-      resetCfg: function () { self.setState({ cfg: Object.assign({}, DEFCFG) }); }
+      resetCfg: function () { self.setState({ cfgDraft: Object.assign({}, DEFCFG), draftOld: false, cfgMsg: '' }); },
+      cfgPending: draftKeys.length > 0, cfgClean: draftKeys.length === 0,
+      cfgPendingTxt: draftKeys.length === 1 ? '1 alteração ainda não publicada' : draftKeys.length + ' alterações ainda não publicadas',
+      cfgPendingList: draftKeys.map(function (k) { return { label: CFG_LABEL[k] || k, from: String(cfgRaw[k]), to: String(cfgForm[k]) }; }),
+      draftOld: draftKeys.length > 0 && !!st.draftOld,
+      cfgInfo: (function () {
+        var cdb = st.cdb, at = cdb ? brOfIso(cdb.at) : NaN;
+        if (!cdb) return st.cdbSrc === 'cache' || !st.cdbSrc ? 'Usando os valores padrão do app (ajustes centrais ainda não baixados).' : 'Usando os valores padrão do app (nenhum ajuste publicado ainda).';
+        return (st.cdbSrc === 'cache' ? 'Sem conexão · usando os últimos ajustes baixados' : 'Ajustes centrais em uso') + (isFinite(at) ? ' · publicados em ' + fmtDT(at) + (cdb.by ? ' por ' + cdb.by : '') : '');
+      })(),
+      cfgMsgOk: !!st.cfgMsg && st.cfgMsgKind === 'ok', cfgMsgErr: !!st.cfgMsg && st.cfgMsgKind === 'err', cfgMsgInfo: !!st.cfgMsg && st.cfgMsgKind === 'info', cfgMsg: st.cfgMsg,
+      pubCfgLabel: busy ? 'PUBLICANDO…' : 'PUBLICAR PARA TODOS OS APARELHOS',
+      discardCfg: function () { self.setState({ cfgDraft: null, draftOld: false, cfgMsgKind: 'ok', cfgMsg: 'Alterações descartadas. Valem os ajustes publicados.' }); },
+      publishCfg: function () {
+        var cs = self.cur();
+        if (!canEditCfg || cs.busy) return;
+        var central = Object.assign({}, DEFCFG, cs.cdb ? cs.cdb.cfg : {});
+        var keys = cfgDiff(cs.cfgDraft, central);
+        if (!keys.length) { self.setState({ cfgMsgKind: 'ok', cfgMsg: 'Nada para publicar.' }); return; }
+        var bad = keys.map(function (k) { var m = cfgCheck(k, cs.cfgDraft[k]); return m ? (CFG_LABEL[k] || k) + ': ' + m : ''; }).filter(Boolean);
+        if (bad.length) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Corrija antes de publicar — ' + bad.join('; ') + '.' }); return; }
+        var tok = getToken();
+        if (!tok) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Configure o token do GitHub (card "Publicação no GitHub", no topo de Ajustes) para publicar.' }); return; }
+        var changes = {};
+        keys.forEach(function (k) { changes[k] = String(cs.cfgDraft[k]).trim(); });
+        var me = cs.session ? cs.session.login : '';
+        self.setState({ busy: true, cfgMsgKind: 'info', cfgMsg: 'Publicando…' });
+        ghPublishFile(CFG_FILE, parseCdb, function (curr) {
+          // aplica só o que foi alterado aqui sobre a versão mais nova (não desfaz mudança de outra pessoa)
+          return cdbToFile(Object.assign({}, DEFCFG, curr ? curr.cfg : {}, changes), me);
+        }, tok, 'ajustes de cálculo (' + keys.map(function (k) { return k + '=' + changes[k]; }).join(', ') + ')').then(function (nc) {
+          self.setState({ busy: false, cfgDraft: null, draftOld: false });
+          self.applyCdb(nc, 'github');
+          self.setState({ cfgMsgKind: 'ok', cfgMsg: 'Ajustes publicados. Já valem em todos os aparelhos.' });
+        }, function (e) { self.setState({ busy: false, cfgMsgKind: 'err', cfgMsg: e.message || String(e) }); });
+      }
     };
   }
 }

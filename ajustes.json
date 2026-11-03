@@ -1,0 +1,20 @@
+{
+  "sistema": "SIAG – ajustes de cálculo centrais. Não edite à mão: use Ajustes no app (Administrador ou Regulação).",
+  "atualizado_em": "2026-11-03T14:04:19.000Z",
+  "atualizado_por": "instalação v1.4 (valores padrão)",
+  "ajustes": {
+    "tol": "3",
+    "pcsRef": "9400",
+    "pcsTeste": "8500.79",
+    "partida": "0",
+    "gmax1": "57.393",
+    "gmin1": "45.914",
+    "ton": "12",
+    "toff": "4",
+    "rel": "1.0177849601",
+    "nMax": "2",
+    "a": "3903.1183550",
+    "b": "194.9803447",
+    "k": "1.1171045962"
+  }
+}

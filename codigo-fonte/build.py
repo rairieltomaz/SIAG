@@ -106,8 +106,8 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const u = new URL(e.request.url);
-  // lista central de usuários e API do GitHub: sempre direto da rede (o app guarda a última cópia)
-  if (u.origin !== self.location.origin || u.pathname.endsWith('/usuarios.json')) return;
+  // listas centrais (usuários e ajustes) e API do GitHub: sempre direto da rede (o app guarda a última cópia)
+  if (u.origin !== self.location.origin || u.pathname.endsWith('/usuarios.json') || u.pathname.endsWith('/ajustes.json')) return;
   e.respondWith(fetch(e.request, { cache: 'no-store' }).then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; }).catch(() => caches.match(e.request).then(r => r || caches.match('./index.html'))));
 });
 '''
