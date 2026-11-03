@@ -93,13 +93,16 @@ button:disabled{cursor:not-allowed}
           <sc-if value="{{ hasLoginErr }}" hint-placeholder-val="{{ false }}">
             <div role="alert" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8A1A12; background: #FDECEA; border-left: 4px solid #B42318; padding: 10px 12px">{{ loginErr }}</div>
           </sc-if>
-          <button type="button" onClick="{{ doLoginBtn }}" style="height: 52px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px">
-            ENTRAR
+          <button type="button" onClick="{{ doLoginBtn }}" disabled="{{ loginBusy }}" style="height: 52px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px">
+            {{ loginBtnLabel }}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
           </button>
         </div>
 
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.2.1</div>
+        <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
+        </sc-if>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.3</div>
       </main>
     </div>
   </sc-if>
@@ -117,7 +120,9 @@ button:disabled{cursor:not-allowed}
         <span style="font-size: 11px; color: #D6E7F7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ userName }} · {{ roleLabel }}</span>
       </div>
       <div style="display: flex; align-items: stretch">
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
       <button type="button" onClick="{{ openPw }}" aria-label="Trocar minha senha" style="height: 44px; border: 0; border-left: 1px solid #3C82BF; background: #1061A6; color: #FFFFFF; padding: 0 12px; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M10.8 12.2L20 3"></path><path d="M16 7l3 3"></path></svg>SENHA</button>
+      </sc-if>
       <button type="button" onClick="{{ logout }}" style="height: 44px; border: 0; border-left: 1px solid #3C82BF; background: #0B4A80; color: #FFFFFF; padding: 0 16px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer">SAIR</button>
       </div>
     </div>
@@ -125,12 +130,16 @@ button:disabled{cursor:not-allowed}
 
   <main class="app-main" style="flex: 1 1 auto; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
 
+    <sc-if value="{{ defaultPassWarn }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; font-size: 13px; color: #6B3A00; line-height: 1.4">Este usuário ainda usa a senha padrão. Peça ao administrador para definir uma senha nova em Ajustes.</div>
+    </sc-if>
+
     <!-- ============ TROCA DE SENHA ============ -->
     <sc-if value="{{ pwView }}" hint-placeholder-val="{{ false }}">
       <div class="page pw-page" style="display: flex; flex-direction: column; gap: 14px">
         <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">{{ pwTitle }}</h1>
         <sc-if value="{{ mustChange }}" hint-placeholder-val="{{ false }}">
-          <div role="alert" style="background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; font-size: 14px; color: #6B3A00; line-height: 1.4">Primeiro acesso com a senha padrão. Crie uma senha pessoal para continuar.</div>
+          <div role="alert" style="background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; font-size: 14px; color: #6B3A00; line-height: 1.4">Primeiro acesso do administrador com a senha padrão. Crie a sua senha: ela será publicada e passará a valer em todos os aparelhos.</div>
         </sc-if>
         <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #1061A6; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px">
           <div style="font-size: 14px; color: #33475E">Usuário: <b>{{ userName }}</b></div>
@@ -148,10 +157,30 @@ button:disabled{cursor:not-allowed}
             <label for="pw-new2" style="font-size: 13px; font-weight: 600; color: #33475E">Repita a nova senha</label>
             <input id="pw-new2" type="password" autoComplete="new-password" value="{{ pwNew2 }}" onChange="{{ onPwNew2 }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
           </div>
+          <sc-if value="{{ noTok }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 8px; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 12px">
+            <div style="font-size: 14px; font-weight: 600">Token do GitHub (publicação das senhas)</div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
+            <input id="tk-pw" type="password" autoComplete="off" autoCapitalize="none" placeholder="github_pat_…" value="{{ tokIn }}" onChange="{{ onTokIn }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+            <button type="button" onClick="{{ saveTok }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Salvar token</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ tokMsgOk }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
+          <sc-if value="{{ tokMsgInfo }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
+          <sc-if value="{{ tokMsgErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
           <sc-if value="{{ pwMsgErr }}" hint-placeholder-val="{{ false }}">
             <div role="alert" style="font-size: 14px; color: #8A1A12; background: #FDECEA; border-left: 4px solid #B42318; padding: 10px 12px">{{ pwMsg }}</div>
           </sc-if>
-          <button type="button" onClick="{{ savePw }}" style="height: 50px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer">SALVAR NOVA SENHA</button>
+          <sc-if value="{{ pwMsgInfo }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 14px; color: #0B4A80; background: #E8F1FA; padding: 10px 12px">{{ pwMsg }}</div>
+          </sc-if>
+          <button type="button" onClick="{{ savePw }}" disabled="{{ busy }}" style="height: 50px; border: 0; border-radius: 2px; background: #1061A6; color: #FFFFFF; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer">{{ savePwLabel }}</button>
           <sc-if value="{{ canCancelPw }}" hint-placeholder-val="{{ true }}">
             <button type="button" onClick="{{ closePw }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Cancelar</button>
           </sc-if>
@@ -159,7 +188,7 @@ button:disabled{cursor:not-allowed}
             <button type="button" onClick="{{ logout }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">Sair</button>
           </sc-if>
         </div>
-        <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">A senha fica gravada neste aparelho. Em outro celular, a troca precisa ser feita nele também.</div>
+        <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">A senha é publicada na lista central do SIAG e passa a valer em todos os celulares e computadores. Quem estiver conectado com este usuário em outro aparelho precisará entrar de novo.</div>
       </div>
     </sc-if>
 
@@ -630,15 +659,46 @@ button:disabled{cursor:not-allowed}
           <div style="display: flex; flex-direction: column; gap: 4px">
             <div style="font-size: 15px; font-weight: 600">Usuários</div>
             <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Administrador: acesso total e cadastro de usuários. Regulação: altera os Ajustes, sem cadastro. Operação: sem acesso aos Ajustes.</div>
+            <div style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">Usuários e senhas são centrais: o que for cadastrado ou trocado aqui vale em todos os aparelhos.</div>
           </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-size: 12px; color: #4A5B6E; line-height: 1.4">{{ udbInfo }}</span>
+            <button type="button" onClick="{{ syncNow }}" style="flex: 0 0 auto; height: 36px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #1061A6; padding: 0 10px; font-size: 13px; cursor: pointer">Atualizar</button>
+          </div>
+          <sc-if value="{{ noTok }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 8px; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 12px">
+            <div style="font-size: 14px; font-weight: 600">Token do GitHub (publicação das senhas)</div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
+            <input id="tk-cfg" type="password" autoComplete="off" autoCapitalize="none" placeholder="github_pat_…" value="{{ tokIn }}" onChange="{{ onTokIn }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+            <button type="button" onClick="{{ saveTok }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Salvar token</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ hasTok }}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: #075C2E">
+              <span>✓ Token do GitHub configurado neste aparelho</span>
+              <button type="button" onClick="{{ clearTok }}" style="flex: 0 0 auto; height: 36px; border: 1px solid #E3B4AE; border-radius: 2px; background: #FFFFFF; color: #9B1C14; padding: 0 10px; font-size: 13px; cursor: pointer">Remover</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tokMsgOk }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
+          <sc-if value="{{ tokMsgInfo }}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
+          <sc-if value="{{ tokMsgErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
+          </sc-if>
           <sc-for list="{{ userList }}" as="u" hint-placeholder-count="2">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-top: 1px solid #EDF2F7">
               <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
                 <span style="font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ u.login }}</span>
                 <span style="font-size: 12px; color: #4A5B6E">{{ u.roleLabel }}</span>
+                <sc-if value="{{ u.padrao }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size: 11px; font-weight: 700; color: #6B3A00; background: #FFF4E5; padding: 1px 6px; align-self: flex-start">AINDA COM SENHA PADRÃO</span>
+                </sc-if>
               </div>
               <sc-if value="{{ u.canRemove }}" hint-placeholder-val="{{ false }}">
-                <button type="button" onClick="{{ u.remove }}" style="height: 40px; border: 1px solid #E3B4AE; border-radius: 2px; background: #FFFFFF; color: #9B1C14; padding: 0 12px; cursor: pointer">Remover</button>
+                <button type="button" onClick="{{ u.remove }}" disabled="{{ busy }}" style="height: 40px; border: 1px solid #E3B4AE; border-radius: 2px; background: #FFFFFF; color: #9B1C14; padding: 0 12px; cursor: pointer">Remover</button>
               </sc-if>
             </div>
           </sc-for>
@@ -657,8 +717,8 @@ button:disabled{cursor:not-allowed}
                 <input id="r-pass" type="password" autoComplete="new-password" value="{{ resetP }}" onChange="{{ onResetP }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340">
               </div>
             </div>
-            <button type="button" onClick="{{ doReset }}" style="height: 48px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Redefinir senha</button>
-            <div style="font-size: 12px; color: #4A5B6E">O usuário precisará criar uma senha pessoal no próximo acesso.</div>
+            <button type="button" onClick="{{ doReset }}" disabled="{{ busy }}" style="height: 48px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Redefinir senha</button>
+            <div style="font-size: 12px; color: #4A5B6E">A nova senha vale em todos os aparelhos. Quem estiver conectado com esse usuário precisará entrar de novo.</div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EDF2F7; padding-top: 12px">
             <div style="font-size: 14px; font-weight: 600">Cadastrar novo usuário</div>
@@ -680,12 +740,15 @@ button:disabled{cursor:not-allowed}
                 </select>
               </div>
             </div>
-            <button type="button" onClick="{{ addUser }}" style="height: 48px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Cadastrar</button>
+            <button type="button" onClick="{{ addUser }}" disabled="{{ busy }}" style="height: 48px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Cadastrar</button>
             <sc-if value="{{ userMsgOk }}" hint-placeholder-val="{{ false }}">
               <div role="status" style="font-size: 14px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 10px 12px">{{ userMsg }}</div>
             </sc-if>
             <sc-if value="{{ userMsgErr }}" hint-placeholder-val="{{ false }}">
               <div role="alert" style="font-size: 14px; color: #6E140E; background: #FDECEA; border-radius: 2px; padding: 10px 12px">{{ userMsg }}</div>
+            </sc-if>
+            <sc-if value="{{ userMsgInfo }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="font-size: 14px; color: #0B4A80; background: #E8F1FA; border-radius: 2px; padding: 10px 12px">{{ userMsg }}</div>
             </sc-if>
           </div>
         </div>
@@ -798,49 +861,148 @@ var ADV = [
   { k: 'k', label: 'Fator de calibração (k)', unit: '–' }
 ];
 var PCS_MIN = 6000, PCS_MAX = 12000;
-var H123 = '92c1e6482d582964130d7863ebd8eca2b5d5057308b91f695885a707e56b35ba'; // senha padrão de primeiro acesso
-var DEFAULT_USERS = [
-  { login: 'CEA-ADM', hash: H123, role: 'admin', fixed: true },
-  { login: 'CEA-REG', hash: H123, role: 'reg', fixed: true },
-  { login: 'CEA-OPE', hash: H123, role: 'oper', fixed: true }
-];
+// ---- usuários centralizados (arquivo usuarios.json no GitHub) ----
+var GH_REPO = 'rairieltomaz/SIAG', GH_BRANCH = 'main', GH_FILE = 'usuarios.json';
+var GH_API = 'https://api.github.com/repos/' + GH_REPO;
+var UKEY = 'siag-usuarios-v1';   // última lista baixada (para uso sem internet)
+var TKEY = 'siag-gh-token';      // token do GitHub (só no aparelho do administrador)
+var DEF_PASS = 'Siag@2026';      // senha padrão de primeiro acesso
+var PBKDF2_ITER = 150000;
 function norm(s) {
-  return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+  return String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
 }
 function roleName(r) { return r === 'admin' ? 'Administrador' : (r === 'reg' ? 'Regulação' : 'Operação'); }
-function sha256Sync(ascii) {
-  var bytes = unescape(encodeURIComponent(String(ascii)));
-  var K = [], H = [], isP = {}, c = 0, n = 2;
-  while (c < 64) {
-    if (!isP[n]) { for (var m = n * n; m < 313; m += n) isP[m] = 1; if (c < 8) H[c] = (Math.pow(n, 0.5) * 4294967296) | 0; K[c++] = (Math.pow(n, 1 / 3) * 4294967296) | 0; }
-    n++;
-  }
-  var w = [], L = bytes.length * 8, i, j;
-  bytes += '\x80';
-  while (bytes.length % 64 - 56) bytes += '\x00';
-  for (i = 0; i < bytes.length; i++) { j = bytes.charCodeAt(i); w[i >> 2] |= j << ((3 - i) % 4) * 8; }
-  w[w.length] = (L / 4294967296) | 0;
-  w[w.length] = L | 0;
-  function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
-  for (j = 0; j < w.length;) {
-    var W = w.slice(j, j += 16), old = H.slice(0);
-    for (i = 0; i < 64; i++) {
-      var w15 = W[i - 15], w2 = W[i - 2], a = H[0], e = H[4];
-      if (i >= 16) W[i] = (W[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + W[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0;
-      var t1 = H[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & H[5]) ^ (~e & H[6])) + K[i] + W[i];
-      var t2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
-      H = [(t1 + t2) | 0].concat(H);
-      H[4] = (H[4] + t1) | 0;
-      H.length = 8;
-    }
-    for (i = 0; i < 8; i++) H[i] = (H[i] + old[i]) | 0;
-  }
-  var out = '';
-  for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) { var b = (H[i] >> (j * 8)) & 255; out += (b < 16 ? '0' : '') + b.toString(16); }
+function hexOf(buf) {
+  var b = new Uint8Array(buf), out = '';
+  for (var i = 0; i < b.length; i++) out += (b[i] < 16 ? '0' : '') + b[i].toString(16);
   return out;
 }
-function sha256Hex(text) {
-  try { return Promise.resolve(sha256Sync(text)); } catch (e) { return Promise.reject(e); }
+function hexBytes(h) {
+  var a = new Uint8Array(h.length / 2);
+  for (var i = 0; i < a.length; i++) a[i] = parseInt(h.substr(i * 2, 2), 16);
+  return a;
+}
+function randHex(n) { var a = new Uint8Array(n); crypto.getRandomValues(a); return hexOf(a); }
+// PBKDF2-SHA256 com sal: o arquivo de usuários é público, então a senha nunca vai em texto
+function pwHash(pass, salt, iter) {
+  try {
+    return crypto.subtle.importKey('raw', new TextEncoder().encode(String(pass)), 'PBKDF2', false, ['deriveBits'])
+      .then(function (k) { return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: hexBytes(salt), iterations: iter }, k, 256); })
+      .then(hexOf);
+  } catch (e) { return Promise.reject(e); }
+}
+function makeSecret(pass) {
+  var salt = randHex(16);
+  return pwHash(pass, salt, PBKDF2_ITER).then(function (h) { return { sal: salt, iter: PBKDF2_ITER, hash: h }; });
+}
+function stampOf(u) { return u && u.hash ? String(u.hash).slice(0, 16) : ''; }
+function b64enc(str) {
+  var b = new TextEncoder().encode(str), bin = '';
+  for (var i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]);
+  return btoa(bin);
+}
+function b64dec(s) {
+  var bin = atob(String(s).replace(/\s/g, '')), b = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(b);
+}
+// valida o conteúdo do usuarios.json e devolve { at, by, users: [...] } ou null
+function parseUdb(obj) {
+  if (!obj || !Array.isArray(obj.usuarios)) return null;
+  var users = [];
+  obj.usuarios.forEach(function (u) {
+    if (!u || !u.login || !u.hash || !u.sal) return;
+    users.push({
+      login: String(u.login), role: u.perfil === 'admin' ? 'admin' : (u.perfil === 'reg' ? 'reg' : 'oper'),
+      fixed: !!u.fixo, sal: String(u.sal), iter: parseInt(u.iter, 10) || PBKDF2_ITER, hash: String(u.hash), padrao: !!u.senha_padrao
+    });
+  });
+  if (!users.some(function (u) { return u.role === 'admin'; })) return null;
+  return { at: obj.atualizado_em || '', by: obj.atualizado_por || '', users: users };
+}
+function udbToFile(users, by) {
+  return {
+    sistema: 'SIAG – lista central de usuários. Não edite à mão: use Ajustes no app (perfil Administrador).',
+    atualizado_em: new Date().toISOString(), atualizado_por: by || '',
+    usuarios: users.map(function (u) {
+      var o = { login: u.login, perfil: u.role };
+      if (u.fixed) o.fixo = true;
+      o.sal = u.sal; o.iter = u.iter; o.hash = u.hash;
+      if (u.padrao) o.senha_padrao = true;
+      return o;
+    })
+  };
+}
+function findUser(udb, login) {
+  return udb && udb.users ? udb.users.filter(function (u) { return norm(u.login) === norm(login); })[0] || null : null;
+}
+function readUdbCache() {
+  try { var c = JSON.parse(window.localStorage.getItem(UKEY) || 'null'); return c && c.udb && c.udb.users ? c : null; } catch (e) { return null; }
+}
+function writeUdbCache(udb) { try { window.localStorage.setItem(UKEY, JSON.stringify({ udb: udb, got: Date.now() })); } catch (e) {} }
+function getToken() { try { return window.localStorage.getItem(TKEY) || ''; } catch (e) { return ''; } }
+function setToken(t) { try { if (t) window.localStorage.setItem(TKEY, t); else window.localStorage.removeItem(TKEY); } catch (e) {} }
+function timeout(p, ms) {
+  return new Promise(function (ok, fail) {
+    var t = setTimeout(function () { fail(new Error('timeout')); }, ms);
+    p.then(function (v) { clearTimeout(t); ok(v); }, function (e) { clearTimeout(t); fail(e); });
+  });
+}
+function ghHeaders(token, raw) {
+  var h = { 'Accept': raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json' };
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+// baixa a lista central: 1º API do GitHub (sempre atualizada), 2º arquivo publicado no site
+function fetchUdb() {
+  var tok = getToken();
+  var viaApi = timeout(fetch(GH_API + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(tok, true) }), 7000)
+    .then(function (r) { if (!r.ok) throw new Error('api ' + r.status); return r.json(); })
+    .then(function (j) { var d = parseUdb(j); if (!d) throw new Error('inválido'); return { udb: d, src: 'github' }; });
+  return viaApi.catch(function () {
+    return timeout(fetch(GH_FILE + '?t=' + Date.now(), { cache: 'no-store' }), 7000)
+      .then(function (r) { if (!r.ok) throw new Error('site ' + r.status); return r.json(); })
+      .then(function (j) { var d = parseUdb(j); if (!d) throw new Error('inválido'); return { udb: d, src: 'site' }; });
+  });
+}
+function ghErr(status, body) {
+  if (status === 401) return 'Token do GitHub inválido ou vencido. Gere um novo e salve em Ajustes.';
+  if (status === 403 || status === 404) return 'O token não tem permissão de escrita no repositório SIAG (precisa de "Contents: Read and write").';
+  if (status === 409 || status === 422) return 'Outra alteração foi publicada ao mesmo tempo. Tente de novo.';
+  return 'Falha ao publicar no GitHub (' + status + ')' + (body && body.message ? ': ' + body.message : '') + '.';
+}
+// lê a versão mais nova do arquivo, aplica a alteração e grava de volta (um commit no GitHub)
+function ghPublish(token, mutate, by, msg, tries) {
+  tries = tries || 0;
+  var url = GH_API + '/contents/' + GH_FILE;
+  return timeout(fetch(url + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(token) }), 10000)
+    .then(function (r) {
+      if (r.status === 404) return { sha: null, udb: null };
+      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
+      return r.json().then(function (j) { return { sha: j.sha, udb: parseUdb(JSON.parse(b64dec(j.content))) }; });
+    })
+    .then(function (curr) {
+      var users = mutate(curr.udb ? curr.udb.users.map(function (u) { return Object.assign({}, u); }) : []);
+      var file = udbToFile(users, by);
+      var body = { message: 'SIAG: ' + msg, content: b64enc(JSON.stringify(file, null, 2) + '\n'), branch: GH_BRANCH };
+      if (curr.sha) body.sha = curr.sha;
+      return timeout(fetch(url, { method: 'PUT', headers: Object.assign(ghHeaders(token), { 'Content-Type': 'application/json' }), body: JSON.stringify(body) }), 15000)
+        .then(function (r) {
+          if (r.ok) return parseUdb(file);
+          if ((r.status === 409 || r.status === 422) && tries < 1) return ghPublish(token, mutate, by, msg, tries + 1);
+          return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
+        });
+    })
+    .catch(function (e) {
+      if (e && (e.message === 'timeout' || e instanceof TypeError)) throw new Error('Sem conexão com o GitHub. Verifique a internet e tente de novo.');
+      throw e;
+    });
+}
+function brOfIso(iso) {
+  var t = Date.parse(iso);
+  if (!isFinite(t)) return NaN;
+  var u = new Date(t - 3 * 3600000);
+  return new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), u.getUTCHours(), u.getUTCMinutes()).getTime();
 }
 
 function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -1021,9 +1183,10 @@ function freshState() {
     cfg: Object.assign({}, DEFCFG), log: [], sel: defaultSel(), med: '', pcsReal: '', operador: '',
     fillDe: 0, fillAte: 48, fillMw: '', fillGt: '', paste: '', showPaste: false, confirmClear: false, msg: '', msgKind: '',
     units: [{ s: '', since: '' }, { s: '', since: '' }], showNota: false, now: brNow(),
-    pcsBase: 'contrato', session: null, users: [], loginU: '', loginP: '', loginErr: '',
+    pcsBase: 'contrato', session: null, loginU: '', loginP: '', loginErr: '', loginBusy: false,
     newU: '', newP: '', newRole: 'oper', userMsg: '', userMsgKind: '',
-    pwOver: {}, forceChange: {}, mustChange: false, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', resetLogin: '', resetP: ''
+    showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', resetLogin: '', resetP: '',
+    udb: null, udbSrc: '', udbGot: 0, udbSyncing: false, busy: false, tokIn: '', tokMsg: '', tokMsgKind: '', hasTok: false
   };
 }
 
@@ -1042,28 +1205,57 @@ class Component extends DCLogic {
         log: Array.isArray(saved.log) ? saved.log : [],
         operador: saved.operador || '',
         units: Array.isArray(saved.units) ? saved.units : base.units,
-        session: saved.session && saved.session.login ? saved.session : null,
-        pwOver: saved.pwOver || {}, forceChange: saved.forceChange || {}, mustChange: !!saved.mustChange,
-        users: Array.isArray(saved.users) ? saved.users : [],
+        session: saved.session && saved.session.login && saved.session.stamp ? saved.session : null,
         pcsBase: saved.pcsBase === 'medido' ? 'medido' : 'contrato',
         pcsReal: saved.pcsReal || ''
       }));
     } else {
-      if (saved) {
-        base.session = saved.session && saved.session.login ? saved.session : null;
-        base.users = Array.isArray(saved.users) ? saved.users : [];
-        base.pwOver = saved.pwOver || {}; base.forceChange = saved.forceChange || {}; base.mustChange = !!saved.mustChange;
-      }
+      if (saved) base.session = saved.session && saved.session.login && saved.session.stamp ? saved.session : null;
       this.setState(base);
     }
+    var cache = readUdbCache();
+    this.setState({ udb: cache ? cache.udb : null, udbSrc: cache ? 'cache' : '', udbGot: cache ? cache.got : 0, hasTok: !!getToken() });
     var self = this;
     this._tick = setInterval(function () { self.setState({ now: brNow() }); }, 30000);
+    this._sync = setInterval(function () { if (document.visibilityState !== 'hidden') self.syncUsers(); }, 5 * 60000);
+    this._vis = function () { if (document.visibilityState === 'visible') self.syncUsers(); };
+    document.addEventListener('visibilitychange', this._vis);
+    this.syncUsers();
   }
-  componentWillUnmount() { if (this._tick) clearInterval(this._tick); }
+  componentWillUnmount() {
+    if (this._tick) clearInterval(this._tick);
+    if (this._sync) clearInterval(this._sync);
+    if (this._vis) document.removeEventListener('visibilitychange', this._vis);
+  }
+  // aplica uma lista de usuários nova (baixada ou recém-publicada) e derruba sessões que perderam a validade
+  applyUdb(udb, src) {
+    writeUdbCache(udb);
+    var patch = { udb: udb, udbSrc: src, udbGot: Date.now() };
+    var ses = this.cur().session;
+    if (ses) {
+      var u = findUser(udb, ses.login);
+      if (!u) { patch.session = null; patch.loginErr = 'O usuário ' + ses.login + ' foi removido pelo administrador.'; }
+      else if (stampOf(u) !== ses.stamp) { patch.session = null; patch.loginErr = 'A senha de ' + u.login + ' foi alterada. Entre com a senha nova.'; }
+      else if (u.role !== ses.role) patch.session = Object.assign({}, ses, { role: u.role });
+      if (patch.session === null) { patch.showPw = false; patch.tab = 'prog'; }
+    }
+    this.setState(patch);
+  }
+  syncUsers() {
+    var self = this;
+    if (this._syncP) return this._syncP;
+    this.setState({ udbSyncing: true });
+    this._syncP = fetchUdb().then(function (r) {
+      self._syncP = null; self.applyUdb(r.udb, r.src); self.setState({ udbSyncing: false }); return true;
+    }, function () {
+      self._syncP = null; self.setState({ udbSyncing: false }); return false;
+    });
+    return this._syncP;
+  }
   componentDidUpdate() {
     var s = this.cur();
     try {
-      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfg: s.cfg, log: s.log, operador: s.operador, units: s.units, session: s.session, users: s.users, pwOver: s.pwOver, forceChange: s.forceChange, mustChange: s.mustChange, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
+      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfg: s.cfg, log: s.log, operador: s.operador, units: s.units, session: s.session, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
     } catch (e) {}
   }
 
@@ -1335,40 +1527,71 @@ class Component extends DCLogic {
 
     function setMsg(kind, text) { self.setState({ msg: text, msgKind: kind }); }
 
-    // ---- acesso ----
-    var allUsers = DEFAULT_USERS.concat(st.users || []);
+    // ---- acesso (lista central de usuários) ----
+    var udb = st.udb;
+    var allUsers = udb ? udb.users : [];
     var session = st.session;
-    var sessUser = session ? allUsers.filter(function (u) { return norm(u.login) === norm(session.login); })[0] : null;
+    var sessUser = session ? findUser(udb, session.login) : null;
+    if (sessUser && stampOf(sessUser) !== session.stamp) sessUser = null;
     var logged = !!sessUser;
     var isAdmin = logged && sessUser.role === 'admin';
     var canCfg = logged && (sessUser.role === 'admin' || sessUser.role === 'reg');
     if (tab === 'cfg' && !canCfg) tab = 'prog';
-    var pwView = logged && (!!st.mustChange || !!st.showPw);
+    var mustChange = isAdmin && !!sessUser.padrao;
+    var pwView = logged && (mustChange || (!!st.showPw && isAdmin));
     if (pwView) tab = '__pw';
+    var hasTok = !!st.hasTok;
+    var busy = !!st.busy;
     var doLogin = function () {
       var s = self.cur();
-      var u = DEFAULT_USERS.concat(s.users || []).filter(function (x) { return norm(x.login) === norm(s.loginU); })[0];
+      if (s.loginBusy) return;
       if (isBlank(s.loginU) || isBlank(s.loginP)) { self.setState({ loginErr: 'Digite o login e a senha.' }); return; }
-      sha256Hex(String(s.loginP).trim()).then(function (h) {
+      var typed = String(s.loginP).trim(), login = s.loginU;
+      self.setState({ loginBusy: true, loginErr: '' });
+      // confere a lista mais nova antes de validar (senha pode ter sido trocada em outro aparelho)
+      timeout(self.syncUsers(), 8000).catch(function () { return false; }).then(function () {
         var cur = self.cur();
-        var uh = u ? ((cur.pwOver || {})[norm(u.login)] || u.hash) : null;
-        if (!u || uh !== h) { self.setState({ loginErr: 'Login ou senha incorretos.', loginP: '' }); return; }
-        var must = h === H123 || !!(cur.forceChange || {})[norm(u.login)];
-        var patch = { session: { login: u.login, role: u.role }, loginErr: '', loginP: '', loginU: '', tab: 'prog', mustChange: must, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' };
-        if (isBlank(self.cur().operador)) patch.operador = u.login;
-        self.setState(patch);
-      }, function () { self.setState({ loginErr: 'Este navegador não permite o login seguro. Use Chrome ou Safari atualizado.' }); });
+        if (!cur.udb) { self.setState({ loginBusy: false, loginErr: 'Sem conexão. No primeiro acesso deste aparelho é preciso internet para baixar a lista de usuários.' }); return; }
+        var u = findUser(cur.udb, login);
+        if (!u) { self.setState({ loginBusy: false, loginErr: 'Login ou senha incorretos.', loginP: '' }); return; }
+        return pwHash(typed, u.sal, u.iter).then(function (h) {
+          if (h !== u.hash) { self.setState({ loginBusy: false, loginErr: 'Login ou senha incorretos.', loginP: '' }); return; }
+          var patch = { session: { login: u.login, role: u.role, stamp: stampOf(u) }, loginBusy: false, loginErr: '', loginP: '', loginU: '', tab: 'prog', showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' };
+          if (isBlank(self.cur().operador)) patch.operador = u.login;
+          self.setState(patch);
+        });
+      }).catch(function () { self.setState({ loginBusy: false, loginErr: 'Este navegador não permite o login seguro. Use Chrome ou Safari atualizado.' }); });
     };
+    // publica uma alteração de usuários no GitHub (só administrador, com token neste aparelho)
+    var publish = function (mutate, msg, okText, msgField, after) {
+      var tok = getToken();
+      var kindF = msgField === 'pw' ? null : 'userMsgKind', txtF = msgField === 'pw' ? 'pwMsg' : 'userMsg';
+      function say(kind, text) { var p = {}; p[txtF] = text; if (kindF) p[kindF] = kind; self.setState(p); }
+      if (!tok) { say('err', 'Configure o token do GitHub (campo "Publicação das senhas") antes de alterar usuários.'); return Promise.resolve(false); }
+      self.setState({ busy: true });
+      say('info', 'Publicando…');
+      var me = self.cur().session ? self.cur().session.login : '';
+      return ghPublish(tok, mutate, me, msg).then(function (nu) {
+        self.setState({ busy: false });
+        if (after) after(nu);
+        self.applyUdb(nu, 'github');
+        say('ok', okText);
+        return true;
+      }, function (e) { self.setState({ busy: false }); say('err', e.message || String(e)); return false; });
+    };
+    var udbAt = udb ? brOfIso(udb.at) : NaN;
+    var udbInfo = !udb ? 'Lista de usuários ainda não baixada neste aparelho.'
+      : (st.udbSrc === 'cache' ? 'Sem conexão no momento · usando a última lista baixada' : 'Lista de usuários sincronizada')
+        + (isFinite(udbAt) ? ' · alterada em ' + fmtDT(udbAt) + (udb.by ? ' por ' + udb.by : '') : '');
     var userList = allUsers.map(function (u) {
       return {
-        login: u.login, roleLabel: roleName(u.role) + (u.fixed ? ' · padrão' : ''),
+        login: u.login, roleLabel: roleName(u.role) + (u.fixed ? ' · conta fixa' : ''), padrao: !!u.padrao,
         canRemove: !u.fixed && !(session && norm(session.login) === norm(u.login)),
         remove: function () {
-          var cs = self.cur();
-          var us = (cs.users || []).filter(function (x) { return norm(x.login) !== norm(u.login); });
-          var po = Object.assign({}, cs.pwOver || {}); delete po[norm(u.login)];
-          var fc = Object.assign({}, cs.forceChange || {}); delete fc[norm(u.login)];
-          self.setState({ users: us, pwOver: po, forceChange: fc, userMsgKind: 'ok', userMsg: 'Usuário ' + u.login + ' removido.' });
+          if (self.cur().busy) return;
+          publish(function (list) {
+            return list.filter(function (x) { return !(norm(x.login) === norm(u.login) && !x.fixed); });
+          }, 'remove usuário ' + u.login, 'Usuário ' + u.login + ' removido em todos os aparelhos.');
         }
       };
     });
@@ -1382,56 +1605,97 @@ class Component extends DCLogic {
       onLoginU: function (e) { self.setState({ loginU: e.target.value, loginErr: '' }); },
       onLoginP: function (e) { self.setState({ loginP: e.target.value, loginErr: '' }); },
       doLoginBtn: function () { doLogin(); },
+      loginBtnLabel: st.loginBusy ? 'ENTRANDO…' : 'ENTRAR',
+      loginBusy: !!st.loginBusy,
+      udbInfo: udbInfo, udbWarn: !st.udbSyncing && (!udb || st.udbSrc === 'cache'),
       passType: st.showPass ? 'text' : 'password',
       passToggleLabel: st.showPass ? 'Ocultar senha' : 'Mostrar senha',
       togglePass: function () { self.setState({ showPass: !self.cur().showPass }); },
       onLoginKey: function (e) { if (e && e.key === 'Enter') { if (e.preventDefault) e.preventDefault(); doLogin(); } },
       hasLoginErr: !!st.loginErr, loginErr: st.loginErr,
-      logout: function () { self.setState({ session: null, tab: 'prog', loginU: '', loginP: '', loginErr: '', showPass: false, mustChange: false, showPw: false }); },
-      pwView: pwView, mustChange: logged && !!st.mustChange, askCurrent: !st.mustChange, canCancelPw: !st.mustChange,
-      pwTitle: st.mustChange ? 'Criar senha pessoal' : 'Trocar minha senha',
+      logout: function () { self.setState({ session: null, tab: 'prog', loginU: '', loginP: '', loginErr: '', showPass: false, showPw: false }); },
+      defaultPassWarn: logged && !isAdmin && !!sessUser.padrao,
+      pwView: pwView, mustChange: mustChange, askCurrent: !mustChange, canCancelPw: !mustChange,
+      pwTitle: mustChange ? 'Criar senha do administrador' : 'Trocar minha senha',
       openPw: function () { self.setState({ showPw: true, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' }); },
       closePw: function () { self.setState({ showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '' }); },
       pwCur: st.pwCur, pwNew: st.pwNew, pwNew2: st.pwNew2,
       onPwCur: function (e) { self.setState({ pwCur: e.target.value, pwMsg: '' }); },
       onPwNew: function (e) { self.setState({ pwNew: e.target.value, pwMsg: '' }); },
       onPwNew2: function (e) { self.setState({ pwNew2: e.target.value, pwMsg: '' }); },
-      pwMsgErr: !!st.pwMsg, pwMsg: st.pwMsg,
+      pwMsgErr: !!st.pwMsg && st.pwMsg !== 'Publicando…', pwMsgInfo: st.pwMsg === 'Publicando…', pwMsg: st.pwMsg,
+      savePwLabel: busy ? 'PUBLICANDO…' : 'SALVAR E PUBLICAR',
+      busy: busy,
       savePw: function () {
         var cs = self.cur();
-        if (!sessUser) return;
-        var key = norm(sessUser.login);
-        var curHash = (cs.pwOver || {})[key] || sessUser.hash;
-        if (!cs.mustChange && sha256Sync(String(cs.pwCur).trim()) !== curHash) { self.setState({ pwMsg: 'Senha atual incorreta.' }); return; }
+        if (!sessUser || !isAdmin || cs.busy) return;
         var np = String(cs.pwNew).trim();
         if (np.length < 6) { self.setState({ pwMsg: 'A nova senha precisa ter pelo menos 6 caracteres.' }); return; }
         if (np !== String(cs.pwNew2).trim()) { self.setState({ pwMsg: 'As duas senhas novas não são iguais.' }); return; }
-        var nh = sha256Sync(np);
-        if (nh === H123) { self.setState({ pwMsg: 'Não use a senha padrão. Escolha uma senha pessoal.' }); return; }
-        if (nh === curHash) { self.setState({ pwMsg: 'A nova senha precisa ser diferente da atual.' }); return; }
-        var po = Object.assign({}, cs.pwOver || {}), us = (cs.users || []).slice();
-        if (sessUser.fixed) po[key] = nh;
-        else us = us.map(function (x) { return norm(x.login) === key ? Object.assign({}, x, { hash: nh }) : x; });
-        var fc = Object.assign({}, cs.forceChange || {}); delete fc[key];
-        self.setState({ pwOver: po, users: us, forceChange: fc, mustChange: false, showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', msgKind: 'ok', msg: 'Senha alterada com sucesso.' });
+        if (np === DEF_PASS) { self.setState({ pwMsg: 'Não use a senha padrão. Escolha uma senha pessoal.' }); return; }
+        if (!getToken()) { self.setState({ pwMsg: 'Configure o token do GitHub (logo abaixo) para publicar a senha.' }); return; }
+        var me = sessUser;
+        var check = mustChange ? Promise.resolve(true) : pwHash(String(cs.pwCur).trim(), me.sal, me.iter).then(function (h) { return h === me.hash; });
+        self.setState({ busy: true, pwMsg: '' });
+        check.then(function (okCur) {
+          if (!okCur) { self.setState({ busy: false, pwMsg: 'Senha atual incorreta.' }); return; }
+          return makeSecret(np).then(function (sec) {
+            self.setState({ busy: false });
+            return publish(function (list) {
+              var hit = false;
+              list = list.map(function (x) { if (norm(x.login) !== norm(me.login)) return x; hit = true; var y = Object.assign({}, x, sec); delete y.padrao; return y; });
+              if (!hit) throw new Error('Seu usuário não está mais na lista central.');
+              return list;
+            }, 'troca de senha de ' + me.login, '', 'pw', function (nu) {
+              var mine = findUser(nu, me.login);
+              self.setState({ session: Object.assign({}, self.cur().session, { stamp: stampOf(mine) }), showPw: false, pwCur: '', pwNew: '', pwNew2: '', tokMsg: '', msgKind: 'ok', msg: 'Senha alterada e publicada. Já vale em todos os aparelhos.' });
+            });
+          });
+        }).catch(function () { self.setState({ busy: false, pwMsg: 'Este navegador não permite gerar a senha com segurança.' }); });
+      },
+      hasTok: hasTok, noTok: !hasTok,
+      tokIn: st.tokIn,
+      onTokIn: function (e) { self.setState({ tokIn: e.target.value, tokMsg: '' }); },
+      tokMsgOk: !!st.tokMsg && st.tokMsgKind === 'ok', tokMsgErr: !!st.tokMsg && st.tokMsgKind === 'err', tokMsgInfo: !!st.tokMsg && st.tokMsgKind === 'info', tokMsg: st.tokMsg,
+      saveTok: function () {
+        var t = String(self.cur().tokIn || '').trim();
+        if (t.length < 20) { self.setState({ tokMsgKind: 'err', tokMsg: 'Cole o token completo (começa com github_pat_).' }); return; }
+        self.setState({ tokMsgKind: 'info', tokMsg: 'Conferindo o token…' });
+        timeout(fetch(GH_API + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(t) }), 10000).then(function (r) {
+          if (r.ok || r.status === 404) {
+            setToken(t);
+            self.setState({ hasTok: true, tokIn: '', tokMsgKind: 'ok', tokMsg: 'Token salvo neste aparelho. As alterações de usuários serão publicadas no GitHub.' });
+          } else self.setState({ tokMsgKind: 'err', tokMsg: r.status === 401 ? 'Token inválido ou vencido.' : 'O token não dá acesso ao repositório SIAG (' + r.status + ').' });
+        }, function () { self.setState({ tokMsgKind: 'err', tokMsg: 'Sem conexão com o GitHub para conferir o token.' }); });
+      },
+      clearTok: function () { setToken(''); self.setState({ hasTok: false, tokMsgKind: 'ok', tokMsg: 'Token removido deste aparelho.' }); },
+      syncNow: function () {
+        self.setState({ userMsg: '', tokMsg: '' });
+        self.syncUsers().then(function (ok) { self.setState(ok ? { userMsgKind: 'ok', userMsg: 'Lista de usuários atualizada.' } : { userMsgKind: 'err', userMsg: 'Sem conexão: não foi possível atualizar agora.' }); });
       },
       resetLogin: st.resetLogin, resetP: st.resetP,
       onResetLogin: function (e) { self.setState({ resetLogin: e.target.value, userMsg: '' }); },
       onResetP: function (e) { self.setState({ resetP: e.target.value, userMsg: '' }); },
       doReset: function () {
         var cs = self.cur();
-        if (!isAdmin) return;
-        var tu = DEFAULT_USERS.concat(cs.users || []).filter(function (x) { return norm(x.login) === norm(cs.resetLogin); })[0];
+        if (!isAdmin || cs.busy) return;
+        var tu = findUser(udb, cs.resetLogin);
         if (!tu) { self.setState({ userMsgKind: 'err', userMsg: 'Escolha o usuário.' }); return; }
         var np = String(cs.resetP || '').trim();
         if (np.length < 6) { self.setState({ userMsgKind: 'err', userMsg: 'A senha precisa ter pelo menos 6 caracteres.' }); return; }
-        var nh = sha256Sync(np), key = norm(tu.login);
-        var po = Object.assign({}, cs.pwOver || {}), us = (cs.users || []).slice();
-        if (tu.fixed) po[key] = nh;
-        else us = us.map(function (x) { return norm(x.login) === key ? Object.assign({}, x, { hash: nh }) : x; });
-        var fc = Object.assign({}, cs.forceChange || {});
-        if (!(session && norm(session.login) === key)) fc[key] = true;
-        self.setState({ pwOver: po, users: us, forceChange: fc, resetLogin: '', resetP: '', userMsgKind: 'ok', userMsg: 'Senha de ' + tu.login + ' redefinida neste aparelho.' });
+        if (np === DEF_PASS) { self.setState({ userMsgKind: 'err', userMsg: 'Não use a senha padrão.' }); return; }
+        var self2 = session && norm(session.login) === norm(tu.login);
+        makeSecret(np).then(function (sec) {
+          publish(function (list) {
+            var hit = false;
+            list = list.map(function (x) { if (norm(x.login) !== norm(tu.login)) return x; hit = true; var y = Object.assign({}, x, sec); delete y.padrao; return y; });
+            if (!hit) throw new Error('O usuário ' + tu.login + ' não existe mais na lista central.');
+            return list;
+          }, 'nova senha de ' + tu.login, 'Senha de ' + tu.login + ' redefinida. Já vale em todos os aparelhos' + (self2 ? '.' : '; quem estiver conectado com esse usuário precisará entrar de novo.'), 'user', function (nu) {
+            self.setState({ resetLogin: '', resetP: '' });
+            if (self2) self.setState({ session: Object.assign({}, self.cur().session, { stamp: stampOf(findUser(nu, tu.login)) }) });
+          });
+        }, function () { self.setState({ userMsgKind: 'err', userMsg: 'Este navegador não permite gerar a senha com segurança.' }); });
       },
       userList: userList,
       newU: st.newU, newP: st.newP, newRole: st.newRole,
@@ -1441,17 +1705,23 @@ class Component extends DCLogic {
       addUser: function () {
         var s = self.cur();
         var lg = String(s.newU || '').trim();
-        if (!isAdmin) return;
-        if (lg.length < 3) { self.setState({ userMsgKind: 'err', userMsg: 'O login precisa ter pelo menos 3 caracteres.' }); return; }
-        if (DEFAULT_USERS.concat(s.users || []).some(function (x) { return norm(x.login) === norm(lg); })) { self.setState({ userMsgKind: 'err', userMsg: 'Já existe um usuário com esse login.' }); return; }
-        if (String(s.newP || '').length < 6) { self.setState({ userMsgKind: 'err', userMsg: 'A senha precisa ter pelo menos 6 caracteres.' }); return; }
+        if (!isAdmin || s.busy) return;
+        if (lg.length < 3 || norm(lg).length < 3) { self.setState({ userMsgKind: 'err', userMsg: 'O login precisa ter pelo menos 3 letras ou números.' }); return; }
+        if (findUser(udb, lg)) { self.setState({ userMsgKind: 'err', userMsg: 'Já existe um usuário com esse login.' }); return; }
+        var np = String(s.newP || '').trim();
+        if (np.length < 6) { self.setState({ userMsgKind: 'err', userMsg: 'A senha precisa ter pelo menos 6 caracteres.' }); return; }
+        if (np === DEF_PASS) { self.setState({ userMsgKind: 'err', userMsg: 'Não use a senha padrão.' }); return; }
         var role = s.newRole === 'admin' ? 'admin' : (s.newRole === 'reg' ? 'reg' : 'oper');
-        sha256Hex(s.newP).then(function (h) {
-          var us = (self.cur().users || []).concat([{ login: lg, hash: h, role: role }]);
-          self.setState({ users: us, newU: '', newP: '', newRole: 'oper', userMsgKind: 'ok', userMsg: 'Usuário ' + lg + ' cadastrado como ' + roleName(role) + '.' });
+        makeSecret(np).then(function (sec) {
+          publish(function (list) {
+            if (list.some(function (x) { return norm(x.login) === norm(lg); })) throw new Error('Já existe um usuário com esse login.');
+            return list.concat([Object.assign({ login: lg, role: role }, sec)]);
+          }, 'cadastro de ' + lg + ' (' + roleName(role) + ')', 'Usuário ' + lg + ' cadastrado como ' + roleName(role) + '. Já pode entrar em qualquer aparelho.', 'user', function () {
+            self.setState({ newU: '', newP: '', newRole: 'oper' });
+          });
         }, function () { self.setState({ userMsgKind: 'err', userMsg: 'Este navegador não permite cadastrar senha com segurança.' }); });
       },
-      userMsgOk: !!st.userMsg && st.userMsgKind !== 'err', userMsgErr: !!st.userMsg && st.userMsgKind === 'err', userMsg: st.userMsg,
+      userMsgOk: !!st.userMsg && st.userMsgKind === 'ok', userMsgErr: !!st.userMsg && st.userMsgKind === 'err', userMsgInfo: !!st.userMsg && st.userMsgKind === 'info', userMsg: st.userMsg,
 
       accent: accent,
       dateLabel: dateLabel,

@@ -1,0 +1,34 @@
+{
+  "sistema": "SIAG – lista central de usuários. Não edite à mão: use Ajustes no app (perfil Administrador).",
+  "atualizado_em": "2026-11-03T13:36:12.000Z",
+  "atualizado_por": "instalação v1.3",
+  "usuarios": [
+    {
+      "login": "CEA-ADM",
+      "perfil": "admin",
+      "fixo": true,
+      "sal": "3c828896103078eb594dd957fef2bf0c",
+      "iter": 150000,
+      "hash": "46a5e07b9df042a72eaeb11de98a09837ad2551ec49f660a73896495535394f8",
+      "senha_padrao": true
+    },
+    {
+      "login": "CEA-REG",
+      "perfil": "reg",
+      "fixo": true,
+      "sal": "615abe018d8a1d4e9414ff0a1a6594cd",
+      "iter": 150000,
+      "hash": "10b47ca74e7ece495e19b80f025dd1f26690c7c07ff7237d4144aa9285f39c30",
+      "senha_padrao": true
+    },
+    {
+      "login": "CEA-OPE",
+      "perfil": "oper",
+      "fixo": true,
+      "sal": "0c74b8c6f748bce91984abdf5a352931",
+      "iter": 150000,
+      "hash": "e37a2ec50a439d673d76022c41001341a1bfae20cc8aaa69bf43205df161ba53",
+      "senha_padrao": true
+    }
+  ]
+}

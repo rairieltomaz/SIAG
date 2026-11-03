@@ -1,29 +1,44 @@
-# SIAG – Sistema Integrado de Aferição de Gás · versão 1.2.1
+# SIAG – Sistema Integrado de Aferição de Gás · versão 1.3
 
-Data da versão: 21/10/2026
+Data da versão: 03/11/2026
 Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 ## Conteúdo do pacote
 
 | Pasta / arquivo | Para que serve |
 |---|---|
-| `app/index.html` | O aplicativo completo (um arquivo só). Abre em qualquer navegador. |
-| `app/manifest.json`, `app/sw.js`, `app/icon-*.png` | Permitem instalar no celular ("Adicionar à tela inicial") e usar sem internet. |
+| `index.html` (raiz) | O aplicativo completo (um arquivo só). Abre em qualquer navegador. |
+| `manifest.json`, `sw.js`, `icon-*.png` (raiz) | Permitem instalar no celular ("Adicionar à tela inicial") e usar sem internet. |
+| `usuarios.json` (raiz) | **Lista central de usuários e senhas** (senhas guardadas só como hash PBKDF2 com sal). É gravada pelo próprio app (Ajustes, perfil Administrador). Não edite à mão nem apague. |
 | `codigo-fonte/SIAG-app.dc.html` | Fonte do app (telas + lógica). É dele que o `index.html` é gerado. |
 | `codigo-fonte/runtime.js` | Motor que desenha as telas no navegador. |
-| `codigo-fonte/build.py` | Script que gera a pasta `app/` a partir da fonte. |
+| `codigo-fonte/build.py` | Script que gera a pasta `codigo-fonte/siag/` a partir da fonte. |
 | `codigo-fonte/cea-logo.png` | Logo usada no app. |
 
 ## Como publicar / atualizar
 
-1. Copie **todo o conteúdo da pasta `app/`** para o servidor (GitHub Pages, intranet da TI ou outro).
-2. Para atualizar uma versão, substitua os arquivos no mesmo endereço. Os celulares baixam a versão nova ao abrir o app com internet.
-3. Para testar no computador sem servidor, basta abrir `app/index.html` no Chrome (a instalação como app só funciona quando publicado em https).
+1. Gere o app: dentro de `codigo-fonte/`, rode `python3 build.py` (requer Python 3). Ele grava a pasta `codigo-fonte/siag/`.
+2. Copie `index.html`, `sw.js`, `manifest.json` e os ícones dessa pasta para a raiz do repositório e publique. **Não substitua nem apague o `usuarios.json` da raiz** – ele guarda os usuários e senhas atuais.
+3. Antes de publicar uma versão nova, puxe as alterações do GitHub (`git pull`): cada troca de senha feita no app vira um commit no repositório.
+4. Os celulares baixam a versão nova ao abrir o app com internet.
 
-Para gerar de novo a pasta `app/` a partir da fonte (requer Python 3): dentro de `codigo-fonte/`, rode `python3 build.py`. Ele lê `SIAG-app.dc.html`, `runtime.js`, `cea-logo.png` e os ícones, e grava a pasta `siag/`.
+## Usuários e senhas centralizados (desde a 1.3)
+
+- A lista de usuários fica no arquivo `usuarios.json` do repositório `rairieltomaz/SIAG`. Todo aparelho baixa essa lista ao abrir o app, ao voltar para o app e antes de cada login; sem internet, usa a última lista baixada.
+- No primeiro acesso de um aparelho é preciso internet para baixar a lista.
+- Só o **Administrador** cadastra, remove e troca senhas (Ajustes › Usuários). Cada alteração é publicada na hora no GitHub e passa a valer em todos os aparelhos. Quem estiver conectado com um usuário cuja senha mudou é desconectado e precisa entrar com a senha nova.
+- Para publicar, o aparelho do administrador precisa de um **token do GitHub** (configurado uma vez):
+  1. Abra https://github.com/settings/personal-access-tokens/new (logado como rairieltomaz).
+  2. Nome: `SIAG`. Validade: a que preferir (ex.: 1 ano; ao vencer, gere outro e cole de novo).
+  3. *Repository access* › *Only select repositories* › `SIAG`.
+  4. *Permissions* › *Repository permissions* › *Contents*: **Read and write**.
+  5. *Generate token*, copie o código (`github_pat_…`) e cole no SIAG em Ajustes › Usuários (ou na tela de criação de senha) › **Salvar token**.
+  O token fica guardado só nesse aparelho. Se o celular for perdido, apague o token no GitHub (Settings › Developer settings › Fine-grained tokens).
+- O arquivo `usuarios.json` é público (o site está no GitHub Pages). Ele não contém as senhas, só hashes com sal, mas senhas curtas ou óbvias podem ser descobertas por quem tiver conhecimento técnico: use senhas com pelo menos 8 caracteres misturando letras, números e símbolos.
 
 ## Histórico
 
+- **1.3 (03/11/2026)** – Usuários e senhas centralizados no `usuarios.json` do GitHub: uma senha criada ou trocada vale em todos os aparelhos. Administrador publica as alterações com token do GitHub; troca de senha desconecta as sessões antigas; operação e regulação não trocam a própria senha (pedem ao administrador).
 - **1.2.1 (21/10/2026)** – Comprovante sem assinaturas e com a programação de geração simulada.
 - **1.2 (21/10/2026)** – Comprovante de leitura (imprimir / salvar PDF) na aba Verificar.
 - **1.1 (21/10/2026)** – Inclui as correções da 1.0.1 (login tolerante a espaços e traços, atualização sem cache). Verificar: horário em Manaus com conversão automática para Brasília; totalizador digitado sem conversão e convertido para PCS 9.400, com os dois valores na tela; removido o modo "Contrato" que travava o PCS em 9.400 e gerava desvio falso.
@@ -34,12 +49,12 @@ Para gerar de novo a pasta `app/` a partir da fonte (requer Python 3): dentro de
 
 | Login | Perfil | O que acessa |
 |---|---|---|
-| CEA-ADM | Administrador principal | Tudo, inclusive Ajustes, cadastro de usuários e redefinição de senhas |
+| CEA-ADM | Administrador principal | Tudo, inclusive Ajustes, cadastro de usuários e troca de senhas (publicadas para todos os aparelhos) |
 | CEA-REG | Regulação | Tudo, inclusive Ajustes; sem gestão de usuários |
 | CEA-OPE | Operação | Programa, Ton/Toff, Verificar e Resumo (sem Ajustes) |
 
-- Senha padrão de primeiro acesso: **Siag@2026**. No primeiro acesso o app obriga a criar uma senha pessoal.
-- Senhas, usuários cadastrados, programação e leituras ficam gravados **no próprio aparelho** (não há servidor central).
+- Senha padrão inicial das três contas: **Siag@2026**. No primeiro acesso do CEA-ADM o app obriga a criar a senha do administrador (e pede o token do GitHub). Em seguida, defina em Ajustes as senhas do CEA-REG e do CEA-OPE – enquanto isso não for feito, elas continuam com a senha padrão e o app mostra o aviso "AINDA COM SENHA PADRÃO".
+- Usuários e senhas valem em todos os aparelhos (lista central). Programação, leituras e Ajustes de cálculo continuam gravados **no próprio aparelho**.
 - O login separa perfis, mas não é proteção contra quem tem conhecimento técnico.
 
 ## Telas
@@ -66,5 +81,5 @@ A programação (PDP) usa horários de **Brasília (UTC−3)**, independentement
 
 ## Limitações conhecidas
 
-- Dados não são compartilhados entre celulares (cada aparelho tem sua própria programação e registro).
+- Programação, leituras e Ajustes de cálculo não são compartilhados entre celulares (cada aparelho tem seu próprio registro). Usuários e senhas, sim (desde a 1.3).
 - O consumo previsto é extrapolado da reta do teste de 96 h fora do ponto de 114 MW.
