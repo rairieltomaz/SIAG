@@ -105,7 +105,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.6</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.7</div>
       </main>
     </div>
   </sc-if>
@@ -227,7 +227,7 @@ button:disabled{cursor:not-allowed}
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
             <sc-if value="{{ complete }}" hint-placeholder-val="{{ false }}">
-              <span style="font-size: 14px; font-weight: 600; color: #0B7A3E">✓ Programação completa</span>
+              <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600; color: #0B7A3E">✓ Programação completa</span><span style="font-size: 12px; font-weight: 600; color: {{ progConfColor }}">{{ progConfLine }}</span></span>
             </sc-if>
             <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ true }}">
               <span style="font-size: 14px; font-weight: 600; color: #B42318">{{ lockReason }}</span>
@@ -256,7 +256,7 @@ button:disabled{cursor:not-allowed}
               <input id="f-mw" type="text" inputMode="decimal" placeholder="114" value="{{ fillMw }}" onChange="{{ onFillMw }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 8px; font-variant-numeric: tabular-nums; color: #0C2340">
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px">
-              <label for="f-gt" style="font-size: 12px; color: #4A5B6E">GTs *</label>
+              <label for="f-gt" style="font-size: 12px; color: #4A5B6E">GTs</label>
               <select id="f-gt" value="{{ fillGt }}" onChange="{{ onFillGt }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-size: 15px">
                 <sc-for list="{{ gtOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
               </select>
@@ -278,7 +278,7 @@ button:disabled{cursor:not-allowed}
           </sc-if>
           <sc-if value="{{ showPaste }}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <label for="f-paste" style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Cole os 48 valores de MW (00:00 a 24:00). Depois lance as GTs por faixa com o MW em branco.</label>
+              <label for="f-paste" style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Cole os 48 valores de MW (00:00 a 24:00). As GTs entram pela prévia automática; altere na tabela se precisar.</label>
               <textarea id="f-paste" rows="4" value="{{ paste }}" onChange="{{ onPaste }}" placeholder="91&#10;91&#10;45&#10;…" style="border: 1px solid #C9D5E2; border-radius: 2px; padding: 10px; font-variant-numeric: tabular-nums; color: #0C2340; resize: vertical"></textarea>
               <button type="button" onClick="{{ applyPaste }}" style="height: 46px; border: 0; border-radius: 2px; background: #0B4A80; color: #FFFFFF; font-weight: 600; cursor: pointer">Aplicar colagem</button>
             </div>
@@ -291,9 +291,15 @@ button:disabled{cursor:not-allowed}
           </sc-if>
         </div>
 
+        <div style="display: flex; align-items: flex-start; gap: 10px; background: #EEF5FC; border: 1px dashed #1061A6; padding: 10px 12px; font-size: 13px; color: #0B4A80; line-height: 1.4">
+          <span style="flex: 1 1 auto">GTs com <b>borda azul tracejada</b> = prévia automática ({{ autoCount }} intervalos): menor nº de GTs que atende a carga, mantendo a máquina ligada em quedas curtas (Toff) e até cumprir o Ton. Toque para alterar; <b>↺ Prévia</b> volta ao automático.</span>
+          <sc-if value="{{ hasManual }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ previewAll }}" style="flex: 0 0 auto; height: 36px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-size: 12px; font-weight: 600; padding: 0 8px; cursor: pointer">Tudo pela prévia</button>
+          </sc-if>
+        </div>
         <div class="prog-table" style="background: #FFFFFF; border-radius: 0px; overflow: hidden; border: 1px solid #C9D5E2">
           <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: end; padding: 10px 8px; font-size: 12px; font-weight: 600; color: #4A5B6E; background: #EEF3F8">
-            <span>Até<br><span style="font-size: 10px; font-weight: 500">BSB</span></span><span>MW *</span><span>GTs *</span>
+            <span>Até<br><span style="font-size: 10px; font-weight: 500">BSB</span></span><span>MW *</span><span>GTs</span>
             <span style="text-align: right; display: flex; flex-direction: column; gap: 1px"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">PCS {{ pcsHdr }}</span></span>
             <span style="text-align: right; display: flex; flex-direction: column; gap: 1px; color: #0B4A80"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">contrato {{ pcsRefStr }}</span></span>
           </div>
@@ -302,8 +308,8 @@ button:disabled{cursor:not-allowed}
               <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: center; padding: 6px 8px">
                 <span style="font-variant-numeric: tabular-nums; font-size: 14px; color: #33475E">{{ r.end }}</span>
                 <input type="text" inputMode="decimal" aria-label="{{ r.ariaMw }}" placeholder="MW" value="{{ r.mwStr }}" onChange="{{ r.onMw }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px solid {{ r.mwBorder }}; border-radius: 2px; padding: 0 8px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340; background: #FFFFFF">
-                <select aria-label="{{ r.ariaGt }}" value="{{ r.gtVal }}" onChange="{{ r.onGt }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px solid {{ r.gtBorder }}; border-radius: 2px; padding: 0 4px; font-size: 15px; color: #0C2340; background: #FFFFFF">
-                  <sc-for list="{{ gtOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+                <select aria-label="{{ r.ariaGt }}" value="{{ r.gtVal }}" onChange="{{ r.onGt }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px {{ r.gtStyle }} {{ r.gtBorder }}; border-radius: 2px; padding: 0 4px; font-size: 15px; color: #0C2340; background: {{ r.gtBg }}">
+                  <sc-for list="{{ gtRowOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
                 </select>
                 <span style="font-variant-numeric: tabular-nums; font-size: 12px; text-align: right; color: #4A5B6E">{{ r.accMedStr }}</span>
                 <span style="font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 600; text-align: right; color: #0B4A80">{{ r.acc94Str }}</span>
@@ -315,14 +321,128 @@ button:disabled{cursor:not-allowed}
           </sc-for>
         </div>
 
-        <sc-if value="{{ complete }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ needConf }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ goConf }}" style="height: 54px; border: 0; border-radius: 0px; background: #075C2E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Conferir programação →</button>
+        </sc-if>
+        <sc-if value="{{ verOk }}" hint-placeholder-val="{{ false }}">
           <button type="button" onClick="{{ goVer }}" style="height: 54px; border: 0; border-radius: 0px; background: {{ accent }}; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Ir para Verificar →</button>
+          <button type="button" onClick="{{ goConf }}" style="height: 44px; border: 1px solid #075C2E; border-radius: 0px; background: #FFFFFF; color: #075C2E; font-size: 14px; font-weight: 600; cursor: pointer">Ver comprovante da conferência</button>
         </sc-if>
         <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ true }}">
           <button type="button" disabled="{{ true }}" style="height: 54px; border: 0; border-radius: 0px; background: #DCE3EA; color: #4A5B6E; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
             {{ lockBtn }}
           </button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ CONFERÊNCIA DA PROGRAMAÇÃO (comprovante) ============ -->
+    <sc-if value="{{ isConf }}" hint-placeholder-val="{{ false }}">
+      <div class="page" style="display: flex; flex-direction: column; gap: 14px; max-width: 820px">
+        <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 6px; border-bottom: 2px solid #1061A6">
+          <button type="button" onClick="{{ goProg }}" aria-label="Voltar ao Programa" style="flex: 0 0 auto; height: 38px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-size: 13px; font-weight: 600; padding: 0 10px; cursor: pointer">← Programa</button>
+          <h1 style="margin: 0; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Conferência da programação</h1>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #C9D5E2; box-shadow: 0 2px 10px rgba(12, 35, 64, 0.08); padding: 18px 16px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; border-bottom: 3px solid #1061A6; padding-bottom: 10px">
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <span style="font-size: 16px; font-weight: 800; letter-spacing: 0.3px; color: #0C2340">COMPROVANTE DE CONFERÊNCIA</span>
+              <span style="font-size: 12px; color: #4A5B6E">Programação do ONS · PDP {{ confDateStr }}</span>
+            </div>
+            <span style="flex: 0 0 auto; font-size: 11px; color: #4A5B6E; text-align: right; line-height: 1.4">Código<br><b style="font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: #0C2340">{{ confCode }}</b></span>
+          </div>
+          <div role="status" style="border: 2px solid {{ confStatusColor }}; background: {{ confStatusBg }}; color: {{ confStatusColor }}; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 15px; font-weight: 800; letter-spacing: 0.2px">{{ confStatusTxt }}</span>
+            <span style="font-size: 13px; line-height: 1.4">{{ confStatusSub }}</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column">
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0B4A80; border-bottom: 1px solid #0B4A80; padding-bottom: 4px">Resumo do dia</div>
+            <sc-for list="{{ confSum }}" as="x" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 7px 2px; border-bottom: 1px solid #EDF2F7; font-size: 14px">
+                <span style="color: #33475E">{{ x.k }}</span>
+                <sc-if value="{{ x.b }}" hint-placeholder-val="{{ false }}"><b style="text-align: right; font-variant-numeric: tabular-nums">{{ x.v }}</b></sc-if>
+                <sc-if value="{{ x.nb }}" hint-placeholder-val="{{ true }}"><span style="text-align: right; font-variant-numeric: tabular-nums">{{ x.v }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0B4A80; border-bottom: 1px solid #0B4A80; padding-bottom: 4px">
+              <span>Validação dos dados</span><span style="text-transform: none; letter-spacing: 0; font-weight: 600">{{ confCountTxt }}</span>
+            </div>
+            <sc-for list="{{ confChecks }}" as="x" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; align-items: start; font-size: 13px; line-height: 1.4; padding: 3px 0">
+                <span aria-hidden="true" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: {{ x.c }}; background: {{ x.bg }}; border: 1px solid {{ x.c }}">{{ x.s }}</span>
+                <span style="color: #0C2340">{{ x.t }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column">
+            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0B4A80; border-bottom: 1px solid #0B4A80; padding-bottom: 4px">Programação por faixa</div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) 54px 34px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; padding: 6px 2px; font-size: 11px; font-weight: 700; color: #4A5B6E; background: #E8F1FA">
+              <span>Faixa Brasília<br><span style="font-weight: 500">Manaus</span></span><span style="text-align: right">MW</span><span style="text-align: right">GTs</span><span>Origem<br>das GTs</span><span style="text-align: right">Gás m³<br><span style="font-weight: 500">contrato</span></span>
+            </div>
+            <sc-for list="{{ confFaixas }}" as="f" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) 54px 34px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: center; padding: 6px 2px; border-bottom: 1px solid #EDF2F7; font-size: 13px; font-variant-numeric: tabular-nums">
+                <span style="display: flex; flex-direction: column; gap: 1px"><b style="font-weight: 600">{{ f.de }}</b><span style="font-size: 11px; color: #4A5B6E">{{ f.mao }}</span></span>
+                <span style="text-align: right; font-weight: 600">{{ f.mw }}</span>
+                <span style="text-align: right; font-weight: 600">{{ f.g }}</span>
+                <span style="font-size: 12px; color: {{ f.oc }}">{{ f.orig }}</span>
+                <span style="text-align: right">{{ f.gas }}</span>
+              </div>
+            </sc-for>
+            <button type="button" onClick="{{ toggleConfAll }}" style="margin-top: 8px; height: 40px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; font-size: 13px; cursor: pointer">
+              <sc-if value="{{ confAllClosed }}" hint-placeholder-val="{{ true }}">Ver os 48 intervalos</sc-if><sc-if value="{{ confAllOpen }}" hint-placeholder-val="{{ false }}">Ocultar os 48 intervalos</sc-if>
+            </button>
+            <sc-if value="{{ confAllOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; margin-top: 8px; border: 1px solid #C9D5E2">
+                <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) 54px 40px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; padding: 6px; font-size: 11px; font-weight: 700; color: #0B4A80; background: #E8F1FA">
+                  <span>Intervalo<br><span style="font-weight: 500">fim Manaus</span></span><span style="text-align: right">MW</span><span style="text-align: right">GTs</span><span style="text-align: right">Gás 30 min</span><span style="text-align: right">Acumulado</span>
+                </div>
+                <sc-for list="{{ confRows }}" as="r" hint-placeholder-count="48">
+                  <div style="display: grid; grid-template-columns: minmax(0, 1.3fr) 54px 40px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; padding: 4px 6px; border-top: 1px solid #EDF2F7; font-size: 12px; font-variant-numeric: tabular-nums; background: {{ r.bg }}">
+                    <span>{{ r.bsb }} <span style="color: #4A5B6E">· {{ r.mao }}</span></span><span style="text-align: right">{{ r.mw }}</span><span style="text-align: right">{{ r.g }}</span><span style="text-align: right">{{ r.gas }}</span><span style="text-align: right">{{ r.acc }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <div style="margin-top: 8px; font-size: 11px; color: #4A5B6E; line-height: 1.45">P = GTs da prévia automática (fundo azul). * Manaus no dia anterior. Gás pelo modelo do SIAG na base do contrato.</div>
+          </div>
+        </div>
+
+        <sc-if value="{{ confShowForm }}" hint-placeholder-val="{{ true }}">
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #075C2E; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+            <div style="font-size: 15px; font-weight: 700">Confirmar a conferência</div>
+            <sc-if value="{{ hasConfWarnNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 13px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ confWarnNote }}</div>
+            </sc-if>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="c-op" style="font-size: 14px; font-weight: 600">Operador que conferiu <span style="color: #B42318">*</span></label>
+              <input id="c-op" type="text" placeholder="Nome ou matrícula" value="{{ operador }}" onChange="{{ onOp }}" style="height: 48px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
+            </div>
+            <label for="c-chk" style="display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; align-items: start; font-size: 14px; line-height: 1.4; cursor: pointer">
+              <input id="c-chk" type="checkbox" checked="{{ confChk }}" onClick="{{ onConfChk }}" style="width: 22px; height: 22px; margin: 0; accent-color: #075C2E">
+              <span>Conferi a potência (MW) e as GTs dos 48 intervalos com o PDP do ONS (PDPW) e com as máquinas disponíveis.</span>
+            </label>
+            <button type="button" onClick="{{ confirmConf }}" style="height: 54px; border: 0; border-radius: 0px; background: {{ confBtnBg }}; color: {{ confBtnFg }}; font-size: 15px; font-weight: 700; letter-spacing: 0.4px; cursor: pointer">{{ confBtnLabel }}</button>
+            <sc-if value="{{ confMsgErr }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="font-size: 14px; color: #6E140E; background: #FDECEA; padding: 10px 12px; line-height: 1.4">{{ confMsg }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ confDone }}" hint-placeholder-val="{{ false }}">
+          <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #075C2E; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+            <sc-if value="{{ confMsgOk }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="font-size: 14px; color: #075C2E; background: #E5F4EA; padding: 10px 12px">{{ confMsg }}</div>
+            </sc-if>
+            <button type="button" onClick="{{ confShare }}" style="height: 52px; border: 0; border-radius: 2px; background: #128C7E; color: #FFFFFF; font-size: 16px; font-weight: 700; cursor: pointer">Enviar comprovante (PDF / WhatsApp)</button>
+            <button type="button" onClick="{{ goVer }}" style="height: 52px; border: 0; border-radius: 0px; background: {{ accent }}; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer">Ir para Verificar →</button>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">Se a potência ou as GTs mudarem (reprogramação do ONS), a conferência perde a validade e o Verificar volta a pedir a conferência.</div>
+          </div>
         </sc-if>
       </div>
     </sc-if>
@@ -431,18 +551,23 @@ button:disabled{cursor:not-allowed}
       <div class="page" style="display: flex; flex-direction: column; gap: 14px">
         <h1 style="margin: 0; padding-bottom: 6px; border-bottom: 2px solid #1061A6; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #0C2340">Verificar consumo</h1>
 
-        <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ verLocked }}" hint-placeholder-val="{{ false }}">
           <div role="alert" style="background: #FFFFFF; border: 2px solid #B42318; border-radius: 0px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
             <div style="display: flex; align-items: center; gap: 10px; color: #8A1A12">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
               <span style="font-size: 20px; font-weight: 700">Verificação bloqueada</span>
             </div>
-            <div style="font-size: 15px; color: #33475E; line-height: 1.45">{{ lockReason }} Complete os 48 intervalos (MW e GTs) para liberar.</div>
-            <button type="button" onClick="{{ goProg }}" style="height: 50px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Ir para Programa</button>
+            <div style="font-size: 15px; color: #33475E; line-height: 1.45">{{ verLockReason }}</div>
+            <sc-if value="{{ needConf }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ goConf }}" style="height: 50px; border: 0; border-radius: 0px; background: #075C2E; color: #FFFFFF; font-weight: 600; cursor: pointer">Conferir programação</button>
+            </sc-if>
+            <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ goProg }}" style="height: 50px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-weight: 600; cursor: pointer">Ir para Programa</button>
+            </sc-if>
           </div>
         </sc-if>
 
-        <sc-if value="{{ complete }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ verOk }}" hint-placeholder-val="{{ true }}">
           <div class="ver-body" style="display: flex; flex-direction: column; gap: 14px">
             <div class="ver-inputs" style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
               <div style="display: flex; flex-direction: column; gap: 6px">
@@ -924,7 +1049,7 @@ button:disabled{cursor:not-allowed}
         <div style="background: #EEF3F8; border-radius: 0px; padding: 14px; font-size: 13px; color: #33475E; line-height: 1.5; display: flex; flex-direction: column; gap: 6px">
           <div style="font-weight: 600; color: #0C2340">Como o app calcula</div>
           <div>1. Potência bruta = MW do ONS × relação bruta/líquida.</div>
-          <div>2. GTs: definidas pelo operador (obrigatório). Bloqueia potência sem GT e acima da máxima DESSEM arredondada para MW inteiro (1 GT: 57,393 MW; 2 GTs: 115 MW).</div>
+          <div>2. GTs: prévia automática (menor nº de GTs que atende a carga, sem parar a máquina em quedas mais curtas que o Toff nem antes do Ton), editável pelo operador. Bloqueia potência sem GT e acima da máxima DESSEM arredondada para MW inteiro (1 GT: 57,393 MW; 2 GTs: 115 MW). O Verificar só libera depois da conferência da programação.</div>
           <div>3. Vazão (m³/h) = k × (nº GTs × a + b × potência bruta). Relação bruta/líquida, a, b, k e PCS do modelo saem do teste de performance: {{ lpInUse }}.</div>
           <div>4. Volume em 30 min = vazão × 0,5, acumulado desde 00:00.</div>
           <div>5. Desvio = (medido − previsto) ÷ previsto; dentro se |desvio| ≤ tolerância.</div>
@@ -959,10 +1084,10 @@ button:disabled{cursor:not-allowed}
       Ton/Toff
     </button>
     <button type="button" onClick="{{ goVer }}" class="nav-btn" aria-current="{{ nav.verCur }}" style="height: 56px; border: 0; border-top: 3px solid {{ nav.verBd }}; border-radius: 0; background: {{ nav.verBg }}; color: {{ nav.verFg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; cursor: pointer">
-      <sc-if value="{{ complete }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ verOk }}" hint-placeholder-val="{{ true }}">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 1 1 9-9"></path><path d="M12 12l4-4"></path><path d="M16 19l2 2 4-4"></path></svg>
       </sc-if>
-      <sc-if value="{{ incomplete }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ verLocked }}" hint-placeholder-val="{{ false }}">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
       </sc-if>
       Verificar
@@ -1024,7 +1149,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ shareReady }}" hint-placeholder-val="{{ false }}">
           <button type="button" onClick="{{ shareCopy }}" style="height: 44px; border: 1px solid #128C7E; border-radius: 2px; background: #FFFFFF; color: #0B6E62; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="1"></rect><path d="M4 16V4h12"></path></svg>
-            Copiar resumo da leitura (para colar na conversa)
+            {{ shareCopyLbl }}
           </button>
         </sc-if>
         <sc-if value="{{ shareNoSend }}" hint-placeholder-val="{{ false }}">
@@ -1444,6 +1569,7 @@ function brOfIso(iso) {
 function pad(n) { return (n < 10 ? '0' : '') + n; }
 function hhmm(m) { return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
 function blank48() { var a = []; for (var i = 0; i < 48; i++) a.push(''); return a; }
+function auto48() { var a = []; for (var i = 0; i < 48; i++) a.push(true); return a; }
 function isBlank(s) { return s === null || s === undefined || String(s).trim() === ''; }
 function num(s) {
   if (isBlank(s)) return NaN;
@@ -1968,6 +2094,210 @@ function downloadBlob(blob, name) {
     return true;
   } catch (e) { return false; }
 }
+// ---- prévia automática das GTs ----
+// Para cada meia hora: menor nº de GTs que atende a carga (limite DESSEM por GT, com 2 GTs aceita até o MW inteiro).
+// Mantém a GT ligada em quedas de carga mais curtas que o Toff (senão ela não poderia partir de novo) e até cumprir o Ton.
+// Carga 0 = máquinas paradas. Linhas definidas pelo operador entram como estão e a prévia se ajusta em volta delas.
+function gtPreview(prog, gts, auto, o) {
+  var mw = prog.map(function (v) { var x = num(v); return isFinite(x) && x >= 0 ? x : null; });
+  function need(m) {
+    if (m === 0) return 0;
+    for (var n = 1; n <= o.nMax; n++) { var lim = Math.max(n * o.gmax1, Math.round(n * o.gmax1)); if (m <= lim + 0.001) return n; }
+    return o.nMax;
+  }
+  var base = mw.map(function (m) { return m === null ? null : need(m); });
+  var man = auto.map(function (a, i) { var g = parseInt(gts[i], 10); return a ? null : (isFinite(g) ? g : NaN); });
+  var out = [], cur = 0, starts = [];
+  function setN(target, t) {
+    while (cur < target) { starts.push(t === 0 ? null : t); cur++; }   // ligada às 00:00 = vinha do dia anterior (Ton já cumprido)
+    while (cur > target) {   // para a GT ligada há mais tempo
+      var k = 0;
+      for (var q = 0; q < starts.length; q++) { if (starts[q] === null) { k = q; break; } if (starts[k] !== null && starts[q] < starts[k]) k = q; }
+      starts.splice(k, 1); cur--;
+    }
+  }
+  for (var i = 0; i < 48; i++) {
+    var t = i * 30, target;
+    if (man[i] !== null) {   // definida pelo operador
+      out.push(isBlank(gts[i]) ? '' : String(gts[i]).trim());
+      if (isFinite(man[i])) setN(Math.max(0, man[i]), t);
+      continue;
+    }
+    if (base[i] === null) { out.push(''); continue; }
+    if (mw[i] === 0) target = 0;
+    else if (base[i] >= cur) target = base[i];
+    else {
+      var j = i;
+      while (j < 48 && man[j] === null && base[j] !== null && mw[j] > 0 && base[j] < cur) j++;
+      var back = j < 48 && (man[j] !== null ? (isFinite(man[j]) && man[j] >= cur) : (base[j] !== null && mw[j] > 0 && base[j] >= cur));
+      if (back && (j - i) * 30 < o.toffMin) target = cur;
+      else {
+        var free = starts.filter(function (s) { return s === null || t - s >= o.tonMin; }).length;
+        target = Math.max(base[i], cur - free);
+      }
+    }
+    setN(target, t);
+    out.push(String(target));
+  }
+  return out;
+}
+// assinatura da programação (data + MW + GTs): muda se qualquer valor mudar depois da conferência
+function progSig(date, prog, gts) {
+  var str = String(date || '') + '|' + prog.map(function (v) { var x = num(v); return isFinite(x) ? String(Math.round(x * 1000) / 1000) : '-'; }).join(',') + '|' + gts.map(function (g) { return isBlank(g) ? '-' : String(g).trim(); }).join(',');
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h.toString(16).toUpperCase().padStart(8, '0');
+}
+function progCode(date, sig) { return 'SIAG-P-' + String(date || '').replace(/-/g, '') + '-' + String(sig).slice(0, 6); }
+// comprovante da conferência da programação: página 1 = identificação, resumo, validação e faixas; depois, os 48 intervalos
+function progDraw(r, logo, newPage) {
+  var L = 40, R = PW - 40, CW = R - L, BOT = 792;
+  var gen = fmtDT(brNow()), pages = [];
+  var p = newPage(); pages.push(p);
+  if (logo) {
+    var lh = 32, lw = logo.w * lh / logo.h;
+    if (lw > 190) { lw = 190; lh = lw * logo.h / logo.w; }
+    p.image('Logo', L, 34 + (32 - lh) / 2, lw, lh);
+  } else p.text(L, 58, 'CEA', { size: 20, bold: true, color: '#1061A6' });
+  p.text(R, 50, 'CONFERÊNCIA DA PROGRAMAÇÃO', { size: 13, bold: true, align: 'right' });
+  p.text(R, 63, 'SIAG · PDP ONS ' + r.dateBr, { size: 8.5, color: '#4A5B6E', align: 'right' });
+  p.rect(L, 74, CW, 2.2, '#1061A6');
+  var w0 = p.text(L, 92, 'Código da conferência: ', { size: 8.5, color: '#4A5B6E' });
+  p.text(L + w0, 92, r.code, { size: 9.5, bold: true });
+  p.rect(L, 102, CW, 46, '#E5F4EA', '#075C2E', 1.5);
+  p.text(L + 12, 122, 'PROGRAMAÇÃO CONFERIDA', { size: 13, bold: true, color: '#075C2E' });
+  p.text(L + 12, 139, 'por ' + (r.op || '—') + ' em ' + fmtDT(r.at) + '/' + new Date(r.at).getFullYear() + ' (Brasília)', { size: 9, color: '#075C2E' });
+  p.text(R - 12, 128, fmt(r.sum.energy, 1) + ' MWh', { size: 18, bold: true, color: '#075C2E', align: 'right' });
+  var y = 162, KX = L + 6, VX = L + CW * 0.5;
+  function newP() {
+    p = newPage(); pages.push(p);
+    p.text(L, 30, 'SIAG · Conferência da programação · PDP ' + r.dateBr, { size: 7.5, color: '#4A5B6E' });
+    p.text(R, 30, r.code, { size: 7.5, bold: true, color: '#4A5B6E', align: 'right' });
+    y = 50;
+  }
+  function room(h) { if (y + h > BOT) newP(); }
+  function sect(t) { room(40); y += 10; p.text(L, y, t.toUpperCase(), { size: 8.5, bold: true, color: '#0B4A80' }); p.line(L, y + 4, R, y + 4, '#0B4A80', 0.8); y += 18; }
+  function row(k, v, strong) {
+    room(18);
+    p.text(KX, y, k, { size: 9.5, color: '#33475E' });
+    p.text(VX, y, v, { size: 9.5, bold: !!strong });
+    p.line(L, y + 6, R, y + 6, '#E2E8F0', 0.6);
+    y += 18;
+  }
+  sect('Identificação');
+  row('Data da programação (PDP)', r.dateBr, true);
+  row('Conferido por (operador)', r.op || '—', true);
+  row('Usuário do sistema', r.login || '—');
+  row('Conferido em', fmtDT(r.at) + '/' + new Date(r.at).getFullYear() + ' (Brasília)');
+  sect('Resumo do dia');
+  row('Energia programada', fmt(r.sum.energy, 1) + ' MWh', true);
+  row('Potência média · máxima · mínima', fmt(r.sum.mwAvg, 1) + ' · ' + fmtMw(r.sum.mwMax) + ' · ' + fmtMw(r.sum.mwMin) + ' MW');
+  row('GTs em operação (máximo no dia)', String(r.sum.gMax));
+  row('Partidas · paradas previstas', r.sum.starts + ' · ' + r.sum.stops);
+  row('Gás previsto no dia · contrato ' + fmt(r.pcsRef, 0) + ' kcal/m³', fmt(r.sum.gas94, 0) + ' m³', true);
+  row('Gás previsto no dia · gás real PCS ' + fmt(r.pcsUse, 0), fmt(r.sum.gasReal, 0) + ' m³');
+  row('Consumo específico (contrato)', fmt(r.sum.ce, 1) + ' m³/MWh');
+  sect('Validação dos dados');
+  var KC = { ok: ['OK', '#075C2E'], warn: ['AVISO', '#B54708'], err: ['ERRO', '#B42318'], info: ['INFO', '#0B4A80'] };
+  r.checks.forEach(function (ck) {
+    var lines = pdfWrap(ck.t, 9, false, CW - 58);
+    room(lines.length * 12 + 8);
+    var kc = KC[ck.k] || KC.info;
+    p.text(KX, y, kc[0], { size: 7.5, bold: true, color: kc[1] });
+    lines.forEach(function (ln, li) { p.text(L + 52, y + li * 12, ln, { size: 9, color: '#0C2340' }); });
+    y += lines.length * 12;
+    p.line(L, y - 6, R, y - 6, '#E2E8F0', 0.6);
+    y += 6;
+  });
+  sect('Programação por faixa (horário de Brasília)');
+  var fx = [{ x: KX, a: 'left' }, { x: L + 110, a: 'left' }, { x: L + 250, a: 'right' }, { x: L + 300, a: 'right' }, { x: L + 330, a: 'left' }, { x: R - 6, a: 'right' }];
+  function frow(vals, o) {
+    room(18);
+    if (o.bg) p.rect(L, y - 12, CW, 18, o.bg);
+    vals.forEach(function (v, i) { p.text(fx[i].x, y, v, { size: o.size || 9, bold: !!o.bold, color: o.color, align: fx[i].a }); });
+    if (!o.bg) p.line(L, y + 6, R, y + 6, '#E2E8F0', 0.6);
+    y += 18;
+  }
+  frow(['Faixa (Brasília)', 'Manaus', 'MW', 'GTs', 'Origem das GTs', 'Gás na faixa (m³)'], { size: 7.8, bold: true, color: '#0B4A80', bg: '#E8F1FA' });
+  r.faixas.forEach(function (f) { frow([f.de + '–' + f.ate, f.deM + '–' + f.ateM, fmtMw(f.mw), String(f.g), f.orig, fmt(f.gas94, 0)], {}); });
+  room(30); y += 4;
+  pdfWrap('Gás calculado pelo modelo do SIAG (' + r.model + ') na base do contrato ' + fmt(r.pcsRef, 0) + ' kcal/m³. Os 48 intervalos estão na página seguinte.', 7.8, false, CW)
+    .forEach(function (ln) { p.text(L, y, ln, { size: 7.8, color: '#4A5B6E' }); y += 10.5; });
+  // ---------- 48 intervalos ----------
+  newP();
+  p.text(L, y, 'OS 48 INTERVALOS DA PROGRAMAÇÃO', { size: 9, bold: true, color: '#0B4A80' });
+  y += 10;
+  var top = y, hh = 22;
+  var sc = [
+    { x: L + 4, a: 'left', h: ['Intervalo', 'Brasília'] }, { x: L + 74, a: 'left', h: ['Fim', 'Manaus'] },
+    { x: L + 166, a: 'right', h: ['MW', 'ONS'] }, { x: L + 206, a: 'right', h: ['GTs', ''] },
+    { x: L + 278, a: 'right', h: ['Gás 30 min', 'PCS ' + fmt(r.pcsUse, 0)] }, { x: L + 350, a: 'right', h: ['Gás 30 min', 'PCS ' + fmt(r.pcsRef, 0)] },
+    { x: L + 432, a: 'right', h: ['Acumulado', 'PCS ' + fmt(r.pcsUse, 0)] }, { x: R - 4, a: 'right', h: ['Acumulado', 'PCS ' + fmt(r.pcsRef, 0)] }
+  ];
+  p.rect(L, top, CW, hh, '#E8F1FA');
+  sc.forEach(function (c) {
+    p.text(c.x, top + 9, c.h[0], { size: 7, bold: true, color: '#0B4A80', align: c.a });
+    if (c.h[1]) p.text(c.x, top + 18, c.h[1], { size: 7, bold: true, color: '#0B4A80', align: c.a });
+  });
+  var accR = 0, acc9 = 0, rh = 13.6, ry = top + hh;
+  for (var i = 0; i < 48; i++) {
+    var vr = r.v[i] * r.pcsT / r.pcsUse, v94 = r.v[i] * r.pcsT / r.pcsRef;
+    accR += vr; acc9 += v94;
+    if (r.auto[i]) p.rect(L, ry, CW, rh, '#F5F9FD');
+    p.line(L, ry + rh, R, ry + rh, '#EDF2F7', 0.5);
+    var by = ry + rh - 4, o = { size: 7.8, color: r.v[i] > 0 ? '#0C2340' : '#8A99AB' };
+    var mao = (i + 1) * 30 - 60;
+    p.text(sc[0].x, by, hhmm(i * 30) + '–' + hhmm((i + 1) * 30), o);
+    p.text(sc[1].x, by, mao < 0 ? hhmm(mao + 1440) + '*' : hhmm(mao), o);
+    p.text(sc[2].x, by, r.mw[i] === null ? '—' : fmtMw(r.mw[i]), Object.assign({ align: 'right' }, o));
+    p.text(sc[3].x, by, (isBlank(r.g[i]) ? '—' : String(r.g[i])) + (r.auto[i] ? ' P' : '  '), Object.assign({ align: 'right' }, o));
+    p.text(sc[4].x, by, fmt(vr, 0), Object.assign({ align: 'right' }, o));
+    p.text(sc[5].x, by, fmt(v94, 0), Object.assign({ align: 'right' }, o));
+    p.text(sc[6].x, by, fmt(accR, 0), Object.assign({ align: 'right' }, o));
+    p.text(sc[7].x, by, fmt(acc9, 0), Object.assign({ align: 'right' }, o));
+    ry += rh;
+  }
+  p.rect(L, ry, CW, 16, '#E8F1FA'); p.line(L, ry, R, ry, '#0B4A80', 1.4);
+  var fo = { size: 7.8, bold: true, color: '#0B4A80' };
+  p.text(sc[0].x, ry + 11, 'Total do dia', fo);
+  p.text(sc[2].x, ry + 11, fmt(r.sum.energy, 1) + ' MWh', Object.assign({ align: 'right' }, fo));
+  p.text(sc[3].x, ry + 11, 'máx. ' + r.sum.gMax, Object.assign({ align: 'right' }, fo));
+  p.text(sc[6].x, ry + 11, fmt(accR, 0), Object.assign({ align: 'right' }, fo));
+  p.text(sc[7].x, ry + 11, fmt(acc9, 0), Object.assign({ align: 'right' }, fo));
+  ry += 28;
+  pdfWrap('P = GTs da prévia automática do SIAG (fundo azul), conferidas pelo operador. Sem P = definidas pelo operador. * Manaus no dia anterior. Programação registrada no momento da conferência.', 7.5, false, CW)
+    .forEach(function (ln) { p.text(L, ry, ln, { size: 7.5, color: '#4A5B6E' }); ry += 10; });
+  pages.forEach(function (pg, k) {
+    pg.line(L, 806, R, 806, '#C9D5E2', 0.6);
+    pg.text(L, 818, 'CEA – Companhia Energética Amazonense', { size: 7.5, color: '#4A5B6E' });
+    pg.text(R, 818, 'Emitido em ' + gen + ' (Brasília) · SIAG · página ' + (k + 1) + ' de ' + pages.length, { size: 7.5, color: '#4A5B6E', align: 'right' });
+  });
+  return { pages: pages, n: pages.length, code: r.code };
+}
+function progFileName(r) {
+  var dp = String(r.date || '').split('-');
+  return 'Conferencia_programacao_SIAG_' + (dp.length === 3 ? dp[2] + '-' + dp[1] + '-' + dp[0] : 'sem-data') + '.pdf';
+}
+function progShareText(r) {
+  var n = r.checks.filter(function (c) { return c.k === 'warn'; }).length;
+  return 'Conferência da programação – SIAG\n' +
+    'PDP ' + r.dateBr + ' · ' + fmt(r.sum.energy, 1) + ' MWh · gás previsto ' + fmt(r.sum.gas94, 0) + ' m³ (contrato ' + fmt(r.pcsRef, 0) + ')\n' +
+    'Conferida por ' + (r.op || '—') + ' em ' + fmtDT(r.at) + (n ? ' · ' + n + ' aviso(s)' : ' · sem avisos') + '\n' +
+    'Código: ' + r.code;
+}
+function makeProgFile(r) {
+  return timeout(logoJpeg(), 3000).catch(function () { return null; }).then(function (logo) {
+    var d = progDraw(r, logo, function () { return new PdfPage(); });
+    var bytes = pdfBuild(d.pages, logo, 'Conferência da programação ' + r.code), name = progFileName(r);
+    var blob = new Blob([bytes], { type: 'application/pdf' }), file = null;
+    try { file = new File([bytes], name, { type: 'application/pdf', lastModified: Date.now() }); } catch (e) { file = null; }
+    var res = { file: file, blob: blob, name: name, pages: d.n, size: bytes.length, text: progShareText(r), imgs: [] };
+    var di = progDraw(r, logo, function () { return new CanvasPage(2, logo); });
+    var base = name.replace(/\.pdf$/, '');
+    return Promise.all(di.pages.map(function (pg, i) { return canvasJpeg(pg.cv, base + '_pag' + (i + 1) + '.jpg'); }))
+      .then(function (imgs) { res.imgs = imgs; return res; }, function () { return res; });
+  });
+}
 function brNow() {
   var u = new Date(Date.now() - 3 * 3600000);
   return new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), u.getUTCHours(), u.getUTCMinutes(), u.getUTCSeconds()).getTime();
@@ -1983,9 +2313,9 @@ function defaultSel() {
 }
 function freshState() {
   return {
-    tab: 'prog', date: today(), prog: blank48(), gts: blank48(),
+    tab: 'prog', date: today(), prog: blank48(), gts: blank48(), gtsAuto: auto48(), progConf: null, confChk: false, confAll: false,
     cfg: Object.assign({}, DEFCFG), log: [], sel: defaultSel(), med: '', pcsReal: '', operador: '',
-    fillDe: 0, fillAte: 48, fillMw: '', fillGt: '', paste: '', showPaste: false, confirmClear: false, msg: '', msgKind: '',
+    fillDe: 0, fillAte: 48, fillMw: '', fillGt: 'auto', paste: '', showPaste: false, confirmClear: false, msg: '', msgKind: '',
     units: [{ s: '', since: '' }, { s: '', since: '' }], showNota: false, now: brNow(),
     pcsBase: 'contrato', session: null, loginU: '', loginP: '', loginErr: '', loginBusy: false,
     newU: '', newP: '', newRole: 'oper', userMsg: '', userMsgKind: '',
@@ -2007,6 +2337,10 @@ class Component extends DCLogic {
         date: saved.date || base.date,
         prog: saved.prog.map(function (v) { return v === null || v === undefined ? '' : String(v); }),
         gts: Array.isArray(saved.gts) && saved.gts.length === 48 ? saved.gts.map(function (v) { return v === null || v === undefined ? '' : String(v); }) : blank48(),
+        // versão anterior: GT já escolhida = do operador; em branco = prévia automática
+        gtsAuto: Array.isArray(saved.gtsAuto) && saved.gtsAuto.length === 48 ? saved.gtsAuto.map(function (v) { return !!v; })
+          : (Array.isArray(saved.gts) && saved.gts.length === 48 ? saved.gts.map(function (v) { return isBlank(v); }) : auto48()),
+        progConf: saved.progConf && saved.progConf.sig ? saved.progConf : null,
         cfgDraft: saved.cfgDraft && typeof saved.cfgDraft === 'object' ? saved.cfgDraft : null,
         draftOld: !!saved.draftOld,
         log: Array.isArray(saved.log) ? saved.log : [],
@@ -2038,11 +2372,15 @@ class Component extends DCLogic {
     setTimeout(function () { logoJpeg(); }, 800);   // deixa a logo do PDF pronta
   }
   // ---- compartilhamento do comprovante em PDF ----
-  openShare(rec) {
+  openShare(rec, kind) {
     var self = this, seq = (this._shareSeq = (this._shareSeq || 0) + 1);
-    this._shareRec = rec; this._shareOut = null; this._sharing = false;
-    this.setState({ share: { status: 'gen', rec: { code: codeOf(rec), horaMao: rec.horaMao, hora: rec.hora, ok: !!rec.ok, dev: pct(rec.dev) }, msg: '', msgKind: '' } });
-    makeReceiptFile(rec).then(function (out) {
+    var isProg = kind === 'prog';
+    this._shareRec = rec; this._shareKind = isProg ? 'prog' : 'read'; this._shareOut = null; this._sharing = false;
+    var head = isProg
+      ? { code: rec.code, title: 'Comprovante da conferência da programação', resTxt: 'Programação do PDP ' + rec.dateBr + ' conferida por ' + (rec.op || '—'), ok: true }
+      : { code: codeOf(rec), title: 'Comprovante da leitura das ' + rec.horaMao + ' (Manaus)', resTxt: (rec.ok ? 'Dentro da tolerância' : 'Fora da tolerância') + ' · desvio ' + pct(rec.dev), ok: !!rec.ok };
+    this.setState({ share: { status: 'gen', kind: this._shareKind, rec: head, msg: '', msgKind: '' } });
+    (isProg ? makeProgFile(rec) : makeReceiptFile(rec)).then(function (out) {
       if (seq !== self._shareSeq) return;
       self._shareOut = out;
       var sh = Object.assign({}, self.cur().share, { status: 'ok', name: out.name, info: out.pages + (out.pages > 1 ? ' páginas' : ' página') + ' · ' + Math.max(1, Math.round(out.size / 1024)) + ' KB', canSend: canShareFile(out.file), canSendImg: canShareFiles((out.imgs || []).map(function (i) { return i.file; })) });
@@ -2112,7 +2450,7 @@ class Component extends DCLogic {
   componentDidUpdate() {
     var s = this.cur();
     try {
-      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, cfgDraft: s.cfgDraft, draftOld: s.draftOld, log: s.log, operador: s.operador, units: s.units, session: s.session, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
+      window.localStorage.setItem(KEY, JSON.stringify({ date: s.date, prog: s.prog, gts: s.gts, gtsAuto: s.gtsAuto, progConf: s.progConf, cfgDraft: s.cfgDraft, draftOld: s.draftOld, log: s.log, operador: s.operador, units: s.units, session: s.session, pcsBase: s.pcsBase, pcsReal: s.pcsReal }));
     } catch (e) {}
   }
 
@@ -2140,8 +2478,13 @@ class Component extends DCLogic {
     var fMed = pcsT / pcsUse;       // volume do modelo -> volume de gás com o PCS medido
     var pcsBase = st.pcsBase === 'medido' ? 'medido' : 'contrato';
 
-    var gtOpts = [{ v: '', t: 'Definir' }];
+    var gtOpts = [{ v: 'auto', t: 'Prévia' }];
     for (var g = 0; g <= nMax; g++) gtOpts.push({ v: String(g), t: g + ' GT' + (g === 1 ? '' : 's') });
+    // GTs: prévia automática (linhas "auto") + escolha do operador
+    var gtsAuto = Array.isArray(st.gtsAuto) && st.gtsAuto.length === 48 ? st.gtsAuto.map(function (v) { return !!v; }) : st.gts.map(function (v) { return isBlank(v); });
+    var gtsEff = gtPreview(st.prog, st.gts, gtsAuto, { gmax1: c.gmax1, nMax: nMax, tonMin: c.ton * 60, toffMin: c.toff * 60 });
+    var gtRowOpts = [{ v: '', t: '—' }, { v: 'auto', t: '↺ Prévia' }];
+    for (var g2 = 0; g2 <= nMax; g2++) gtRowOpts.push({ v: String(g2), t: String(g2) });
 
     function checkRow(mwOk, mw, gOk, n) {
       var sug = mw === 0 ? 0 : Math.min(nMax, Math.max(1, Math.ceil(mw / c.gmax1 - 1e-9)));
@@ -2158,7 +2501,7 @@ class Component extends DCLogic {
 
     // ---- modelo: 48 semi-horas ----
     var rows = [], bars = [], acc = 0, accArr = [], energy = 0, mwSum = 0, prevN = 0, starts = 0, warns = 0, maxVol = 0;
-    var vols = [], ns = [], flagged = [], issues = [], done = 0;
+    var vols = [], ns = [], flagged = [], issues = [], done = 0, rowChk = [];
 
     // ---- Ton / Toff ----
     var now = brNow();
@@ -2198,14 +2541,14 @@ class Component extends DCLogic {
       var rel = isFinite(t) && isFinite(dayStart) ? (t - dayStart) / 60000 : null;
       if (u.s === 'on') onL.push(rel); else if (u.s === 'off') offL.push(rel); else unknown++;
     });
-    var g0 = parseInt(st.gts[0], 10);
+    var g0 = parseInt(gtsEff[0], 10);
     var n0 = isFinite(g0) ? g0 : 0;
     while (onL.length < n0 && unknown > 0) { onL.push(null); unknown--; }
     while (unknown > 0) { offL.push(null); unknown--; }
     var ttNote = [], ttIssues = [];
     var curN = onL.length;
     for (var ti = 0; ti < 48; ti++) {
-      var gv = parseInt(st.gts[ti], 10);
+      var gv = parseInt(gtsEff[ti], 10);
       if (!isFinite(gv)) continue;
       var tm = ti * 30;
       while (curN < gv) {
@@ -2231,13 +2574,14 @@ class Component extends DCLogic {
     }
 
     for (var i = 0; i < 48; i++) {
-      var mwRaw = st.prog[i], gRaw = st.gts[i];
+      var mwRaw = st.prog[i], gRaw = gtsEff[i];
       var mwNum = num(mwRaw);
       var mwOk = isFinite(mwNum) && mwNum >= 0;
       var mw = mwOk ? mwNum : 0;
       var gOk = !isBlank(gRaw) && isFinite(parseInt(gRaw, 10));
       var n = gOk ? parseInt(gRaw, 10) : 0;
       var chk = checkRow(mwOk, mw, gOk, n);
+      if (gtsAuto[i] && !mwOk) chk = { err: 'Falta potência (MW)' };
       if (ttNote[i] && !chk.err) chk = { warn: chk.warn ? chk.warn + ' · ' + ttNote[i] : ttNote[i] };
       var F = mw * c.rel;
       var H = (mwOk && gOk && n > 0) ? c.k * (n * c.a + c.b * F) : 0;
@@ -2249,26 +2593,30 @@ class Component extends DCLogic {
       else done++;
       if (chk.warn) warns++;
       if (vol > maxVol) maxVol = vol;
-      vols.push(vol); ns.push(n); flagged.push(!!(chk.err || chk.warn));
+      vols.push(vol); ns.push(n); flagged.push(!!(chk.err || chk.warn)); rowChk.push({ chk: chk, mwOk: mwOk, mw: mw, n: n });
       (function (idx, chk, mwOk, gOk) {
         rows.push({
           end: hhmm((idx + 1) * 30),
           ariaMw: 'Potência ONS de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30) + ' em MW',
           ariaGt: 'Quantidade de GTs de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30),
           mwStr: isBlank(st.prog[idx]) ? '' : String(st.prog[idx]),
-          gtVal: isBlank(st.gts[idx]) ? '' : String(st.gts[idx]),
+          gtVal: isBlank(gtsEff[idx]) ? '' : String(gtsEff[idx]),
+          isAuto: gtsAuto[idx] && !isBlank(gtsEff[idx]),
+          gtBg: gtsAuto[idx] && !isBlank(gtsEff[idx]) ? '#EEF5FC' : '#FFFFFF',
+          gtStyle: gtsAuto[idx] && !isBlank(gtsEff[idx]) ? 'dashed' : 'solid',
           onMw: function (e) {
             var p = self.cur().prog.slice();
             p[idx] = e.target.value;
             self.setState({ prog: p });
           },
           onGt: function (e) {
-            var gg = self.cur().gts.slice();
-            gg[idx] = e.target.value;
-            self.setState({ gts: gg });
+            var cs = self.cur(), gg = cs.gts.slice(), aa = gtsAuto.slice();
+            if (e.target.value === 'auto') aa[idx] = true;
+            else { gg[idx] = e.target.value; aa[idx] = false; }
+            self.setState({ gts: gg, gtsAuto: aa });
           },
           mwBorder: chk.err && !mwOk ? '#B42318' : '#C9D5E2',
-          gtBorder: chk.err && (!gOk || mwOk) ? '#B42318' : '#C9D5E2',
+          gtBorder: chk.err && (!gOk || mwOk) ? '#B42318' : (gtsAuto[idx] && gOk ? '#1061A6' : '#C9D5E2'),
           accStr: fmt(accArr[idx], 0),
           accMedStr: fmt(accArr[idx] * fMed, 0),
           acc94Str: fmt(accArr[idx] * f94, 0),
@@ -2297,6 +2645,14 @@ class Component extends DCLogic {
     if (noDate) lockParts.push('falta a data do PDP');
     var lockReason = lockParts.length ? lockParts.join(', ').replace(/^./, function (ch) { return ch.toUpperCase(); }) + '.' : '';
     var progPct = Math.round(done / 48 * 100);
+    // ---- conferência da programação (libera o Verificar) ----
+    var sigNow = progSig(st.date, st.prog, gtsEff);
+    var conf = st.progConf && st.progConf.sig ? st.progConf : null;
+    var confOk = !!conf && conf.sig === sigNow && complete;
+    var confStale = !!conf && conf.sig !== sigNow;
+    var verOk = complete && confOk;
+    var verLockReason = !complete ? lockReason + ' Complete os 48 intervalos (MW e GTs) e confira a programação para liberar.'
+      : (confStale ? 'A programação mudou depois da conferência das ' + fmtDT(conf.at) + '. Confira de novo para liberar.' : 'Programação completa, mas ainda não conferida. Confira os dados na tela de conferência para liberar.');
 
     // ---- opções de horário ----
     var startOpts = [], endOpts = [];
@@ -2340,7 +2696,7 @@ class Component extends DCLogic {
         if (l.idx > sel && l.med < med) saveIssues.push({ text: 'Leitura maior que a das ' + l.hora + ' (' + fmt(l.med, 0) + ' m³). Confira o horário.' });
       });
     }
-    var canSave = complete && saveIssues.length === 0;
+    var canSave = verOk && saveIssues.length === 0;
 
     function receiptRec(l) {
       var pr = isFinite(l.pcs) ? l.pcs : NaN;
@@ -2351,7 +2707,7 @@ class Component extends DCLogic {
         prev: l.prev, prev94: isFinite(l.prev94) ? l.prev94 : l.prev * pr / c.pcsRef,
         dev: l.dev, ok: l.ok, tol: isFinite(l.tol) ? l.tol : c.tol,
         idx: l.idx, dateBr: dateLabel,
-        sim: l.sim || { mw: st.prog.slice(), g: st.gts.slice(), v: vols.slice(), pcsT: pcsT }
+        sim: l.sim || { mw: st.prog.slice(), g: gtsEff.slice(), v: vols.slice(), pcsT: pcsT }
       };
     }
     var log = (st.log || []).map(function (l) {
@@ -2365,7 +2721,8 @@ class Component extends DCLogic {
     });
 
     var tab = st.tab;
-    function navC(t) { return tab === t ? { bg: '#E8F1FA', fg: '#1061A6', bd: '#1061A6', cur: 'page' } : { bg: '#FFFFFF', fg: '#5A6B7E', bd: '#FFFFFF', cur: null }; }
+    var navTab = tab === 'conf' ? 'prog' : tab;
+    function navC(t) { return navTab === t ? { bg: '#E8F1FA', fg: '#1061A6', bd: '#1061A6', cur: 'page' } : { bg: '#FFFFFF', fg: '#5A6B7E', bd: '#FFFFFF', cur: null }; }
     var nT = navC('tt'), nP = navC('prog'), nV = navC('ver'), nR = navC('res'), nC = navC('cfg');
 
     function cfgList(list) {
@@ -2500,6 +2857,82 @@ class Component extends DCLogic {
     var dParts = String(st.date || '').split('-');
     var dateLabel = dParts.length === 3 ? dParts[2] + '/' + dParts[1] + '/' + dParts[0] : 'sem data';
 
+    // ---- validação dos dados da programação (tela de conferência e comprovante) ----
+    function ranges(idx) {
+      var out = [], a = null, b = null;
+      idx.forEach(function (i) { if (a !== null && i === b + 1) b = i; else { if (a !== null) out.push(hhmm(a * 30) + '–' + hhmm((b + 1) * 30)); a = i; b = i; } });
+      if (a !== null) out.push(hhmm(a * 30) + '–' + hhmm((b + 1) * 30));
+      return out.join(', ');
+    }
+    var cks = [], todayIso = today();
+    if (noDate) cks.push({ k: 'err', t: 'Falta a data do PDP.' });
+    else if (st.date === todayIso) cks.push({ k: 'ok', t: 'Data do PDP: ' + dateLabel + ' (hoje).' });
+    else { var tp = todayIso.split('-'); cks.push({ k: 'warn', t: 'Data do PDP: ' + dateLabel + ' — não é a data de hoje (' + tp[2] + '/' + tp[1] + '/' + tp[0] + '). Confira.' }); }
+    var noMwI = [], gtErrI = [], gtErrTx = [], idleI = [], lowI = [];
+    rowChk.forEach(function (rc, i) {
+      if (!rc.mwOk) noMwI.push(i);
+      else if (rc.chk.err) { gtErrI.push(i); if (gtErrTx.length < 3) gtErrTx.push(hhmm(i * 30) + ': ' + rc.chk.err); }
+      if (rc.mwOk && rc.mw === 0 && rc.n > 0) idleI.push(i);
+      if (rc.mwOk && rc.mw > 0 && rc.n > 0 && rc.mw / rc.n < c.gmin1 - 1e-9) lowI.push(i);
+    });
+    if (noMwI.length) cks.push({ k: 'err', t: noMwI.length + ' intervalo(s) sem potência: ' + ranges(noMwI) + '.' });
+    else cks.push({ k: 'ok', t: 'Potência informada nos 48 intervalos (energia ' + fmt(energy, 1) + ' MWh).' });
+    var limMax = Math.max(nMax * c.gmax1, Math.round(nMax * c.gmax1));
+    if (gtErrI.length) cks.push({ k: 'err', t: gtErrI.length + ' intervalo(s) com GTs que não fecham com a carga — ' + gtErrTx.join('; ') + (gtErrI.length > 3 ? '; …' : '') + '.' });
+    else if (!noMwI.length) cks.push({ k: 'ok', t: 'GTs atendem a carga em todos os intervalos (máx. ' + fmtMw(c.gmax1) + ' MW por GT; com ' + nMax + ' GTs até ' + fmtMw(limMax) + ' MW).' });
+    if (ttIssues.length) ttIssues.forEach(function (x) { cks.push({ k: 'warn', t: x.text + '.' }); });
+    else cks.push({ k: 'ok', t: 'Partidas e paradas respeitam Ton ' + fmt(c.ton, 0) + ' h e Toff ' + fmt(c.toff, 0) + ' h.' });
+    if (idleI.length) cks.push({ k: 'warn', t: 'GT ligada sem carga em ' + idleI.length + ' intervalo(s): ' + ranges(idleI) + ' (conta só o consumo em vazio).' });
+    if (lowI.length) cks.push({ k: 'warn', t: 'Carga por GT abaixo da geração mínima DESSEM (' + fmtMw(c.gmin1) + ' MW) em ' + lowI.length + ' intervalo(s): ' + ranges(lowI) + '. Confira com o PDP.' });
+    var nAutoG = gtsAuto.filter(function (a, i) { return a && !isBlank(gtsEff[i]); }).length, nManG = gtsAuto.filter(function (a) { return !a; }).length;
+    cks.push({ k: 'info', t: nAutoG ? 'GTs pela prévia automática em ' + nAutoG + ' intervalo(s)' + (nManG ? ' e definidas pelo operador em ' + nManG : '') + '. Confira se batem com as máquinas disponíveis.' : 'GTs definidas pelo operador nos 48 intervalos.' });
+    cks.push({ k: 'info', t: pcsMissing ? 'PCS medido não informado: o gás real usa o PCS do gás do modelo (' + fmt(pcsT, 0) + ' kcal/m³).' : 'PCS medido: ' + fmt(pcsRow, 0) + ' kcal/m³.' });
+    var modelTxt = String(cfgRaw.lpNome || 'teste de performance') + ', k = ' + fmt(c.k, 4);
+    cks.push({ k: 'info', t: 'Modelo da usina: ' + modelTxt + '.' });
+    var nErrC = cks.filter(function (x) { return x.k === 'err'; }).length, nWarnC = cks.filter(function (x) { return x.k === 'warn'; }).length;
+    // faixas (intervalos seguidos com o mesmo MW e as mesmas GTs)
+    var faixas = [];
+    for (var fi = 0; fi < 48; fi++) {
+      var fmw = num(st.prog[fi]), fg = gtsEff[fi], last = faixas[faixas.length - 1];
+      var key = (isFinite(fmw) ? fmw : 'x') + '|' + fg;
+      if (last && last.key === key) { last.b = fi; last.nAuto += gtsAuto[fi] ? 1 : 0; last.v += vols[fi]; }
+      else faixas.push({ key: key, a: fi, b: fi, mw: isFinite(fmw) ? fmw : NaN, g: isBlank(fg) ? '—' : fg, nAuto: gtsAuto[fi] ? 1 : 0, v: vols[fi] });
+    }
+    faixas = faixas.map(function (f) {
+      var nI = f.b - f.a + 1, m0 = f.a * 30 - 60, m1 = (f.b + 1) * 30 - 60;
+      return {
+        de: hhmm(f.a * 30), ate: hhmm((f.b + 1) * 30), deM: m0 < 0 ? hhmm(m0 + 1440) + '*' : hhmm(m0), ateM: m1 < 0 ? hhmm(m1 + 1440) + '*' : hhmm(m1),
+        mw: f.mw, g: f.g, orig: f.nAuto === nI ? 'prévia' : (f.nAuto === 0 ? 'operador' : 'prévia/operador'), gas94: f.v * f94
+      };
+    });
+    var mwVals = st.prog.map(function (v) { return num(v); }).filter(function (x) { return isFinite(x) && x >= 0; });
+    var ups = 0, downs = 0, gMaxD = 0;
+    for (var gi = 0; gi < 48; gi++) {
+      var gnow = parseInt(gtsEff[gi], 10);
+      if (isFinite(gnow) && gnow > gMaxD) gMaxD = gnow;
+      if (gi > 0) { var gprev = parseInt(gtsEff[gi - 1], 10); if (isFinite(gnow) && isFinite(gprev)) { if (gnow > gprev) ups += gnow - gprev; else downs += gprev - gnow; } }
+    }
+    var progSum = {
+      energy: energy, mwAvg: mwSum / 48, mwMax: mwVals.length ? Math.max.apply(null, mwVals) : NaN, mwMin: mwVals.length ? Math.min.apply(null, mwVals) : NaN,
+      gMax: gMaxD, starts: ups, stops: downs, gas94: total * f94, gasReal: total * fMed, ce: energy > 0 ? total * f94 / energy : NaN
+    };
+    function progRec(op, login) {
+      return {
+        sig: sigNow, code: progCode(st.date, sigNow), date: st.date, dateBr: dateLabel, at: brNow(), op: op, login: login,
+        mw: st.prog.map(function (v) { var x = num(v); return isFinite(x) ? x : null; }), g: gtsEff.slice(),
+        auto: gtsAuto.map(function (a, i) { return a && !isBlank(gtsEff[i]); }), v: vols.map(function (x) { return Math.round(x * 10) / 10; }),
+        pcsT: pcsT, pcsRef: c.pcsRef, pcsUse: pcsUse, sum: progSum, checks: cks.slice(), faixas: faixas, model: modelTxt
+      };
+    }
+    var confKind = confOk ? 'ok' : (!complete || nErrC ? 'block' : (confStale ? 'stale' : 'pend'));
+    var CONF_UI = {
+      ok: { t: 'PROGRAMAÇÃO CONFERIDA', c: '#075C2E', bg: '#E5F4EA' },
+      pend: { t: 'AGUARDANDO CONFERÊNCIA', c: '#8A4300', bg: '#FFF4E5' },
+      stale: { t: 'ALTERADA DEPOIS DA CONFERÊNCIA', c: '#8A1A12', bg: '#FDECEA' },
+      block: { t: 'COM PENDÊNCIAS — NÃO PODE SER CONFERIDA', c: '#8A1A12', bg: '#FDECEA' }
+    }[confKind];
+    var CK_UI = { ok: { s: '✓', c: '#075C2E', bg: '#E5F4EA' }, warn: { s: '!', c: '#8A4300', bg: '#FFF4E5' }, err: { s: '✕', c: '#8A1A12', bg: '#FDECEA' }, info: { s: 'i', c: '#0B4A80', bg: '#E8F1FA' } };
+
     function setMsg(kind, text) { self.setState({ msg: text, msgKind: kind }); }
 
     // ---- acesso (lista central de usuários) ----
@@ -2596,9 +3029,10 @@ class Component extends DCLogic {
 
       // compartilhar comprovante (PDF / WhatsApp)
       shareOpen: !!st.share,
-      shareTitle: st.share ? 'Comprovante da leitura das ' + st.share.rec.horaMao + ' (Manaus)' : '',
+      shareTitle: st.share ? st.share.rec.title : '',
       shareCode: st.share ? st.share.rec.code : '',
-      shareResTxt: st.share ? (st.share.rec.ok ? 'Dentro da tolerância' : 'Fora da tolerância') + ' · desvio ' + st.share.rec.dev : '',
+      shareResTxt: st.share ? st.share.rec.resTxt : '',
+      shareCopyLbl: st.share && st.share.kind === 'prog' ? 'Copiar resumo da conferência (para colar na conversa)' : 'Copiar resumo da leitura (para colar na conversa)',
       shareResColor: st.share && st.share.rec.ok ? '#075C2E' : '#8A1A12',
       shareResBg: st.share && st.share.rec.ok ? '#E5F4EA' : '#FDECEA',
       shareGen: !!st.share && st.share.status === 'gen',
@@ -2639,7 +3073,13 @@ class Component extends DCLogic {
         if (downloadBlob(out.blob, out.name)) self.shareMsg('info', 'PDF salvo no aparelho (pasta Downloads/Arquivos). Para enviar: no WhatsApp, toque no clipe › Documento e escolha ' + out.name + '.');
         else self.shareMsg('err', 'Não foi possível salvar o PDF neste navegador.');
       },
-      shareView: function () { if (self._shareRec) openReceipt(self._shareRec); },
+      shareView: function () {
+        if (!self._shareRec) return;
+        if (self._shareKind !== 'prog') { openReceipt(self._shareRec); return; }
+        var out = self._shareOut;   // conferência: abre o próprio PDF
+        if (!out) return;
+        try { var u = URL.createObjectURL(out.blob); var w = window.open(u, '_blank'); if (!w) downloadBlob(out.blob, out.name); setTimeout(function () { URL.revokeObjectURL(u); }, 120000); } catch (e) { downloadBlob(out.blob, out.name); }
+      },
       shareNotReady: !(st.share && st.share.status === 'ok'),
       shareBackdrop: function (e) { if (e && e.target === e.currentTarget) { self._shareSeq = (self._shareSeq || 0) + 1; self._shareOut = null; self.setState({ share: null }); } },
       shareClose: function () { self._shareSeq = (self._shareSeq || 0) + 1; self._shareOut = null; self.setState({ share: null }); },
@@ -2778,6 +3218,60 @@ class Component extends DCLogic {
 
       // intertravamento
       complete: complete, incomplete: !complete,
+      verOk: verOk, verLocked: !verOk, verLockReason: verLockReason,
+      needConf: complete && !confOk, confOk: confOk,
+      progConfLine: confOk ? '✓ Conferida por ' + (conf.op || '—') + ' às ' + fmtDT(conf.at).slice(6) : (confStale ? 'Alterada depois da conferência — confira de novo' : 'Falta conferir a programação'),
+      progConfColor: confOk ? '#075C2E' : '#B54708',
+      // tela de conferência (comprovante)
+      isConf: tab === 'conf',
+      goConf: function () { self.setState({ tab: 'conf', showPw: false, confMsg: '' }); setTimeout(function () { try { var m = document.querySelector('.app-main'); if (m) m.scrollTop = 0; window.scrollTo(0, 0); } catch (e) {} }, 30); },
+      confCode: progCode(st.date, sigNow), confDateStr: dateLabel,
+      confStatusTxt: CONF_UI.t, confStatusColor: CONF_UI.c, confStatusBg: CONF_UI.bg,
+      confStatusSub: confKind === 'ok' ? 'Conferida por ' + (conf.op || '—') + (conf.login ? ' (' + conf.login + ')' : '') + ' em ' + fmtDT(conf.at) + ' (Brasília).'
+        : confKind === 'stale' ? 'Foi conferida por ' + (conf.op || '—') + ' em ' + fmtDT(conf.at) + ', mas MW ou GTs mudaram depois. Confira de novo.'
+        : confKind === 'block' ? 'Corrija os itens marcados com ✕ no Programa. Depois volte aqui para conferir.'
+        : 'Confira o resumo, a validação e as faixas abaixo. Se estiver tudo certo, confirme no fim da página.',
+      confSum: [
+        { k: 'Energia programada', v: fmt(progSum.energy, 1) + ' MWh', b: true, nb: false },
+        { k: 'Potência média · máx. · mín.', v: fmt(progSum.mwAvg, 1) + ' · ' + fmtMw(progSum.mwMax) + ' · ' + fmtMw(progSum.mwMin) + ' MW', b: false, nb: true },
+        { k: 'GTs em operação (máximo)', v: String(progSum.gMax), b: false, nb: true },
+        { k: 'Partidas · paradas no dia', v: progSum.starts + ' · ' + progSum.stops, b: false, nb: true },
+        { k: 'Gás previsto · contrato ' + fmt(c.pcsRef, 0), v: fmt(progSum.gas94, 0) + ' m³', b: true, nb: false },
+        { k: 'Gás previsto · gás real PCS ' + fmt(pcsUse, 0), v: fmt(progSum.gasReal, 0) + ' m³', b: false, nb: true },
+        { k: 'Consumo específico (contrato)', v: fmt(progSum.ce, 1) + ' m³/MWh', b: false, nb: true }
+      ],
+      confChecks: cks.map(function (x) { var u = CK_UI[x.k]; return { t: x.t, s: u.s, c: u.c, bg: u.bg }; }),
+      confNErr: nErrC > 0, confNWarn: nWarnC > 0,
+      confCountTxt: (nErrC ? nErrC + ' erro(s)' : '0 erros') + ' · ' + (nWarnC ? nWarnC + ' aviso(s)' : 'sem avisos'),
+      confFaixas: faixas.map(function (f) { return { de: f.de + '–' + f.ate, mao: f.deM + '–' + f.ateM, mw: isFinite(f.mw) ? fmtMw(f.mw) : '—', g: f.g, orig: f.orig, gas: fmt(f.gas94, 0), oc: f.orig === 'operador' ? '#33475E' : '#1061A6' }; }),
+      confAllOpen: !!st.confAll, confAllClosed: !st.confAll,
+      toggleConfAll: function () { self.setState({ confAll: !self.cur().confAll }); },
+      confRows: (function () {
+        var acc9 = 0;
+        return st.prog.map(function (v, i) {
+          var x = num(v), m = (i + 1) * 30 - 60; acc9 += vols[i] * f94;
+          return { bsb: hhmm(i * 30) + '–' + hhmm((i + 1) * 30), mao: m < 0 ? hhmm(m + 1440) + '*' : hhmm(m), mw: isFinite(x) ? fmtMw(x) : '—',
+            g: (isBlank(gtsEff[i]) ? '—' : gtsEff[i]) + (gtsAuto[i] && !isBlank(gtsEff[i]) ? ' P' : ''), gas: fmt(vols[i] * f94, 0), acc: fmt(acc9, 0),
+            bg: gtsAuto[i] && !isBlank(gtsEff[i]) ? '#F5F9FD' : '#FFFFFF' };
+        });
+      })(),
+      confShowForm: confKind !== 'ok', confDone: confKind === 'ok', confBlocked: confKind === 'block',
+      confChk: !!st.confChk,
+      onConfChk: function (e) { self.setState({ confChk: !!e.target.checked, confMsg: '' }); },
+      confBtnLabel: confKind === 'stale' ? 'CONFIRMAR NOVA CONFERÊNCIA' : 'CONFIRMAR CONFERÊNCIA',
+      confBtnBg: confKind === 'block' ? '#DCE3EA' : '#075C2E', confBtnFg: confKind === 'block' ? '#4A5B6E' : '#FFFFFF',
+      confirmConf: function () {
+        var cs = self.cur();
+        if (confKind === 'block') { self.setState({ confMsgKind: 'err', confMsg: 'Há ' + (nErrC || 'pendências') + (nErrC ? ' erro(s)' : '') + ' na programação. Corrija no Programa antes de conferir.' }); return; }
+        if (isBlank(cs.operador)) { self.setState({ confMsgKind: 'err', confMsg: 'Informe o nome ou a matrícula do operador que conferiu.' }); return; }
+        if (!cs.confChk) { self.setState({ confMsgKind: 'err', confMsg: 'Marque a declaração de que conferiu MW e GTs com o PDP.' }); return; }
+        var rec = progRec(String(cs.operador).trim(), cs.session ? cs.session.login : '');
+        self.setState({ progConf: rec, confChk: false, confMsgKind: 'ok', confMsg: 'Programação conferida. A verificação está liberada.' });
+      },
+      confShare: function () { var cf = self.cur().progConf; if (cf && cf.sig === sigNow) self.openShare(cf, 'prog'); },
+      confMsgOk: !!st.confMsg && st.confMsgKind === 'ok', confMsgErr: !!st.confMsg && st.confMsgKind === 'err', confMsg: st.confMsg || '',
+      confWarnNote: nWarnC ? 'Há ' + nWarnC + ' aviso(s) na validação. Avisos não impedem a conferência, mas confira cada um.' : '',
+      hasConfWarnNote: nWarnC > 0 && confKind !== 'ok',
       lockReason: lockReason,
       lockBtn: issues.length > 0 ? 'Faltam ' + issues.length + ' intervalo(s)' : 'Falta a data do PDP',
       pcsHdr: pcsMissing ? fmt(pcsT, 0) : fmt(pcsRow, 0),
@@ -2799,7 +3293,10 @@ class Component extends DCLogic {
 
       // passo 1
       onDate: function (e) { self.setState({ date: e.target.value }); },
-      startOpts: startOpts, endOpts: endOpts, gtOpts: gtOpts,
+      startOpts: startOpts, endOpts: endOpts, gtOpts: gtOpts, gtRowOpts: gtRowOpts,
+      autoCount: String(gtsAuto.filter(function (a, i) { return a && !isBlank(gtsEff[i]); }).length),
+      hasManual: gtsAuto.some(function (a) { return !a; }),
+      previewAll: function () { self.setState({ gtsAuto: auto48(), msgKind: 'ok', msg: 'Todas as GTs voltaram para a prévia automática.' }); },
       fillDeStr: String(st.fillDe), fillAteStr: String(st.fillAte), fillMw: st.fillMw, fillGt: st.fillGt,
       units: units,
       ttIssues: ttIssues, ttOk: ttIssues.length === 0,
@@ -2818,8 +3315,8 @@ class Component extends DCLogic {
         var s = self.cur();
         var a = s.fillDe, b = s.fillAte;
         if (b <= a) { setMsg('err', 'O horário "Até" precisa ser depois do "De".'); return; }
-        if (isBlank(s.fillGt)) { setMsg('err', 'Escolha a quantidade de GTs em operação nesta faixa.'); return; }
-        var nn = parseInt(s.fillGt, 10);
+        var isAutoF = isBlank(s.fillGt) || s.fillGt === 'auto';
+        var nn = isAutoF ? NaN : parseInt(s.fillGt, 10);
         var mwBlank = isBlank(s.fillMw);
         var v = num(s.fillMw);
         if (!mwBlank && (!isFinite(v) || v < 0)) { setMsg('err', 'Potência inválida. Use só números (0 para máquina parada).'); return; }
@@ -2829,17 +3326,19 @@ class Component extends DCLogic {
             if (!(isFinite(num(s.prog[x])) && num(s.prog[x]) >= 0)) { setMsg('err', 'Há intervalos sem potência nessa faixa (' + hhmm(x * 30) + '). Digite a potência em MW.'); return; }
           }
         }
-        for (x = a; x < b; x++) {
-          var mwx = mwBlank ? num(s.prog[x]) : v;
-          var r = checkRow(true, mwx, true, nn);
-          if (r.err) { setMsg('err', 'Não aplicado — ' + hhmm(x * 30) + ': ' + r.err + '.'); return; }
+        if (!isAutoF) {
+          for (x = a; x < b; x++) {
+            var mwx = mwBlank ? num(s.prog[x]) : v;
+            var r = checkRow(true, mwx, true, nn);
+            if (r.err) { setMsg('err', 'Não aplicado — ' + hhmm(x * 30) + ': ' + r.err + '.'); return; }
+          }
         }
-        var p = s.prog.slice(), gg = s.gts.slice();
-        for (x = a; x < b; x++) { if (!mwBlank) p[x] = String(s.fillMw).trim(); gg[x] = String(nn); }
+        var p = s.prog.slice(), gg = s.gts.slice(), aa = gtsAuto.slice();
+        for (x = a; x < b; x++) { if (!mwBlank) p[x] = String(s.fillMw).trim(); if (isAutoF) aa[x] = true; else { gg[x] = String(nn); aa[x] = false; } }
         self.setState({
-          prog: p, gts: gg, msgKind: 'ok',
-          msg: 'Aplicado: ' + hhmm(a * 30) + ' às ' + hhmm(b * 30) + (mwBlank ? '' : ' = ' + String(s.fillMw).trim() + ' MW') + ' com ' + nn + ' GT' + (nn === 1 ? '' : 's') + '.',
-          fillDe: b < 48 ? b : a, fillAte: 48, fillMw: '', fillGt: ''
+          prog: p, gts: gg, gtsAuto: aa, msgKind: 'ok',
+          msg: 'Aplicado: ' + hhmm(a * 30) + ' às ' + hhmm(b * 30) + (mwBlank ? '' : ' = ' + String(s.fillMw).trim() + ' MW') + (isAutoF ? ', GTs pela prévia automática (pode alterar na tabela).' : ' com ' + nn + ' GT' + (nn === 1 ? '' : 's') + '.'),
+          fillDe: b < 48 ? b : a, fillAte: 48, fillMw: '', fillGt: 'auto'
         });
       },
       showPaste: !!st.showPaste,
@@ -2854,12 +3353,12 @@ class Component extends DCLogic {
         if (vals.length === 48) p = vals;
         else if (vals.length === 24) { p = []; vals.forEach(function (v) { p.push(v, v); }); }
         else { setMsg('err', 'Encontrei ' + vals.length + ' valores. São necessários 48 (meia em meia hora) ou 24 (hora a hora).'); return; }
-        self.setState({ prog: p, paste: '', showPaste: false, msgKind: 'ok', msg: 'Potências coladas (' + vals.length + ' valores). Agora defina as GTs por faixa, deixando a potência em branco.' });
+        self.setState({ prog: p, gtsAuto: auto48(), paste: '', showPaste: false, msgKind: 'ok', msg: 'Potências coladas (' + vals.length + ' valores). As GTs entraram pela prévia automática (em azul): confira e altere se precisar.' });
       },
       confirmClear: !!st.confirmClear,
       askClear: function () { self.setState({ confirmClear: true }); },
       cancelClear: function () { self.setState({ confirmClear: false }); },
-      doClear: function () { self.setState({ prog: blank48(), gts: blank48(), log: [], confirmClear: false, med: '', pcsReal: '', msgKind: 'ok', msg: 'Programação apagada. Lance as faixas do dia.' }); },
+      doClear: function () { self.setState({ prog: blank48(), gts: blank48(), gtsAuto: auto48(), progConf: null, confChk: false, log: [], confirmClear: false, med: '', pcsReal: '', msgKind: 'ok', msg: 'Programação apagada. Lance as faixas do dia.' }); },
       msgOk: !!st.msg && st.msgKind !== 'err', msgErr: !!st.msg && st.msgKind === 'err', msg: st.msg,
       rows: rows,
       totalLabel: complete ? 'Gás previsto no dia' : 'Gás previsto (parcial)',
@@ -2873,7 +3372,7 @@ class Component extends DCLogic {
       opBorder: opOk ? '#C9D5E2' : '#B42318',
       selStr: String(sel),
       selLabel: hhmm((sel + 1) * 30),
-      selGtStr: (isBlank(st.gts[sel]) ? '—' : st.gts[sel]) + ' GT',
+      selGtStr: (isBlank(gtsEff[sel]) ? '—' : gtsEff[sel]) + ' GT',
       onSel: function (e) { self.setState({ sel: parseInt(e.target.value, 10) || 0 }); },
       prevStr: pcsBase === 'contrato' ? fmt(prev94, 0) + ' m³' : (pcsOk ? fmt(prevReal, 0) + ' m³' : 'informe o PCS'),
       med: st.med,
@@ -2912,9 +3411,9 @@ class Component extends DCLogic {
         if (!canSave) return null;
         var s = self.cur();
         var lg = (s.log || []).filter(function (l) { return l.idx !== sel; });
-        var rec = { idx: sel, hora: hhmm((sel + 1) * 30), horaMao: maoOf(sel), med: med, med94: med94, prev: prevReal, prev94: prev94, dev: dev, ok: ok, pcs: pcsReal, op: String(s.operador).trim(), gts: s.gts[sel],
+        var rec = { idx: sel, hora: hhmm((sel + 1) * 30), horaMao: maoOf(sel), med: med, med94: med94, prev: prevReal, prev94: prev94, dev: dev, ok: ok, pcs: pcsReal, op: String(s.operador).trim(), gts: gtsEff[sel],
           mw: num(s.prog[sel]), tol: c.tol, savedAt: brNow(), login: s.session && s.session.login,
-          sim: { mw: s.prog.slice(), g: s.gts.slice(), v: vols.map(function (x) { return Math.round(x * 10) / 10; }), pcsT: pcsT } };
+          sim: { mw: s.prog.slice(), g: gtsEff.slice(), v: vols.map(function (x) { return Math.round(x * 10) / 10; }), pcsT: pcsT } };
         lg.push(rec);
         lg.sort(function (x, y) { return x.idx - y.idx; });
         self.setState({ log: lg, med: '', sel: Math.min(47, sel + 2) });
@@ -2924,9 +3423,9 @@ class Component extends DCLogic {
         if (!canSave) return;
         var s = self.cur();
         var lg = (s.log || []).filter(function (l) { return l.idx !== sel; });
-        var rec = { idx: sel, hora: hhmm((sel + 1) * 30), horaMao: maoOf(sel), med: med, med94: med94, prev: prevReal, prev94: prev94, dev: dev, ok: ok, pcs: pcsReal, op: String(s.operador).trim(), gts: s.gts[sel],
+        var rec = { idx: sel, hora: hhmm((sel + 1) * 30), horaMao: maoOf(sel), med: med, med94: med94, prev: prevReal, prev94: prev94, dev: dev, ok: ok, pcs: pcsReal, op: String(s.operador).trim(), gts: gtsEff[sel],
           mw: num(s.prog[sel]), tol: c.tol, savedAt: brNow(), login: s.session && s.session.login,
-          sim: { mw: s.prog.slice(), g: s.gts.slice(), v: vols.map(function (x) { return Math.round(x * 10) / 10; }), pcsT: pcsT } };
+          sim: { mw: s.prog.slice(), g: gtsEff.slice(), v: vols.map(function (x) { return Math.round(x * 10) / 10; }), pcsT: pcsT } };
         lg.push(rec);
         lg.sort(function (x, y) { return x.idx - y.idx; });
         self.setState({ log: lg, med: '', sel: Math.min(47, sel + 2) });

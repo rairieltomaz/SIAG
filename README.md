@@ -6,4 +6,4 @@ Acesse: https://rairieltomaz.github.io/SIAG/
 
 No celular, abra o link e use "Adicionar à tela inicial" para instalar como app.
 
-Versão atual: **1.6** (04/11/2026) – load points do teste de performance das GTs em Ajustes, com recálculo do modelo (relação bruta/líquida, a, b, k e PCS).
+Versão atual: **1.7** (04/11/2026) – prévia automática das GTs ao lançar a carga e tela de conferência da programação em formato de comprovante (libera o Verificar).
