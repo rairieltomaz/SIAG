@@ -15,6 +15,8 @@ input,select,textarea,button{font-family:inherit;font-size:16px}
 input:focus,select:focus,textarea:focus{outline:3px solid #9CC8EC;outline-offset:1px}
 button:focus-visible{outline:3px solid #9CC8EC;outline-offset:2px}
 button:disabled{cursor:not-allowed}
+@keyframes siag-spin{to{transform:rotate(360deg)}}
+.siag-spin{animation:siag-spin .8s linear infinite;transform-origin:50% 50%}
 
 /* ---- responsivo: celular pequeno ---- */
 .app-nav{padding-bottom:calc(8px + env(safe-area-inset-bottom)) !important}
@@ -102,7 +104,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.4.1</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.5</div>
       </main>
     </div>
   </sc-if>
@@ -540,7 +542,7 @@ button:disabled{cursor:not-allowed}
                 <button type="button" onClick="{{ saveReading }}" style="height: 54px; border: 0; border-radius: 0px; background: #1061A6; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Salvar leitura</button>
                 <button type="button" onClick="{{ saveAndReceipt }}" style="height: 48px; border: 2px solid #1061A6; border-radius: 0px; background: #FFFFFF; color: #1061A6; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"></path><path d="M14 2v6h6"></path><path d="M9 13h8"></path><path d="M9 17h6"></path></svg>
-                  Salvar e gerar comprovante
+                  Salvar e enviar comprovante (PDF)
                 </button>
               </div>
             </sc-if>
@@ -571,7 +573,7 @@ button:disabled{cursor:not-allowed}
                     <span style="font-variant-numeric: tabular-nums; color: #33475E">{{ l.medStr }} m³</span>
                     <span style="font-variant-numeric: tabular-nums; color: #0B4A80; font-weight: 600">{{ l.med94Str }} m³</span>
                     <span style="font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; color: {{ l.color }}">{{ l.devStr }}</span>
-                    <button type="button" onClick="{{ l.onReceipt }}" aria-label="Gerar comprovante da leitura das {{ l.horaMao }}" title="Gerar comprovante" style="width: 44px; height: 40px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0">
+                    <button type="button" onClick="{{ l.onReceipt }}" aria-label="Comprovante da leitura das {{ l.horaMao }}: enviar PDF, ver ou imprimir" title="Comprovante: enviar PDF (WhatsApp), ver ou imprimir" style="width: 44px; height: 40px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"></path><path d="M14 2v6h6"></path><path d="M9 13h8"></path><path d="M9 17h6"></path></svg>
                     </button>
                   </div>
@@ -882,6 +884,68 @@ button:disabled{cursor:not-allowed}
     </button>
     </sc-if>
   </nav>
+
+  <!-- ============ COMPARTILHAR COMPROVANTE (PDF / WhatsApp) ============ -->
+  <sc-if value="{{ shareOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="share-overlay" onClick="{{ shareBackdrop }}" style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(12, 35, 64, 0.55); display: flex; align-items: flex-end; justify-content: center">
+      <div role="dialog" aria-modal="true" aria-label="Compartilhar comprovante" style="width: 100%; max-width: 560px; max-height: 92%; overflow-y: auto; box-sizing: border-box; background: #FFFFFF; border-top: 4px solid #1061A6; padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; color: #0C2340">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+            <div style="font-size: 16px; font-weight: 700">{{ shareTitle }}</div>
+            <div style="font-size: 12px; color: #4A5B6E; font-variant-numeric: tabular-nums">Código {{ shareCode }}</div>
+          </div>
+          <button type="button" onClick="{{ shareClose }}" aria-label="Fechar" style="flex: 0 0 auto; width: 40px; height: 40px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #33475E; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6L6 18"></path></svg>
+          </button>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: {{ shareResColor }}; background: {{ shareResBg }}; padding: 8px 10px">{{ shareResTxt }}</div>
+
+        <sc-if value="{{ shareGen }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #0B4A80; background: #E8F1FA; padding: 12px">
+            <svg class="siag-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 1-9 9"></path></svg>
+            Gerando o PDF…
+          </div>
+        </sc-if>
+        <sc-if value="{{ shareReady }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 10px; border: 1px solid #C9D5E2; padding: 10px 12px">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 auto"><path d="M6 2h9l5 5v15H6z"></path><path d="M14 2v6h6"></path><text x="7.2" y="18" font-size="5.6" font-weight="700" fill="#B42318" stroke="none" font-family="Arial, sans-serif">PDF</text></svg>
+            <span style="font-size: 13px; color: #33475E; word-break: break-all; line-height: 1.35">{{ shareInfo }}</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ shareCanSend }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ sendShare }}" style="height: 56px; border: 0; border-radius: 2px; background: #128C7E; color: #FFFFFF; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4"></path><path d="M15.4 6.5l-6.8 4"></path></svg>
+            Enviar pelo WhatsApp
+          </button>
+          <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">Abre o menu de compartilhar do celular: escolha <b>WhatsApp</b> e depois o contato ou grupo. O PDF vai como documento, com um resumo da leitura.</div>
+        </sc-if>
+        <sc-if value="{{ shareNoSend }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="font-size: 13px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; line-height: 1.4">Este navegador não envia arquivos direto para outros apps. Toque em <b>Baixar PDF</b> e, no WhatsApp, toque no clipe › <b>Documento</b>.</div>
+        </sc-if>
+        <sc-if value="{{ shareMsgOk }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">{{ shareMsg }}</div>
+        </sc-if>
+        <sc-if value="{{ shareMsgInfo }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; padding: 8px 10px; line-height: 1.4; word-break: break-word">{{ shareMsg }}</div>
+        </sc-if>
+        <sc-if value="{{ shareMsgErr }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; padding: 8px 10px; line-height: 1.4">{{ shareMsg }}</div>
+        </sc-if>
+
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px">
+          <button type="button" onClick="{{ shareDownload }}" disabled="{{ shareNotReady }}" style="height: 48px; border: 2px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+            Baixar PDF
+          </button>
+          <button type="button" onClick="{{ shareView }}" style="height: 48px; border: 2px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"></path><rect x="3" y="9" width="18" height="8" rx="1"></rect><path d="M6 14h12v8H6z"></path></svg>
+            Ver / imprimir
+          </button>
+        </div>
+        <button type="button" onClick="{{ shareClose }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; font-size: 15px; cursor: pointer">Fechar</button>
+      </div>
+    </div>
+  </sc-if>
   </div>
   </sc-if>
 </div>
@@ -1287,6 +1351,302 @@ function openReceipt(r) {
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   } catch (e) {}
 }
+// ---- PDF do comprovante (gerado no próprio aparelho, sem biblioteca externa) ----
+// Texto em Helvetica/Helvetica-Bold (fontes padrão de PDF, codificação WinAnsi). Larguras em 1/1000 em, códigos 32..255.
+var HELV = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,761,556,0,222,556,333,1000,556,556,333,1000,667,333,1000,0,611,0,0,222,222,333,333,350,556,1000,333,1000,500,333,944,0,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+var HELVB = [278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,761,556,0,278,556,500,1000,556,556,333,1000,667,333,1000,0,611,0,0,278,278,500,500,350,556,1000,333,1000,556,333,944,0,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,333,400,584,333,333,333,611,556,278,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+var WIN_EXTRA = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E,
+  0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F,
+  0x2212: 0x96, 0x202F: 0x20, 0x2009: 0x20, 0x2007: 0x20 };
+var PW = 595.28, PH = 841.89;   // A4 em pontos
+function winCodes(s) {
+  var out = [];
+  s = String(s == null ? '' : s);
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    if ((c >= 32 && c < 127) || (c >= 160 && c <= 255)) out.push(c);
+    else if (WIN_EXTRA[c]) out.push(WIN_EXTRA[c]);
+    else if (c === 9 || c === 10 || c === 13) out.push(32);
+    else if (c >= 0xDC00 && c <= 0xDFFF) continue;
+    else out.push(63);
+  }
+  return out;
+}
+function pdfW(s, size, bold) {
+  var t = bold ? HELVB : HELV, cs = winCodes(s), w = 0;
+  for (var i = 0; i < cs.length; i++) w += t[cs[i] - 32] || 556;
+  return w * size / 1000;
+}
+function pdfStr(s) {
+  var cs = winCodes(s), o = '(';
+  for (var i = 0; i < cs.length; i++) {
+    var c = cs[i];
+    if (c === 40 || c === 41 || c === 92) o += '\\' + String.fromCharCode(c);
+    else if (c > 126) o += '\\' + ('00' + c.toString(8)).slice(-3);
+    else o += String.fromCharCode(c);
+  }
+  return o + ')';
+}
+function n2(x) { return String(Math.round(x * 100) / 100); }
+function pdfRgb(hex) { var h = String(hex).replace('#', ''); return [0, 2, 4].map(function (i) { return n2(parseInt(h.substr(i, 2), 16) / 255); }).join(' '); }
+// página: coordenadas em pontos a partir do canto superior esquerdo (y = linha de base do texto)
+function PdfPage() { this.ops = []; }
+PdfPage.prototype.text = function (x, y, s, o) {
+  o = o || {};
+  var size = o.size || 9, bold = !!o.bold, w = pdfW(s, size, bold);
+  if (o.align === 'right') x -= w; else if (o.align === 'center') x -= w / 2;
+  this.ops.push('BT /' + (bold ? 'F2' : 'F1') + ' ' + n2(size) + ' Tf ' + pdfRgb(o.color || '#0C2340') + ' rg ' + n2(x) + ' ' + n2(PH - y) + ' Td ' + pdfStr(s) + ' Tj ET');
+  return w;
+};
+PdfPage.prototype.rect = function (x, y, w, h, fill, stroke, lw) {
+  var op = '';
+  if (fill) op += pdfRgb(fill) + ' rg ';
+  if (stroke) op += pdfRgb(stroke) + ' RG ' + n2(lw || 1) + ' w ';
+  this.ops.push(op + n2(x) + ' ' + n2(PH - y - h) + ' ' + n2(w) + ' ' + n2(h) + ' re ' + (fill && stroke ? 'B' : (fill ? 'f' : 'S')));
+};
+PdfPage.prototype.line = function (x1, y1, x2, y2, color, lw) {
+  this.ops.push(pdfRgb(color || '#E2E8F0') + ' RG ' + n2(lw || 0.6) + ' w ' + n2(x1) + ' ' + n2(PH - y1) + ' m ' + n2(x2) + ' ' + n2(PH - y2) + ' l S');
+};
+PdfPage.prototype.tri = function (x, y, s, color) {   // triângulo apontando para a esquerda, centro vertical em y
+  this.ops.push(pdfRgb(color) + ' rg ' + n2(x) + ' ' + n2(PH - y) + ' m ' + n2(x + s) + ' ' + n2(PH - y + s / 2) + ' l ' + n2(x + s) + ' ' + n2(PH - y - s / 2) + ' l f');
+};
+PdfPage.prototype.image = function (name, x, y, w, h) {
+  this.ops.push('q ' + n2(w) + ' 0 0 ' + n2(h) + ' ' + n2(x) + ' ' + n2(PH - y - h) + ' cm /' + name + ' Do Q');
+};
+function pdfWrap(s, size, bold, maxW) {
+  var words = String(s).split(/\s+/), lines = [], cur = '';
+  words.forEach(function (w) {
+    var t = cur ? cur + ' ' + w : w;
+    if (cur && pdfW(t, size, bold) > maxW) { lines.push(cur); cur = w; } else cur = t;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function asciiBytes(s) { var b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255; return b; }
+// monta o arquivo PDF (objetos + tabela xref)
+function pdfBuild(pages, img, title) {
+  var objs = [], kids = [], first = img ? 7 : 6;
+  pages.forEach(function (p, i) { kids.push((first + i * 2) + ' 0 R'); });
+  objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+  objs[2] = '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + pages.length + ' >>';
+  objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  objs[5] = '<< /Title ' + pdfStr(title) + ' /Author (SIAG - CEA) /Creator (SIAG) /Producer (SIAG) >>';
+  if (img) objs[6] = ['<< /Type /XObject /Subtype /Image /Width ' + img.w + ' /Height ' + img.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + img.bytes.length + ' >>\nstream\n', img.bytes, '\nendstream'];
+  var res = '<< /Font << /F1 3 0 R /F2 4 0 R >>' + (img ? ' /XObject << /Logo 6 0 R >>' : '') + ' >>';
+  pages.forEach(function (p, i) {
+    var pn = first + i * 2, content = p.ops.join('\n');
+    objs[pn] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + PW + ' ' + PH + '] /Resources ' + res + ' /Contents ' + (pn + 1) + ' 0 R >>';
+    objs[pn + 1] = '<< /Length ' + content.length + ' >>\nstream\n' + content + '\nendstream';
+  });
+  var chunks = [], pos = 0, offs = [];
+  function put(x) { var b = typeof x === 'string' ? asciiBytes(x) : x; chunks.push(b); pos += b.length; }
+  put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  for (var k = 1; k < objs.length; k++) {
+    offs[k] = pos;
+    put(k + ' 0 obj\n');
+    (Array.isArray(objs[k]) ? objs[k] : [objs[k]]).forEach(put);
+    put('\nendobj\n');
+  }
+  var xref = pos, x = 'xref\n0 ' + objs.length + '\n0000000000 65535 f \n';
+  for (k = 1; k < objs.length; k++) x += ('000000000' + offs[k]).slice(-10) + ' 00000 n \n';
+  put(x + 'trailer\n<< /Size ' + objs.length + ' /Root 1 0 R /Info 5 0 R >>\nstartxref\n' + xref + '\n%%EOF\n');
+  var out = new Uint8Array(pos), o = 0;
+  chunks.forEach(function (c) { out.set(c, o); o += c.length; });
+  return out;
+}
+// logo da CEA convertida para JPEG (fundo branco), guardada para os próximos PDFs
+var _logoP = null;
+function logoJpeg() {
+  if (_logoP) return _logoP;
+  var p = new Promise(function (ok) {
+    try {
+      var im0 = document.querySelector('img[src^="data:image"]');
+      if (!im0) { ok(null); return; }
+      var im = new Image();
+      im.onload = function () {
+        try {
+          var sc = Math.min(1, 700 / (im.naturalWidth || 1));
+          var w = Math.max(1, Math.round(im.naturalWidth * sc)), h = Math.max(1, Math.round(im.naturalHeight * sc));
+          var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          var cx = cv.getContext('2d'); cx.fillStyle = '#FFFFFF'; cx.fillRect(0, 0, w, h); cx.drawImage(im, 0, 0, w, h);
+          var d = cv.toDataURL('image/jpeg', 0.92), bin = atob(d.split(',')[1]), b = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+          ok({ bytes: b, w: w, h: h });
+        } catch (e) { ok(null); }
+      };
+      im.onerror = function () { ok(null); };
+      im.src = im0.getAttribute('src');
+    } catch (e) { ok(null); }
+  });
+  _logoP = p.then(function (v) { if (!v) _logoP = null; return v; });
+  return _logoP;
+}
+// desenha o comprovante: página 1 = leitura; página 2 = programação de geração simulada
+function receiptPdf(r, logo) {
+  var L = 40, R = PW - 40, CW = R - L;
+  var code = codeOf(r);
+  var dp = String(r.date || '').split('-');
+  var dateBr = dp.length === 3 ? dp[2] + '/' + dp[1] + '/' + dp[0] : '—';
+  var okCol = r.ok ? '#075C2E' : '#8A1A12', okBg = r.ok ? '#E5F4EA' : '#FDECEA';
+  var gen = fmtDT(brNow());
+  var sm = r.sim, hasSim = !!(sm && sm.v && sm.v.length);
+  var nPages = hasSim ? 2 : 1, pages = [];
+  function footer(p, n) {
+    p.line(L, 806, R, 806, '#C9D5E2', 0.6);
+    p.text(L, 818, 'CEA – Companhia Energética Amazonense', { size: 7.5, color: '#4A5B6E' });
+    p.text(R, 818, 'Emitido em ' + gen + ' (Brasília) · SIAG · página ' + n + ' de ' + nPages, { size: 7.5, color: '#4A5B6E', align: 'right' });
+  }
+  // ---------- página 1 ----------
+  var p = new PdfPage(); pages.push(p);
+  if (logo) {
+    var lh = 32, lw = logo.w * lh / logo.h;
+    if (lw > 190) { lw = 190; lh = lw * logo.h / logo.w; }
+    p.image('Logo', L, 34 + (32 - lh) / 2, lw, lh);
+  } else p.text(L, 58, 'CEA', { size: 20, bold: true, color: '#1061A6' });
+  p.text(R, 50, 'COMPROVANTE DE LEITURA DE GÁS', { size: 13, bold: true, align: 'right' });
+  p.text(R, 63, 'SIAG · Sistema Integrado de Aferição de Gás', { size: 8.5, color: '#4A5B6E', align: 'right' });
+  p.rect(L, 74, CW, 2.2, '#1061A6');
+  var w0 = p.text(L, 92, 'Código da leitura: ', { size: 8.5, color: '#4A5B6E' });
+  p.text(L + w0, 92, code, { size: 9.5, bold: true });
+  p.rect(L, 102, CW, 56, okBg, okCol, 1.5);
+  p.text(L + 12, 125, r.ok ? 'DENTRO DA TOLERÂNCIA' : 'FORA DA TOLERÂNCIA', { size: 13, bold: true, color: okCol });
+  p.text(R - 12, 130, pct(r.dev), { size: 22, bold: true, color: okCol, align: 'right' });
+  p.text(L + 12, 148, 'Limite de tolerância ±' + fmt(r.tol, 1) + '% · desvio = (medido − previsto) ÷ previsto', { size: 8.5, color: okCol });
+  var y = 172, KX = L + 6, VX = L + CW * 0.46;
+  function sect(t) { y += 10; p.text(L, y, t.toUpperCase(), { size: 8.5, bold: true, color: '#0B4A80' }); p.line(L, y + 4, R, y + 4, '#0B4A80', 0.8); y += 18; }
+  function row(k, v, strong) {
+    p.text(KX, y, k, { size: 9.5, color: '#33475E' });
+    p.text(VX, y, v, { size: 9.5, bold: !!strong });
+    p.line(L, y + 6, R, y + 6, '#E2E8F0', 0.6);
+    y += 18;
+  }
+  sect('Identificação');
+  row('Data da programação (PDP)', dateBr);
+  row('Horário da leitura — Manaus', r.horaMao, true);
+  row('Horário da leitura — Brasília (PDP)', r.hora);
+  row('Operador', r.op || '—', true);
+  row('Usuário do sistema', r.login || '—');
+  row('Gravada em', r.savedAt ? fmtDT(r.savedAt) + ' (Brasília)' : '—');
+  sect('Programação ONS no intervalo');
+  row('Potência programada', isFinite(r.mw) ? fmtMw(r.mw) + ' MW' : '—');
+  row('Unidades geradoras (GTs)', r.gts == null || r.gts === '' ? '—' : String(r.gts));
+  sect('Leitura e PCS');
+  row('Totalizador GRMS lido (gás real)', fmt(r.med, 0) + ' m³', true);
+  row('PCS médio medido', fmt(r.pcs, 0) + ' kcal/m³');
+  row('PCS de referência (contrato)', fmt(r.pcsRef, 0) + ' kcal/m³');
+  row('Fator de conversão (PCS medido ÷ referência)', fmt(r.pcs / r.pcsRef, 4));
+  row('Totalizador convertido para ' + fmt(r.pcsRef, 0), fmt(r.med94, 0) + ' m³', true);
+  sect('Comparação com o previsto (acumulado no dia)');
+  var cx = [{ x: KX, a: 'left' }, { x: L + 268, a: 'right' }, { x: L + 352, a: 'right' }, { x: L + 436, a: 'right' }, { x: R - 6, a: 'right' }];
+  function trow(vals, o) {
+    if (o.bg) p.rect(L, y - 12, CW, 18, o.bg);
+    vals.forEach(function (v, i) { p.text(cx[i].x, y, v, { size: o.size || 9.5, bold: !!o.bold || (i === 4 && !!o.devBold), color: o.color, align: cx[i].a }); });
+    if (!o.bg) p.line(L, y + 6, R, y + 6, '#E2E8F0', 0.6);
+    y += 18;
+  }
+  function dif(a, b) { return (a - b >= 0 ? '+' : '−') + fmt(Math.abs(a - b), 0); }
+  trow(['Base', 'Previsto (m³)', 'Medido (m³)', 'Diferença (m³)', 'Desvio'], { size: 8, bold: true, color: '#0B4A80', bg: '#E8F1FA' });
+  trow(['Gás real · PCS ' + fmt(r.pcs, 0), fmt(r.prev, 0), fmt(r.med, 0), dif(r.med, r.prev), pct(r.dev)], { devBold: true });
+  trow(['Contrato · PCS ' + fmt(r.pcsRef, 0), fmt(r.prev94, 0), fmt(r.med94, 0), dif(r.med94, r.prev94), pct(r.dev)], { devBold: true });
+  y += 4;
+  pdfWrap('Conversão para ' + fmt(r.pcsRef, 0) + ' kcal/m³: volume × (PCS medido ÷ ' + fmt(r.pcsRef, 0) + '), aplicada igualmente ao previsto e ao medido; por isso o desvio % é o mesmo nas duas bases. Previsto calculado pelo modelo do SIAG a partir do PDP do ONS (horários do PDP em Brasília, UTC−3; Manaus, UTC−4).', 7.8, false, CW)
+    .forEach(function (ln) { p.text(L, y, ln, { size: 7.8, color: '#4A5B6E' }); y += 10.5; });
+  footer(p, 1);
+  // ---------- página 2 ----------
+  if (hasSim) {
+    p = new PdfPage(); pages.push(p);
+    p.text(L, 30, 'SIAG · Comprovante de leitura de gás', { size: 7.5, color: '#4A5B6E' });
+    p.text(R, 30, code, { size: 7.5, bold: true, color: '#4A5B6E', align: 'right' });
+    p.text(L, 50, ('Programação de geração simulada · PDP ONS ' + (r.dateBr || dateBr)).toUpperCase(), { size: 9, bold: true, color: '#0B4A80' });
+    var lx = L;
+    p.rect(lx, 57, 10, 7, '#F5F9FD', '#C9D5E2', 0.5); lx += 14;
+    lx += p.text(lx, 63.5, 'intervalos somados no previsto', { size: 7.5, color: '#4A5B6E' }) + 14;
+    p.rect(lx, 57, 10, 7, '#FFF4E5', '#B54708', 0.8); lx += 14;
+    lx += p.text(lx, 63.5, 'intervalo da leitura', { size: 7.5, color: '#4A5B6E' }) + 3;
+    p.tri(lx, 60.8, 5, '#B54708'); lx += 16;
+    p.text(lx, 63.5, '* Manaus no dia anterior', { size: 7.5, color: '#4A5B6E' });
+    var top = 72, hh = 22;
+    var sc = [
+      { x: L + 4, a: 'left', h: ['Intervalo', 'Brasília'] }, { x: L + 74, a: 'left', h: ['Fim', 'Manaus'] },
+      { x: L + 176, a: 'right', h: ['MW', 'ONS'] }, { x: L + 206, a: 'right', h: ['GTs', ''] },
+      { x: L + 278, a: 'right', h: ['Gás 30 min', 'PCS ' + fmt(r.pcs, 0)] }, { x: L + 350, a: 'right', h: ['Gás 30 min', 'PCS ' + fmt(r.pcsRef, 0)] },
+      { x: L + 432, a: 'right', h: ['Acumulado', 'PCS ' + fmt(r.pcs, 0)] }, { x: R - 4, a: 'right', h: ['Acumulado', 'PCS ' + fmt(r.pcsRef, 0)] }
+    ];
+    p.rect(L, top, CW, hh, '#E8F1FA');
+    sc.forEach(function (c) {
+      p.text(c.x, top + 9, c.h[0], { size: 7, bold: true, color: '#0B4A80', align: c.a });
+      if (c.h[1]) p.text(c.x, top + 18, c.h[1], { size: 7, bold: true, color: '#0B4A80', align: c.a });
+    });
+    function cell(k, v, by, o) { p.text(sc[k].x, by, v, { size: o.size, bold: o.bold, color: o.color, align: 'right' }); }
+    var pcsT = sm.pcsT, accR = 0, acc9 = 0, eTot = 0, gMax = 0, rh = 13.6, ry = top + hh;
+    for (var i = 0; i < sm.v.length; i++) {
+      var mw = num(sm.mw[i]), g = parseInt(sm.g[i], 10);
+      var vr = sm.v[i] * pcsT / r.pcs, v94 = sm.v[i] * pcsT / r.pcsRef;
+      accR += vr; acc9 += v94;
+      if (isFinite(mw)) eTot += mw * 0.5;
+      if (isFinite(g) && g > gMax) gMax = g;
+      var isRd = i === r.idx, isIn = i < r.idx, off = !(sm.v[i] > 0) && !isRd;
+      if (isRd) { p.rect(L, ry, CW, rh, '#FFF4E5'); p.line(L, ry, R, ry, '#B54708', 1.2); p.line(L, ry + rh, R, ry + rh, '#B54708', 1.2); }
+      else { if (isIn) p.rect(L, ry, CW, rh, '#F5F9FD'); p.line(L, ry + rh, R, ry + rh, '#EDF2F7', 0.5); }
+      var by = ry + rh - 4, o = { size: 7.8, bold: isRd, color: off ? '#8A99AB' : '#0C2340' };
+      var mao = (i + 1) * 30 - 60, maoS = mao < 0 ? hhmm(mao + 1440) + '*' : hhmm(mao);
+      p.text(sc[0].x, by, hhmm(i * 30) + '–' + hhmm((i + 1) * 30), o);
+      var mw0 = p.text(sc[1].x, by, maoS, o);
+      if (isRd) p.tri(sc[1].x + mw0 + 4, ry + rh / 2, 5.5, '#B54708');
+      cell(2, isFinite(mw) ? fmtMw(mw) : '—', by, o); cell(3, isFinite(g) ? String(g) : '—', by, o);
+      cell(4, fmt(vr, 0), by, o); cell(5, fmt(v94, 0), by, o); cell(6, fmt(accR, 0), by, o); cell(7, fmt(acc9, 0), by, o);
+      ry += rh;
+    }
+    p.rect(L, ry, CW, 16, '#E8F1FA'); p.line(L, ry, R, ry, '#0B4A80', 1.4);
+    var fo = { size: 7.8, bold: true, color: '#0B4A80' };
+    p.text(sc[0].x, ry + 11, 'Total do dia', fo);
+    p.text(sc[2].x, ry + 11, fmt(eTot, 1) + ' MWh', { size: 7.8, bold: true, color: '#0B4A80', align: 'right' });
+    p.text(sc[3].x, ry + 11, 'máx. ' + gMax, { size: 7.8, bold: true, color: '#0B4A80', align: 'right' });
+    p.text(sc[6].x, ry + 11, fmt(accR, 0), { size: 7.8, bold: true, color: '#0B4A80', align: 'right' });
+    p.text(sc[7].x, ry + 11, fmt(acc9, 0), { size: 7.8, bold: true, color: '#0B4A80', align: 'right' });
+    ry += 30;
+    pdfWrap('Volumes em m³ calculados pelo modelo do SIAG (reta de Willans do teste de 96 h) a partir da potência e do nº de GTs programados pelo ONS. Programação registrada no momento em que a leitura foi gravada.', 7.5, false, CW)
+      .forEach(function (ln) { p.text(L, ry, ln, { size: 7.5, color: '#4A5B6E' }); ry += 10; });
+    footer(p, 2);
+  }
+  return { bytes: pdfBuild(pages, logo, 'Comprovante de leitura de gás ' + code), pages: nPages };
+}
+function receiptFileName(r) {
+  var dp = String(r.date || '').split('-');
+  var d = dp.length === 3 ? dp[2] + '-' + dp[1] + '-' + dp[0] : 'sem-data';
+  return 'Comprovante_SIAG_' + d + '_' + String(r.horaMao || r.hora || '').replace(':', 'h') + '_Manaus.pdf';
+}
+function receiptShareText(r) {
+  var dp = String(r.date || '').split('-');
+  var d = dp.length === 3 ? dp[2] + '/' + dp[1] + '/' + dp[0] : '';
+  return 'Comprovante de leitura de gás – SIAG\n' +
+    'PDP ' + d + ' · leitura ' + r.horaMao + ' (Manaus) / ' + r.hora + ' (Brasília)\n' +
+    'Desvio ' + pct(r.dev) + ' – ' + (r.ok ? 'dentro' : 'FORA') + ' da tolerância (±' + fmt(r.tol, 1) + '%)\n' +
+    'Operador: ' + (r.op || '—') + '\n' +
+    'Código: ' + codeOf(r);
+}
+// gera o arquivo PDF pronto para compartilhar
+function makeReceiptFile(r) {
+  return timeout(logoJpeg(), 3000).catch(function () { return null; }).then(function (logo) {
+    var out = receiptPdf(r, logo), name = receiptFileName(r);
+    var blob = new Blob([out.bytes], { type: 'application/pdf' }), file = null;
+    try { file = new File([out.bytes], name, { type: 'application/pdf', lastModified: Date.now() }); } catch (e) { file = null; }
+    return { file: file, blob: blob, name: name, pages: out.pages, size: out.bytes.length, text: receiptShareText(r) };
+  });
+}
+function canShareFile(f) {
+  try { return !!(f && navigator.share && navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; }
+}
+function downloadBlob(blob, name) {
+  try {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = name; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+    return true;
+  } catch (e) { return false; }
+}
 function brNow() {
   var u = new Date(Date.now() - 3 * 3600000);
   return new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), u.getUTCHours(), u.getUTCMinutes(), u.getUTCSeconds()).getTime();
@@ -1310,7 +1670,8 @@ function freshState() {
     newU: '', newP: '', newRole: 'oper', userMsg: '', userMsgKind: '',
     showPw: false, pwCur: '', pwNew: '', pwNew2: '', pwMsg: '', resetLogin: '', resetP: '',
     udb: null, udbSrc: '', udbGot: 0, udbSyncing: false, busy: false, tokIn: '', tokMsg: '', tokMsgKind: '', hasTok: false,
-    cdb: null, cdbSrc: '', cfgDraft: null, draftOld: false, cfgMsg: '', cfgMsgKind: ''
+    cdb: null, cdbSrc: '', cfgDraft: null, draftOld: false, cfgMsg: '', cfgMsgKind: '',
+    share: null
   };
 }
 
@@ -1353,7 +1714,24 @@ class Component extends DCLogic {
     this._vis = function () { if (document.visibilityState === 'visible') self.syncUsers(); };
     document.addEventListener('visibilitychange', this._vis);
     this.syncUsers();
+    setTimeout(function () { logoJpeg(); }, 800);   // deixa a logo do PDF pronta
   }
+  // ---- compartilhamento do comprovante em PDF ----
+  openShare(rec) {
+    var self = this, seq = (this._shareSeq = (this._shareSeq || 0) + 1);
+    this._shareRec = rec; this._shareOut = null;
+    this.setState({ share: { status: 'gen', rec: { code: codeOf(rec), horaMao: rec.horaMao, hora: rec.hora, ok: !!rec.ok, dev: pct(rec.dev) }, msg: '', msgKind: '' } });
+    makeReceiptFile(rec).then(function (out) {
+      if (seq !== self._shareSeq) return;
+      self._shareOut = out;
+      var sh = Object.assign({}, self.cur().share, { status: 'ok', name: out.name, info: out.pages + (out.pages > 1 ? ' páginas' : ' página') + ' · ' + Math.max(1, Math.round(out.size / 1024)) + ' KB', canSend: canShareFile(out.file) });
+      self.setState({ share: sh });
+    }, function (e) {
+      if (seq !== self._shareSeq) return;
+      self.setState({ share: Object.assign({}, self.cur().share, { status: 'err', msgKind: 'err', msg: 'Não foi possível gerar o PDF neste aparelho (' + (e && e.message ? e.message : e) + '). Use "Ver / imprimir" › Salvar como PDF.' }) });
+    });
+  }
+  shareMsg(kind, text) { var sh = this.cur().share; if (sh) this.setState({ share: Object.assign({}, sh, { msgKind: kind, msg: text }) }); }
   componentWillUnmount() {
     if (this._tick) clearInterval(this._tick);
     if (this._sync) clearInterval(this._sync);
@@ -1638,7 +2016,7 @@ class Component extends DCLogic {
     }
     var log = (st.log || []).map(function (l) {
       return {
-        onReceipt: function () { openReceipt(receiptRec(l)); },
+        onReceipt: function () { self.openShare(receiptRec(l)); },
         hora: l.hora, horaMao: l.horaMao || maoOf(l.idx), medStr: fmt(l.med, 0), prevStr: fmt(l.prev, 0), devStr: pct(l.dev),
         med94Str: fmt(isFinite(l.med94) ? l.med94 : l.med * l.pcs / c.pcsRef, 0),
         color: l.ok ? '#075C2E' : '#B42318',
@@ -1763,7 +2141,46 @@ class Component extends DCLogic {
       togglePass: function () { self.setState({ showPass: !self.cur().showPass }); },
       onLoginKey: function (e) { if (e && e.key === 'Enter') { if (e.preventDefault) e.preventDefault(); doLogin(); } },
       hasLoginErr: !!st.loginErr, loginErr: st.loginErr,
-      logout: function () { self.setState({ session: null, tab: 'prog', loginU: '', loginP: '', loginErr: '', showPass: false, showPw: false }); },
+
+      // compartilhar comprovante (PDF / WhatsApp)
+      shareOpen: !!st.share,
+      shareTitle: st.share ? 'Comprovante da leitura das ' + st.share.rec.horaMao + ' (Manaus)' : '',
+      shareCode: st.share ? st.share.rec.code : '',
+      shareResTxt: st.share ? (st.share.rec.ok ? 'Dentro da tolerância' : 'Fora da tolerância') + ' · desvio ' + st.share.rec.dev : '',
+      shareResColor: st.share && st.share.rec.ok ? '#075C2E' : '#8A1A12',
+      shareResBg: st.share && st.share.rec.ok ? '#E5F4EA' : '#FDECEA',
+      shareGen: !!st.share && st.share.status === 'gen',
+      shareReady: !!st.share && st.share.status === 'ok',
+      shareInfo: st.share && st.share.status === 'ok' ? st.share.name + ' · ' + st.share.info : '',
+      shareCanSend: !!st.share && st.share.status === 'ok' && !!st.share.canSend,
+      shareNoSend: !!st.share && st.share.status === 'ok' && !st.share.canSend,
+      shareMsgOk: !!st.share && !!st.share.msg && st.share.msgKind === 'ok',
+      shareMsgErr: !!st.share && !!st.share.msg && st.share.msgKind === 'err',
+      shareMsgInfo: !!st.share && !!st.share.msg && st.share.msgKind === 'info',
+      shareMsg: st.share ? st.share.msg : '',
+      sendShare: function () {
+        var out = self._shareOut;
+        if (!out || !out.file) return;
+        var fail = function (e) {
+          if (e && e.name === 'AbortError') return;   // a pessoa fechou o menu
+          self.shareMsg('err', 'O aparelho não abriu o compartilhamento' + (e && e.name ? ' (' + e.name + ')' : '') + '. Toque em "Baixar PDF" e anexe no WhatsApp pelo clipe › Documento.');
+        };
+        try {
+          navigator.share({ files: [out.file], title: 'Comprovante SIAG', text: out.text })
+            .then(function () { self.shareMsg('ok', 'Comprovante enviado para o app escolhido.'); }, fail);
+        } catch (e) { fail(e); }
+      },
+      shareDownload: function () {
+        var out = self._shareOut;
+        if (!out) return;
+        if (downloadBlob(out.blob, out.name)) self.shareMsg('info', 'PDF salvo no aparelho (pasta Downloads/Arquivos). Para enviar: no WhatsApp, toque no clipe › Documento e escolha ' + out.name + '.');
+        else self.shareMsg('err', 'Não foi possível salvar o PDF neste navegador.');
+      },
+      shareView: function () { if (self._shareRec) openReceipt(self._shareRec); },
+      shareNotReady: !(st.share && st.share.status === 'ok'),
+      shareBackdrop: function (e) { if (e && e.target === e.currentTarget) { self._shareSeq = (self._shareSeq || 0) + 1; self._shareOut = null; self.setState({ share: null }); } },
+      shareClose: function () { self._shareSeq = (self._shareSeq || 0) + 1; self._shareOut = null; self.setState({ share: null }); },
+      logout: function () { self._shareSeq = (self._shareSeq || 0) + 1; self.setState({ session: null, tab: 'prog', loginU: '', loginP: '', loginErr: '', showPass: false, showPw: false, share: null }); },
       defaultPassWarn: logged && !isAdmin && !!sessUser.padrao,
       pwView: pwView, mustChange: mustChange, askCurrent: !mustChange, canCancelPw: !mustChange,
       pwTitle: mustChange ? 'Criar senha do administrador' : 'Trocar minha senha',
@@ -2049,8 +2466,8 @@ class Component extends DCLogic {
           sim: { mw: s.prog.slice(), g: s.gts.slice(), v: vols.map(function (x) { return Math.round(x * 10) / 10; }), pcsT: pcsT } };
         lg.push(rec);
         lg.sort(function (x, y) { return x.idx - y.idx; });
-        openReceipt(receiptRec(rec));
         self.setState({ log: lg, med: '', sel: Math.min(47, sel + 2) });
+        self.openShare(receiptRec(rec));
       },
       hasLog: log.length > 0, noLog: log.length === 0, log: log,
       clearLog: function () { self.setState({ log: [] }); },

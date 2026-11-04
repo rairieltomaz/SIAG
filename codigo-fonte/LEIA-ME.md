@@ -1,4 +1,4 @@
-# SIAG – Sistema Integrado de Aferição de Gás · versão 1.4.1
+# SIAG – Sistema Integrado de Aferição de Gás · versão 1.5
 
 Data da versão: 04/11/2026
 Endereço publicado: https://rairieltomaz.github.io/SIAG/
@@ -49,6 +49,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 ## Histórico
 
+- **1.5 (04/11/2026)** – Compartilhamento do comprovante pelo celular: o app gera o PDF (A4, 2 páginas, texto nítido, ~60 KB) no próprio aparelho, sem internet e sem biblioteca externa, e envia pelo menu de compartilhar (WhatsApp, e-mail etc.). Painel do comprovante com Enviar pelo WhatsApp, Baixar PDF e Ver / imprimir. Em navegador que não compartilha arquivos (alguns computadores), o botão de envio some e fica o Baixar PDF.
 - **1.4.1 (04/11/2026)** – Correção do acesso à senha: o app só aceita token que consegue gravar no repositório (antes aceitava token só de leitura, e a criação da senha do administrador falhava sem saída). Botão "Trocar token" na tela de senha; token recusado pelo GitHub é removido e o campo volta a aparecer. Instruções do token com link direto e o passo "Only select repositories › SIAG" destacado.
 - **1.4 (03/11/2026)** – Ajustes de cálculo centralizados no `ajustes.json` do GitHub: os cálculos de todos os aparelhos usam os valores publicados. Edição vira rascunho até publicar; ajustes antigos do aparelho viram rascunho para conferência. Token do GitHub passa para o card "Publicação no GitHub" (Administrador e Regulação).
 - **1.3 (03/11/2026)** – Usuários e senhas centralizados no `usuarios.json` do GitHub: uma senha criada ou trocada vale em todos os aparelhos. Administrador publica as alterações com token do GitHub; troca de senha desconecta as sessões antigas; operação e regulação não trocam a própria senha (pedem ao administrador).
@@ -74,7 +75,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 1. **Programa** – data do PDP, PCS medido (opcional), lançamento por faixa (De/Até/MW/GTs) ou colagem dos 48 valores do PDPW. Tabela de 30 min com volume acumulado no PCS medido e na base do contrato (9.400 kcal/m³). Intertravamento: só libera a verificação com os 48 intervalos completos (MW e GTs) e sem erros.
 2. **Ton/Toff** – calculadora por GT (ligada/desligada desde) e conferência das partidas/paradas da programação. Inclui a nota operacional DESSEM / CER-D nº 464/22.
-3. **Verificar** – operador, horário da leitura **em Manaus** (o app converte sozinho para Brasília, +1 h, e mostra o horário convertido), PCS médio medido, totalizador GRMS **digitado como lido, sem conversão** (até 6 dígitos). O app converte o totalizador para o PCS 9.400 e mostra os dois valores (lido e convertido), o previsto nas duas bases e o desvio. Para salvar exige operador, totalizador e PCS; bloqueia leituras que diminuem com o tempo. O botão **"Salvar e gerar comprovante"** e o ícone de documento em cada leitura salva abrem o **comprovante da leitura** (A4, pronto para imprimir ou salvar em PDF), com código da leitura, horários de Manaus e Brasília, operador, usuário, potência e GTs do PDP, totalizador lido e convertido para 9.400, previsto, desvio e resultado. A 2ª página traz a **programação de geração simulada** do dia (48 intervalos: horário Brasília/Manaus, MW, GTs, gás a cada 30 min e acumulado nas bases PCS medido e 9.400), com o intervalo da leitura destacado. A programação fica registrada no momento em que a leitura é gravada.
+3. **Verificar** – operador, horário da leitura **em Manaus** (o app converte sozinho para Brasília, +1 h, e mostra o horário convertido), PCS médio medido, totalizador GRMS **digitado como lido, sem conversão** (até 6 dígitos). O app converte o totalizador para o PCS 9.400 e mostra os dois valores (lido e convertido), o previsto nas duas bases e o desvio. Para salvar exige operador, totalizador e PCS; bloqueia leituras que diminuem com o tempo. O botão **"Salvar e enviar comprovante (PDF)"** e o ícone de documento em cada leitura salva abrem o painel do **comprovante da leitura**: **Enviar pelo WhatsApp** (o app gera o PDF no próprio celular e abre o menu de compartilhar; escolha WhatsApp e o contato ou grupo – o PDF vai como documento, com um resumo da leitura), **Baixar PDF** e **Ver / imprimir**. O comprovante (A4), com código da leitura, horários de Manaus e Brasília, operador, usuário, potência e GTs do PDP, totalizador lido e convertido para 9.400, previsto, desvio e resultado. A 2ª página traz a **programação de geração simulada** do dia (48 intervalos: horário Brasília/Manaus, MW, GTs, gás a cada 30 min e acumulado nas bases PCS medido e 9.400), com o intervalo da leitura destacado. A programação fica registrada no momento em que a leitura é gravada.
 4. **Resumo** – gás previsto no dia, energia, consumo específico, partidas, avisos, gráfico de 30 min e leituras registradas.
 5. **Ajustes** (ADM e REG) – tolerância, PCS de referência, limites DESSEM, Ton/Toff e modelo da usina (centrais: publicados para todos os aparelhos) e usuários (só ADM).
 
@@ -94,5 +95,6 @@ A programação (PDP) usa horários de **Brasília (UTC−3)**, independentement
 
 ## Limitações conhecidas
 
+- O envio direto de arquivo depende do navegador: funciona no Chrome do Android e no Safari do iPhone (app instalado ou não). No computador, use Baixar PDF e anexe no WhatsApp Web.
 - Programação e leituras não são compartilhadas entre celulares (cada aparelho tem seu próprio registro). Usuários, senhas (1.3) e Ajustes de cálculo (1.4), sim.
 - O consumo previsto é extrapolado da reta do teste de 96 h fora do ponto de 114 MW.
