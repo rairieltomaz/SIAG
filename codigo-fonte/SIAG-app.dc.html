@@ -102,7 +102,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.4</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.4.1</div>
       </main>
     </div>
   </sc-if>
@@ -160,10 +160,16 @@ button:disabled{cursor:not-allowed}
           <sc-if value="{{ noTok }}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; gap: 8px; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 12px">
             <div style="font-size: 14px; font-weight: 600">Token do GitHub (publicação das senhas)</div>
-            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários no repositório SIAG do GitHub. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color: #1061A6; font-weight: 600">Criar o token no GitHub</a> (logado como rairieltomaz): em <b>Repository access</b> escolha <b>Only select repositories › SIAG</b> (o padrão "Public repositories" só lê e não serve); em <b>Permissions › Contents</b> escolha <b>Read and write</b>; toque em <b>Generate token</b>, copie o código e cole aqui. Ele fica guardado só neste aparelho.</div>
             <input id="tk-pw" type="password" autoComplete="off" autoCapitalize="none" placeholder="github_pat_…" value="{{ tokIn }}" onChange="{{ onTokIn }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
-            <button type="button" onClick="{{ saveTok }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Salvar token</button>
+            <button type="button" onClick="{{ saveTok }}" disabled="{{ tokBusy }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">{{ saveTokLabel }}</button>
           </div>
+          </sc-if>
+          <sc-if value="{{ hasTok }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: #075C2E; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 8px 10px">
+              <span>✓ Token do GitHub configurado neste aparelho</span>
+              <button type="button" onClick="{{ clearTok }}" style="flex: 0 0 auto; height: 36px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #1061A6; padding: 0 10px; font-size: 13px; cursor: pointer">Trocar token</button>
+            </div>
           </sc-if>
           <sc-if value="{{ tokMsgOk }}" hint-placeholder-val="{{ false }}">
             <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; border-radius: 2px; padding: 8px 10px">{{ tokMsg }}</div>
@@ -666,9 +672,9 @@ button:disabled{cursor:not-allowed}
           <sc-if value="{{ noTok }}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; gap: 8px; background: #F5F9FD; border: 1px solid #C9D5E2; padding: 12px">
             <div style="font-size: 14px; font-weight: 600">Token do GitHub</div>
-            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários e os ajustes no repositório SIAG do GitHub. Crie um token em github.com › Settings › Developer settings › Fine-grained tokens, com acesso só ao repositório <b>SIAG</b> e permissão <b>Contents: Read and write</b>, e cole aqui. Ele fica guardado só neste aparelho.</div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.45">Para que as senhas valham em todos os aparelhos, o app grava a lista de usuários e os ajustes no repositório SIAG do GitHub. <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color: #1061A6; font-weight: 600">Criar o token no GitHub</a> (logado como rairieltomaz): em <b>Repository access</b> escolha <b>Only select repositories › SIAG</b> (o padrão "Public repositories" só lê e não serve); em <b>Permissions › Contents</b> escolha <b>Read and write</b>; toque em <b>Generate token</b>, copie o código e cole aqui. Ele fica guardado só neste aparelho.</div>
             <input id="tk-cfg" type="password" autoComplete="off" autoCapitalize="none" placeholder="github_pat_…" value="{{ tokIn }}" onChange="{{ onTokIn }}" style="height: 46px; box-sizing: border-box; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 12px; color: #0C2340; background: #FFFFFF">
-            <button type="button" onClick="{{ saveTok }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">Salvar token</button>
+            <button type="button" onClick="{{ saveTok }}" disabled="{{ tokBusy }}" style="height: 46px; border: 1px solid #1061A6; border-radius: 2px; background: #FFFFFF; color: #1061A6; font-weight: 600; cursor: pointer">{{ saveTokLabel }}</button>
           </div>
           </sc-if>
           <sc-if value="{{ hasTok }}" hint-placeholder-val="{{ true }}">
@@ -1055,11 +1061,34 @@ function cfgCheck(k, v) {
   if (k === 'nMax' && (x !== Math.round(x) || x > 6)) return 'precisa ser inteiro de 1 a 6';
   return '';
 }
-function ghErr(status, body) {
-  if (status === 401) return 'Token do GitHub inválido ou vencido. Gere um novo e salve em Ajustes.';
-  if (status === 403 || status === 404) return 'O token não tem permissão de escrita no repositório SIAG (precisa de "Contents: Read and write").';
-  if (status === 409 || status === 422) return 'Outra alteração foi publicada ao mesmo tempo. Tente de novo.';
-  return 'Falha ao publicar no GitHub (' + status + ')' + (body && body.message ? ': ' + body.message : '') + '.';
+var TOK_HELP = 'crie outro em github.com › Settings › Developer settings › Fine-grained tokens com "Repository access: Only select repositories › SIAG" e "Contents: Read and write"';
+// erro de publicação; e.tok = true quando o problema é o token (o app remove o token e pede outro)
+function ghFail(status, body) {
+  var m = body && body.message ? String(body.message) : '';
+  var e;
+  if (status === 401) { e = new Error('O token do GitHub salvo neste aparelho é inválido ou venceu, por isso nada foi publicado. Ele foi removido: ' + TOK_HELP + ' e cole no campo "Token do GitHub".'); e.tok = true; return e; }
+  if ((status === 403 || status === 404) && !/rate limit/i.test(m)) { e = new Error('O token do GitHub salvo neste aparelho só tem leitura (não grava no repositório SIAG), por isso nada foi publicado. Ele foi removido: ' + TOK_HELP + ' e cole no campo "Token do GitHub".'); e.tok = true; return e; }
+  if (status === 409 || status === 422) return new Error('Outra alteração foi publicada ao mesmo tempo. Tente de novo.');
+  return new Error('Falha ao publicar no GitHub (' + status + ')' + (m ? ': ' + m : '') + '.');
+}
+// confere se o token consegue GRAVAR no repositório sem gravar nada:
+// tenta atualizar o arquivo com um "sha" de propósito errado. Com permissão de escrita o GitHub recusa por conflito (409/422);
+// sem permissão recusa por acesso (403/404). Mesmo no pior caso o conteúdo enviado é o atual, então nada muda.
+function ghCheckWrite(token) {
+  var url = GH_API + '/contents/' + GH_FILE;
+  return timeout(fetch(url + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(token) }), 10000).then(function (r) {
+    if (r.status === 401) return 'invalid';
+    if (!r.ok) return r.status === 403 || r.status === 404 ? 'noaccess' : 'unknown';
+    return r.json().then(function (j) {
+      var body = { message: 'SIAG: teste de permissão do token (não altera nada)', content: String(j.content || '').replace(/\s/g, ''), sha: '0000000000000000000000000000000000000000', branch: GH_BRANCH };
+      return timeout(fetch(url, { method: 'PUT', headers: Object.assign(ghHeaders(token), { 'Content-Type': 'application/json' }), body: JSON.stringify(body) }), 10000).then(function (p) {
+        if (p.ok || p.status === 409 || p.status === 422) return 'write';
+        if (p.status === 401) return 'invalid';
+        if (p.status === 403 || p.status === 404) return 'readonly';
+        return 'unknown';
+      });
+    });
+  });
 }
 // lê a versão mais nova do arquivo, aplica a alteração e grava de volta (um commit no GitHub)
 function ghPublishFile(file, parse, build, token, msg, tries) {
@@ -1068,7 +1097,7 @@ function ghPublishFile(file, parse, build, token, msg, tries) {
   return timeout(fetch(url + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(token) }), 10000)
     .then(function (r) {
       if (r.status === 404) return { sha: null, data: null };
-      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
+      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (b) { throw ghFail(r.status, b); });
       return r.json().then(function (j) { return { sha: j.sha, data: parse(JSON.parse(b64dec(j.content))) }; });
     })
     .then(function (curr) {
@@ -1079,7 +1108,7 @@ function ghPublishFile(file, parse, build, token, msg, tries) {
         .then(function (r) {
           if (r.ok) return parse(fileObj);
           if ((r.status === 409 || r.status === 422) && tries < 1) return ghPublishFile(file, parse, build, token, msg, tries + 1);
-          return r.json().catch(function () { return {}; }).then(function (b) { throw new Error(ghErr(r.status, b)); });
+          return r.json().catch(function () { return {}; }).then(function (b) { throw ghFail(r.status, b); });
         });
     })
     .catch(function (e) {
@@ -1694,7 +1723,11 @@ class Component extends DCLogic {
         self.applyUdb(nu, 'github');
         say('ok', okText);
         return true;
-      }, function (e) { self.setState({ busy: false }); say('err', e.message || String(e)); return false; });
+      }, function (e) {
+        // token sem permissão ou vencido: remove para o campo do token voltar a aparecer
+        if (e && e.tok) { setToken(''); self.setState({ hasTok: false, tokIn: '', tokMsg: '' }); }
+        self.setState({ busy: false }); say('err', e.message || String(e)); return false;
+      });
     };
     var udbAt = udb ? brOfIso(udb.at) : NaN;
     var udbInfo = !udb ? 'Lista de usuários ainda não baixada neste aparelho.'
@@ -1750,7 +1783,7 @@ class Component extends DCLogic {
         if (np.length < 6) { self.setState({ pwMsg: 'A nova senha precisa ter pelo menos 6 caracteres.' }); return; }
         if (np !== String(cs.pwNew2).trim()) { self.setState({ pwMsg: 'As duas senhas novas não são iguais.' }); return; }
         if (np === DEF_PASS) { self.setState({ pwMsg: 'Não use a senha padrão. Escolha uma senha pessoal.' }); return; }
-        if (!getToken()) { self.setState({ pwMsg: 'Configure o token do GitHub (logo abaixo) para publicar a senha.' }); return; }
+        if (!getToken()) { self.setState({ pwMsg: 'Antes de salvar, cole o token do GitHub no campo "Token do GitHub" (acima) e toque em Salvar token.' }); return; }
         var me = sessUser;
         var check = mustChange ? Promise.resolve(true) : pwHash(String(cs.pwCur).trim(), me.sal, me.iter).then(function (h) { return h === me.hash; });
         self.setState({ busy: true, pwMsg: '' });
@@ -1775,17 +1808,27 @@ class Component extends DCLogic {
       onTokIn: function (e) { self.setState({ tokIn: e.target.value, tokMsg: '' }); },
       tokMsgOk: !!st.tokMsg && st.tokMsgKind === 'ok', tokMsgErr: !!st.tokMsg && st.tokMsgKind === 'err', tokMsgInfo: !!st.tokMsg && st.tokMsgKind === 'info', tokMsg: st.tokMsg,
       saveTok: function () {
-        var t = String(self.cur().tokIn || '').trim();
+        var t = String(self.cur().tokIn || '').replace(/\s/g, '');
         if (t.length < 20) { self.setState({ tokMsgKind: 'err', tokMsg: 'Cole o token completo (começa com github_pat_).' }); return; }
-        self.setState({ tokMsgKind: 'info', tokMsg: 'Conferindo o token…' });
-        timeout(fetch(GH_API + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH + '&t=' + Date.now(), { cache: 'no-store', headers: ghHeaders(t) }), 10000).then(function (r) {
-          if (r.ok || r.status === 404) {
+        if (self.cur().tokBusy) return;
+        self.setState({ tokBusy: true, tokMsgKind: 'info', tokMsg: 'Conferindo se o token consegue gravar no SIAG…' });
+        ghCheckWrite(t).then(function (res) {
+          if (res === 'write') {
             setToken(t);
-            self.setState({ hasTok: true, tokIn: '', tokMsgKind: 'ok', tokMsg: 'Token salvo neste aparelho. As alterações de usuários serão publicadas no GitHub.' });
-          } else self.setState({ tokMsgKind: 'err', tokMsg: r.status === 401 ? 'Token inválido ou vencido.' : 'O token não dá acesso ao repositório SIAG (' + r.status + ').' });
-        }, function () { self.setState({ tokMsgKind: 'err', tokMsg: 'Sem conexão com o GitHub para conferir o token.' }); });
+            self.setState({ tokBusy: false, hasTok: true, tokIn: '', pwMsg: '', userMsg: '', cfgMsg: '', tokMsgKind: 'ok', tokMsg: 'Token conferido: tem permissão de gravar no SIAG. Salvo neste aparelho.' });
+          } else if (res === 'unknown') {
+            setToken(t);
+            self.setState({ tokBusy: false, hasTok: true, tokIn: '', tokMsgKind: 'info', tokMsg: 'Token salvo, mas o GitHub não confirmou a permissão agora. Se a publicação falhar, o app pede outro token.' });
+          } else {
+            self.setState({ tokBusy: false, tokMsgKind: 'err', tokMsg: res === 'invalid'
+              ? 'Token inválido ou vencido. Confira se copiou o código inteiro (github_pat_…) ou gere outro.'
+              : 'Este token só tem leitura: não consegue gravar no SIAG e não foi salvo. Ao criar o token, em "Repository access" escolha "Only select repositories" › SIAG (o padrão "Public repositories" só lê) e em "Permissions" › "Contents" escolha "Read and write".' });
+          }
+        }, function () { self.setState({ tokBusy: false, tokMsgKind: 'err', tokMsg: 'Sem conexão com o GitHub para conferir o token.' }); });
       },
-      clearTok: function () { setToken(''); self.setState({ hasTok: false, tokMsgKind: 'ok', tokMsg: 'Token removido deste aparelho.' }); },
+      saveTokLabel: st.tokBusy ? 'Conferindo…' : 'Salvar token',
+      tokBusy: !!st.tokBusy,
+      clearTok: function () { setToken(''); self.setState({ hasTok: false, tokIn: '', tokMsgKind: 'ok', tokMsg: 'Token removido deste aparelho. Cole um token novo.' }); },
       syncNow: function () {
         self.setState({ userMsg: '', tokMsgKind: 'info', tokMsg: 'Atualizando…' });
         self.syncUsers().then(function (ok) { self.setState(ok ? { tokMsgKind: 'ok', tokMsg: 'Usuários e ajustes atualizados.' } : { tokMsgKind: 'err', tokMsg: 'Sem conexão: não foi possível atualizar agora.' }); });
@@ -2059,7 +2102,10 @@ class Component extends DCLogic {
           self.setState({ busy: false, cfgDraft: null, draftOld: false });
           self.applyCdb(nc, 'github');
           self.setState({ cfgMsgKind: 'ok', cfgMsg: 'Ajustes publicados. Já valem em todos os aparelhos.' });
-        }, function (e) { self.setState({ busy: false, cfgMsgKind: 'err', cfgMsg: e.message || String(e) }); });
+        }, function (e) {
+          if (e && e.tok) { setToken(''); self.setState({ hasTok: false, tokIn: '', tokMsg: '' }); }
+          self.setState({ busy: false, cfgMsgKind: 'err', cfgMsg: e.message || String(e) });
+        });
       }
     };
   }

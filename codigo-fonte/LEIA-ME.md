@@ -1,6 +1,6 @@
-# SIAG – Sistema Integrado de Aferição de Gás · versão 1.4
+# SIAG – Sistema Integrado de Aferição de Gás · versão 1.4.1
 
-Data da versão: 03/11/2026
+Data da versão: 04/11/2026
 Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 ## Conteúdo do pacote
@@ -40,14 +40,16 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 - Para publicar, o aparelho do administrador precisa de um **token do GitHub** (configurado uma vez):
   1. Abra https://github.com/settings/personal-access-tokens/new (logado como rairieltomaz).
   2. Nome: `SIAG`. Validade: a que preferir (ex.: 1 ano; ao vencer, gere outro e cole de novo).
-  3. *Repository access* › *Only select repositories* › `SIAG`.
+  3. *Repository access* › *Only select repositories* › `SIAG`. **Não deixe no padrão "Public repositories"**: esse token só lê e o app recusa.
   4. *Permissions* › *Repository permissions* › *Contents*: **Read and write**.
-  5. *Generate token*, copie o código (`github_pat_…`) e cole no SIAG em Ajustes › Usuários (ou na tela de criação de senha) › **Salvar token**.
+  5. *Generate token*, copie o código (`github_pat_…`) e cole no SIAG no campo **Token do GitHub** (card "Publicação no GitHub" em Ajustes, ou na tela de criação de senha) › **Salvar token**. O app confere se o token consegue gravar antes de salvar (sem alterar nada no repositório).
+  6. Se o token vencer ou perder a permissão, a publicação falha, o app remove o token do aparelho e mostra o campo de novo. Para trocar a qualquer momento: **Trocar token** (tela de senha) ou **Remover** (Ajustes).
   O token fica guardado só nesse aparelho. Se o celular for perdido, apague o token no GitHub (Settings › Developer settings › Fine-grained tokens).
 - O arquivo `usuarios.json` é público (o site está no GitHub Pages). Ele não contém as senhas, só hashes com sal, mas senhas curtas ou óbvias podem ser descobertas por quem tiver conhecimento técnico: use senhas com pelo menos 8 caracteres misturando letras, números e símbolos.
 
 ## Histórico
 
+- **1.4.1 (04/11/2026)** – Correção do acesso à senha: o app só aceita token que consegue gravar no repositório (antes aceitava token só de leitura, e a criação da senha do administrador falhava sem saída). Botão "Trocar token" na tela de senha; token recusado pelo GitHub é removido e o campo volta a aparecer. Instruções do token com link direto e o passo "Only select repositories › SIAG" destacado.
 - **1.4 (03/11/2026)** – Ajustes de cálculo centralizados no `ajustes.json` do GitHub: os cálculos de todos os aparelhos usam os valores publicados. Edição vira rascunho até publicar; ajustes antigos do aparelho viram rascunho para conferência. Token do GitHub passa para o card "Publicação no GitHub" (Administrador e Regulação).
 - **1.3 (03/11/2026)** – Usuários e senhas centralizados no `usuarios.json` do GitHub: uma senha criada ou trocada vale em todos os aparelhos. Administrador publica as alterações com token do GitHub; troca de senha desconecta as sessões antigas; operação e regulação não trocam a própria senha (pedem ao administrador).
 - **1.2.1 (21/10/2026)** – Comprovante sem assinaturas e com a programação de geração simulada.
