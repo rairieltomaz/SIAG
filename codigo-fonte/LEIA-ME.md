@@ -1,4 +1,4 @@
-# SIAG – Sistema Integrado de Aferição de Gás · versão 1.5.2
+# SIAG – Sistema Integrado de Aferição de Gás · versão 1.6
 
 Data da versão: 04/11/2026
 Endereço publicado: https://rairieltomaz.github.io/SIAG/
@@ -10,7 +10,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 | `index.html` (raiz) | O aplicativo completo (um arquivo só). Abre em qualquer navegador. |
 | `manifest.json`, `sw.js`, `icon-*.png` (raiz) | Permitem instalar no celular ("Adicionar à tela inicial") e usar sem internet. |
 | `usuarios.json` (raiz) | **Lista central de usuários e senhas** (senhas guardadas só como hash PBKDF2 com sal). É gravada pelo próprio app (Ajustes, perfil Administrador). Não edite à mão nem apague. |
-| `ajustes.json` (raiz) | **Ajustes de cálculo centrais** (tolerância, PCS, limites DESSEM, Ton/Toff, modelo da usina). Gravado pelo app (Ajustes › Publicar). Não edite à mão nem apague. |
+| `ajustes.json` (raiz) | **Ajustes de cálculo centrais** (tolerância, PCS, limites DESSEM, Ton/Toff, modelo da usina e load points do teste de performance). Gravado pelo app (Ajustes › Publicar). Não edite à mão nem apague. |
 | `codigo-fonte/SIAG-app.dc.html` | Fonte do app (telas + lógica). É dele que o `index.html` é gerado. |
 | `codigo-fonte/runtime.js` | Motor que desenha as telas no navegador. |
 | `codigo-fonte/build.py` | Script que gera a pasta `codigo-fonte/siag/` a partir da fonte. |
@@ -49,6 +49,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 
 ## Histórico
 
+- **1.6 (04/11/2026)** – Card **Teste de performance — Load Points** em Ajustes (Administrador e Regulação), com a mesma estrutura da aba "Teste 96h - Load Points" da planilha: dados do teste (período, modo, EVAP, condições ambientes), potência, desvio-padrão e pressão de cada GT (GT11 e GT12), vazão medida por GT (opcional; em branco = rateio do GRMS), potência líquida da SE, totalizador do GRMS, PCI/PCS e os pontos 100% e 50% do heat balance. O app mostra a tabela completa do teste (GT11, GT12 e GT11 + GT12: energia, vazões, potência térmica, eficiências, heat rates e k de cada ponto) e recalcula a relação bruta/líquida, a, b, k e o PCS do modelo. Mostra se o modelo em uso confere com os load points e tem o botão "Aplicar os load points ao modelo". Os load points são publicados junto com os ajustes. Correção: os valores de Ajustes com 3 casas decimais (ex.: 57.393) eram lidos como milhar (57 393), o que desligava o bloqueio de potência acima da máxima DESSEM por GT; agora 1 GT acima de 57,393 MW é bloqueada, como previsto.
 - **1.5.2 (04/11/2026)** – Opção **Enviar como imagem (WhatsApp)**: as 2 páginas do comprovante em JPEG (1191 × 1684 px), desenhadas pelo mesmo código do PDF. Alternativa para aparelhos em que o WhatsApp responde "Não foi possível compartilhar" ao receber o PDF do navegador. PDF ganha identificador (/ID) no trailer.
 - **1.5.1 (04/11/2026)** – Correção do envio pelo WhatsApp: o PDF é compartilhado sozinho (com texto junto o WhatsApp falhava ou enviava só o texto, principalmente no iPhone). O resumo da leitura passa para o botão "Copiar resumo". Toque duplo no Enviar não abre dois menus; a mensagem de erro mostra o motivo informado pelo celular.
 - **1.5 (04/11/2026)** – Compartilhamento do comprovante pelo celular: o app gera o PDF (A4, 2 páginas, texto nítido, ~60 KB) no próprio aparelho, sem internet e sem biblioteca externa, e envia pelo menu de compartilhar (WhatsApp, e-mail etc.). Painel do comprovante com Enviar pelo WhatsApp, Baixar PDF e Ver / imprimir. Em navegador que não compartilha arquivos (alguns computadores), o botão de envio some e fica o Baixar PDF.
@@ -79,7 +80,7 @@ Endereço publicado: https://rairieltomaz.github.io/SIAG/
 2. **Ton/Toff** – calculadora por GT (ligada/desligada desde) e conferência das partidas/paradas da programação. Inclui a nota operacional DESSEM / CER-D nº 464/22.
 3. **Verificar** – operador, horário da leitura **em Manaus** (o app converte sozinho para Brasília, +1 h, e mostra o horário convertido), PCS médio medido, totalizador GRMS **digitado como lido, sem conversão** (até 6 dígitos). O app converte o totalizador para o PCS 9.400 e mostra os dois valores (lido e convertido), o previsto nas duas bases e o desvio. Para salvar exige operador, totalizador e PCS; bloqueia leituras que diminuem com o tempo. O botão **"Salvar e enviar comprovante (PDF)"** e o ícone de documento em cada leitura salva abrem o painel do **comprovante da leitura**: **Enviar PDF pelo WhatsApp** (o app gera o PDF no próprio celular e abre o menu de compartilhar; escolha WhatsApp e o contato ou grupo – o PDF vai como documento), **Enviar como imagem** (as páginas do comprovante em JPEG, como fotos – alternativa quando o WhatsApp recusa o PDF), **Copiar resumo da leitura** (texto para colar na conversa), **Baixar PDF** e **Ver / imprimir**. O comprovante (A4), com código da leitura, horários de Manaus e Brasília, operador, usuário, potência e GTs do PDP, totalizador lido e convertido para 9.400, previsto, desvio e resultado. A 2ª página traz a **programação de geração simulada** do dia (48 intervalos: horário Brasília/Manaus, MW, GTs, gás a cada 30 min e acumulado nas bases PCS medido e 9.400), com o intervalo da leitura destacado. A programação fica registrada no momento em que a leitura é gravada.
 4. **Resumo** – gás previsto no dia, energia, consumo específico, partidas, avisos, gráfico de 30 min e leituras registradas.
-5. **Ajustes** (ADM e REG) – tolerância, PCS de referência, limites DESSEM, Ton/Toff e modelo da usina (centrais: publicados para todos os aparelhos) e usuários (só ADM).
+5. **Ajustes** (ADM e REG) – tolerância, PCS de referência, limites DESSEM, Ton/Toff, **teste de performance (load points)** e modelo da usina (centrais: publicados para todos os aparelhos) e usuários (só ADM).
 
 A programação (PDP) usa horários de **Brasília (UTC−3)**, independentemente do fuso do celular. Na aba Verificar o operador escolhe o horário de **Manaus (UTC−4)** e o app converte.
 
@@ -92,6 +93,7 @@ A programação (PDP) usa horários de **Brasília (UTC−3)**, independentement
 - Previsto em gás real = volume do modelo × 8.501 ÷ PCS medido. Medido na base do contrato = totalizador lido × PCS medido ÷ 9.400.
 - O desvio % é o mesmo nas duas bases (a conversão é aplicada igualmente ao previsto e ao medido).
 - Desvio = (medido − previsto) ÷ previsto; dentro da tolerância se |desvio| ≤ 3% (editável).
+- Modelo a partir dos load points (igual à planilha): b = (Q100 − Q50) ÷ (P100 − P50) e a = Q100 − b × P100 (pontos do heat balance, por GT); relação bruta/líquida = potência bruta das GTs ÷ potência líquida da SE; k = vazão média do GRMS no teste ÷ (nº de GTs × a + b × potência bruta); PCS do modelo = PCS médio do teste. Vazão média do GRMS = (totalizador fim − início) × 1000 ÷ duração.
 - Limites DESSEM (líquido): máx. 57,393 MW por GT (com 2 GTs aceita até 115 MW); bloqueia potência acima disso e potência sem GT.
 - Ton = 12 h (mínimo ligado); Toff = 4 h (mínimo desligado antes de nova partida).
 

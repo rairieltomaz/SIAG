@@ -48,6 +48,7 @@ button:disabled{cursor:not-allowed}
   .kpi-grid > .kpi-total{grid-column:1 / -1 !important}
   .cfg-grid{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
   .cfg-grid > h1{grid-column:1 / -1}
+  .lp-swipe{display:none}
   .pw-page{max-width:520px}
   .login-main{align-items:center;justify-content:center;padding:48px 24px !important}
   .login-main > *{width:100%;max-width:460px;box-sizing:border-box}
@@ -104,7 +105,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.5.2</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.6</div>
       </main>
     </div>
   </sc-if>
@@ -808,10 +809,103 @@ button:disabled{cursor:not-allowed}
             </div>
           </sc-for>
         </div>
+        <!-- ---- teste de performance (load points) ---- -->
+        <div style="grid-column: 1 / -1; background: #FFFFFF; border: 1px solid #C9D5E2; border-top: 3px solid #0C2340; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 600">Teste de performance — Load Points</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Mesma estrutura da aba "Teste 96h - Load Points" da planilha. Ao alterar um valor, o app recalcula a relação bruta/líquida, a, b, k e o PCS do modelo. Publique para valer em todos os aparelhos.</div>
+          </div>
+          <div style="background: #F5F9FD; border: 1px solid #C9D5E2; padding: 10px 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px">
+            <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 14px; font-weight: 700; color: #0C2340">{{ lpNomeStr }}</span>
+              <span style="font-size: 12px; color: #4A5B6E">{{ lpPeriodStr }} · {{ lpModoStr }}</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 11px; color: #4A5B6E">Potência bruta das GTs</span><span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{ lpPtStr }} MW</span></div>
+            <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 11px; color: #4A5B6E">Vazão média do GRMS</span><span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{ lpQtStr }} m³/h</span></div>
+            <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 11px; color: #4A5B6E">Heat rate bruto (PCI)</span><span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{ lpHrStr }} kJ/kWh</span></div>
+            <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 11px; color: #4A5B6E">Fator de calibração (k)</span><span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{ lpKStr }}</span></div>
+          </div>
+          <sc-if value="{{ lpHasErr }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; padding: 8px 10px; line-height: 1.4">{{ lpErr }}</div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; border: 1px solid #C9D5E2">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) 80px 80px 18px; gap: 6px; align-items: center; background: #0C2340; color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 7px 8px">
+              <span>Modelo da usina</span><span style="text-align: right">Load points</span><span style="text-align: right">Em uso</span><span></span>
+            </div>
+            <sc-for list="{{ lpModelRows }}" as="m" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) 80px 80px 18px; gap: 6px; align-items: center; font-size: 12px; padding: 6px 8px; border-top: 1px solid #EDF2F7; font-variant-numeric: tabular-nums">
+                <span style="line-height: 1.3">{{ m.label }} <span style="color: #4A5B6E">({{ m.unit }})</span></span>
+                <span style="text-align: right">{{ m.calc }}</span>
+                <span style="text-align: right">{{ m.used }}</span>
+                <span style="text-align: center; font-weight: 700; color: {{ m.color }}">{{ m.okTxt }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ lpModelOk }}" hint-placeholder-val="{{ true }}">
+            <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">✓ O modelo em uso confere com estes load points.</div>
+          </sc-if>
+          <sc-if value="{{ lpModelDiff }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">
+              <span>O modelo em uso é diferente do calculado pelos load points. Isso gera divergência entre o previsto e o medido.</span>
+              <button type="button" onClick="{{ lpApplyNow }}" style="height: 42px; border: 1px solid #B54708; border-radius: 2px; background: #FFFFFF; color: #8A4300; font-weight: 600; cursor: pointer">Aplicar os load points ao modelo</button>
+            </div>
+          </sc-if>
+          <sc-for list="{{ lpChecks }}" as="x" hint-placeholder-count="1">
+            <div style="font-size: 12px; color: #33475E; line-height: 1.4; padding-left: 10px; border-left: 3px solid #C9D5E2">{{ x.t }}</div>
+          </sc-for>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button type="button" onClick="{{ toggleLp }}" aria-expanded="{{ lpOpen }}" style="height: 44px; border: 1px solid #1061A6; border-radius: 2px; background: {{ lpBtnBg }}; color: #1061A6; font-weight: 600; cursor: pointer">
+              <sc-if value="{{ lpClosed }}" hint-placeholder-val="{{ true }}">Editar load points</sc-if><sc-if value="{{ lpOpen }}" hint-placeholder-val="{{ false }}">Fechar edição</sc-if>
+            </button>
+            <button type="button" onClick="{{ toggleLpTab }}" aria-expanded="{{ lpTabOpen }}" style="height: 44px; border: 1px solid #C9D5E2; border-radius: 2px; background: #FFFFFF; color: #0C2340; cursor: pointer">
+              <sc-if value="{{ lpTabOpen }}" hint-placeholder-val="{{ false }}">Ocultar resultados</sc-if><sc-if value="{{ lpTabClosed }}" hint-placeholder-val="{{ true }}">Ver resultados do teste</sc-if><sc-if value="{{ lpHasErr }}" hint-placeholder-val="{{ false }}">Resultados indisponíveis</sc-if>
+            </button>
+          </div>
+          <sc-if value="{{ lpOpen }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ lpGroups }}" as="g" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EDF2F7; padding-top: 10px">
+                <div style="font-size: 14px; font-weight: 700; color: #0C2340">{{ g.title }}</div>
+                <sc-if value="{{ g.hasHint }}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; color: #4A5B6E; line-height: 1.4; margin-top: -6px">{{ g.hint }}</div></sc-if>
+                <sc-for list="{{ g.fields }}" as="f" hint-placeholder-count="3">
+                  <div style="display: grid; grid-template-columns: {{ f.cols }}; gap: 6px 10px; align-items: center">
+                    <label for="{{ f.id }}" style="font-size: 14px; line-height: 1.3">{{ f.label }}<sc-if value="{{ f.hasUnit }}" hint-placeholder-val="{{ true }}"> <span style="color: #4A5B6E">({{ f.unit }})</span></sc-if><sc-if value="{{ f.opt }}" hint-placeholder-val="{{ false }}"> <span style="font-size: 11px; color: #5A6B7E">· opcional</span></sc-if></label>
+                    <sc-if value="{{ f.isNum }}" hint-placeholder-val="{{ true }}"><input id="{{ f.id }}" type="text" inputMode="decimal" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 10px; font-variant-numeric: tabular-nums; font-size: 15px; color: #0C2340"></sc-if>
+                    <sc-if value="{{ f.isTxt }}" hint-placeholder-val="{{ false }}"><input id="{{ f.id }}" type="text" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 10px; font-size: 15px; color: #0C2340"></sc-if>
+                    <sc-if value="{{ f.isDt }}" hint-placeholder-val="{{ false }}"><input id="{{ f.id }}" type="datetime-local" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; min-width: 0; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 8px; font-size: 15px; color: #0C2340"></sc-if>
+                    <sc-if value="{{ f.isSel }}" hint-placeholder-val="{{ false }}"><select id="{{ f.id }}" value="{{ f.val }}" onChange="{{ f.onChange }}" style="height: 44px; box-sizing: border-box; width: 100%; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; border-radius: 2px; padding: 0 6px; font-size: 15px; color: #0C2340"><sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.t }}</option></sc-for></select></sc-if>
+                    <sc-if value="{{ f.bad }}" hint-placeholder-val="{{ false }}"><span role="alert" style="grid-column: 1 / -1; margin-top: -4px; font-size: 12px; color: #B42318; text-align: right">{{ f.badMsg }}</span></sc-if>
+                    <sc-if value="{{ f.changed }}" hint-placeholder-val="{{ false }}"><span style="grid-column: 1 / -1; margin-top: -4px; font-size: 11px; color: #B54708; text-align: right">publicado: {{ f.pubVal }} · não publicado</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ lpTabOpen }}" hint-placeholder-val="{{ false }}">
+            <div class="lp-swipe" style="font-size: 12px; color: #4A5B6E">Arraste a tabela para o lado para ver GT12 e GT11 + GT12 →</div>
+            <div style="overflow-x: auto; border: 1px solid #C9D5E2">
+              <div style="min-width: 520px; display: flex; flex-direction: column; font-size: 12px; font-variant-numeric: tabular-nums">
+                <div style="display: grid; grid-template-columns: minmax(0, 1.7fr) 62px repeat(3, minmax(0, 1fr)); gap: 6px; background: #0C2340; color: #FFFFFF; font-weight: 600; padding: 7px 8px">
+                  <span>Parâmetro</span><span>Unidade</span><span style="text-align: right">GT11</span><span style="text-align: right">GT12</span><span style="text-align: right">GT11 + GT12</span>
+                </div>
+                <sc-for list="{{ lpRows }}" as="r" hint-placeholder-count="6">
+                  <sc-if value="{{ r.sec }}" hint-placeholder-val="{{ false }}">
+                    <div style="background: #E8F1FA; color: #0B4A80; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; font-size: 11px; padding: 6px 8px; border-top: 1px solid #C9D5E2">{{ r.label }}</div>
+                  </sc-if>
+                  <sc-if value="{{ r.notSec }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: grid; grid-template-columns: minmax(0, 1.7fr) 62px repeat(3, minmax(0, 1fr)); gap: 6px; padding: 5px 8px; border-top: 1px solid #EDF2F7">
+                      <span style="line-height: 1.3">{{ r.label }}</span><span style="color: #4A5B6E">{{ r.unit }}</span><span style="text-align: right">{{ r.c0 }}</span><span style="text-align: right">{{ r.c1 }}</span><span style="text-align: right; font-weight: 600">{{ r.c2 }}</span>
+                    </div>
+                  </sc-if>
+                </sc-for>
+              </div>
+            </div>
+            <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">GT11 e GT12: gás rateado pela potência quando não há vazão medida na GT. GT11 + GT12: medição do GRMS. Potência líquida rateada pela participação de cada GT.</div>
+          </sc-if>
+        </div>
         <div style="background: #FFFFFF; border: 1px solid #C9D5E2; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
           <div style="display: flex; flex-direction: column; gap: 4px">
             <div style="font-size: 15px; font-weight: 600">Modelo da usina (engenharia)</div>
-            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Valores do teste de 96 h e do heat balance. Só altere com orientação da engenharia.</div>
+            <div style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Calculado pelos load points do teste de performance (card acima). Só altere aqui com orientação da engenharia: um ajuste manual deixa o modelo diferente dos load points.</div>
           </div>
           <sc-for list="{{ cfgAdv }}" as="f" hint-placeholder-count="5">
             <div style="display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 10px; align-items: center">
@@ -831,7 +925,7 @@ button:disabled{cursor:not-allowed}
           <div style="font-weight: 600; color: #0C2340">Como o app calcula</div>
           <div>1. Potência bruta = MW do ONS × relação bruta/líquida.</div>
           <div>2. GTs: definidas pelo operador (obrigatório). Bloqueia potência sem GT e acima da máxima DESSEM arredondada para MW inteiro (1 GT: 57,393 MW; 2 GTs: 115 MW).</div>
-          <div>3. Vazão (m³/h) = k × (nº GTs × a + b × potência bruta).</div>
+          <div>3. Vazão (m³/h) = k × (nº GTs × a + b × potência bruta). Relação bruta/líquida, a, b, k e PCS do modelo saem do teste de performance: {{ lpInUse }}.</div>
           <div>4. Volume em 30 min = vazão × 0,5, acumulado desde 00:00.</div>
           <div>5. Desvio = (medido − previsto) ÷ previsto; dentro se |desvio| ≤ tolerância.</div>
           <div>6. Ton/Toff: avisa parada antes de 12 h ligada ou partida antes de 4 h desligada.</div>
@@ -970,7 +1064,17 @@ var DEFCFG = {
   tol: '3', pcsRef: '9400', pcsTeste: '8500.79', partida: '0',
   gmax1: '57.393', gmin1: '45.914', ton: '12', toff: '4',
   rel: '1.0177849601', nMax: '2',
-  a: '3903.1183550', b: '194.9803447', k: '1.1171045962'
+  a: '3903.1183550', b: '194.9803447', k: '1.1171045962',
+  // ---- teste de performance (load points) — padrão = teste de 96 h de 20 a 24/08/2026 ----
+  lpNome: 'Teste de 96 h', lpIni: '2026-08-20T17:55', lpFim: '2026-08-24T18:10',
+  lpModo: 'Ciclo simples / bypass', lpEvap: 'Ligado',
+  lpTamb: '29.4599480968858', lpTmin: '25.3', lpTmax: '36.7', lpUR: '77.1141868512111',
+  lpP11: '57.7781968987889', lpSd11: '0.523574796061943', lpPg11: '30.9731182795699', lpQ11: '',
+  lpP12: '56.3557522577855', lpSd12: '0.502807829327332', lpPg12: '30.678085106383', lpQ12: '',
+  lpPliq: '112.139551704152', lpTot0: '3254.297', lpTot1: '6486.4', lpQinst: '33671.2381738754',
+  lpPgIn: '38.445052631579', lpPgOut: '34.3514736842105',
+  lpPci: '7681.96459602076', lpPcs: '8500.79067474048', lpPciM: '39955.2',
+  hbP100: '57.916', hbQ100: '15195.6', hbP50: '28.153', hbQ50: '9392.4'
 };
 var BASIC = [
   { k: 'tol', label: 'Tolerância de desvio', unit: '%' },
@@ -992,6 +1096,117 @@ var ADV = [
   { k: 'k', label: 'Fator de calibração (k)', unit: '–' }
 ];
 var PCS_MIN = 6000, PCS_MAX = 12000;
+// ---- teste de performance: campos dos load points (mesma estrutura da aba "Teste 96h - Load Points") ----
+// t: num | txt | dt (data e hora) | sel ; opt: pode ficar em branco ; z: aceita zero
+var LP_MODOS = ['Ciclo simples / bypass', 'Ciclo combinado'], LP_EVAP = ['Ligado', 'Desligado'];
+var LPG = [
+  { id: 'id', title: 'Identificação do teste', fields: [
+    { k: 'lpNome', label: 'Nome do teste', t: 'txt' },
+    { k: 'lpIni', label: 'Início', t: 'dt' },
+    { k: 'lpFim', label: 'Fim', t: 'dt' },
+    { k: 'lpModo', label: 'Modo de operação', t: 'sel', opts: LP_MODOS },
+    { k: 'lpEvap', label: 'Resfriamento evaporativo (EVAP)', t: 'sel', opts: LP_EVAP }
+  ] },
+  { id: 'amb', title: 'Condições ambientes', fields: [
+    { k: 'lpTamb', label: 'Temperatura ambiente média', unit: '°C', neg: true },
+    { k: 'lpTmin', label: 'Temperatura mínima', unit: '°C', opt: true, neg: true },
+    { k: 'lpTmax', label: 'Temperatura máxima', unit: '°C', opt: true, neg: true },
+    { k: 'lpUR', label: 'Umidade relativa média', unit: '%', opt: true }
+  ] },
+  { id: 'gt11', title: 'GT11', hint: 'Potência 0 = GT fora do teste.', fields: [
+    { k: 'lpP11', label: 'Potência bruta média (terminais)', unit: 'MW', z: true },
+    { k: 'lpSd11', label: 'Desvio-padrão da potência', unit: 'MW', opt: true },
+    { k: 'lpPg11', label: 'Pressão de gás na entrada da GT', unit: 'bar', opt: true },
+    { k: 'lpQ11', label: 'Vazão de gás medida na GT (em branco = rateio do GRMS)', unit: 'm³/h', opt: true }
+  ] },
+  { id: 'gt12', title: 'GT12', hint: 'Potência 0 = GT fora do teste.', fields: [
+    { k: 'lpP12', label: 'Potência bruta média (terminais)', unit: 'MW', z: true },
+    { k: 'lpSd12', label: 'Desvio-padrão da potência', unit: 'MW', opt: true },
+    { k: 'lpPg12', label: 'Pressão de gás na entrada da GT', unit: 'bar', opt: true },
+    { k: 'lpQ12', label: 'Vazão de gás medida na GT (em branco = rateio do GRMS)', unit: 'm³/h', opt: true }
+  ] },
+  { id: 'grms', title: 'Planta e GRMS', fields: [
+    { k: 'lpPliq', label: 'Potência líquida (medição da SE)', unit: 'MW' },
+    { k: 'lpTot0', label: 'Totalizador do GRMS no início', unit: '10³ m³' },
+    { k: 'lpTot1', label: 'Totalizador do GRMS no fim', unit: '10³ m³' },
+    { k: 'lpQinst', label: 'Vazão instantânea média registrada (conferência)', unit: 'm³/h', opt: true },
+    { k: 'lpPgIn', label: 'Pressão média na entrada do GRMS', unit: 'bar', opt: true },
+    { k: 'lpPgOut', label: 'Pressão média na saída do GRMS', unit: 'bar', opt: true }
+  ] },
+  { id: 'gas', title: 'Gás (cromatógrafo, média do teste)', fields: [
+    { k: 'lpPci', label: 'PCI médio (LHV)', unit: 'kcal/m³' },
+    { k: 'lpPcs', label: 'PCS médio (HHV)', unit: 'kcal/m³', pcs: true },
+    { k: 'lpPciM', label: 'PCI mássico adotado (premissa de projeto)', unit: 'kJ/kg' }
+  ] },
+  { id: 'hb', title: 'Curva de carga parcial (heat balance)', hint: 'Define a inclinação (b) e o consumo em vazio (a) da reta de Willans. Padrão: LP42 ÷ 2 GTs e LP48.', fields: [
+    { k: 'hbP100', label: 'Ponto 100% — potência por GT (LP42 ÷ 2)', unit: 'MW' },
+    { k: 'hbQ100', label: 'Ponto 100% — vazão por GT (LP42 ÷ 2)', unit: 'm³/h' },
+    { k: 'hbP50', label: 'Ponto 50% — potência por GT (LP48)', unit: 'MW' },
+    { k: 'hbQ50', label: 'Ponto 50% — vazão por GT (LP48)', unit: 'm³/h' }
+  ] }
+];
+var LPF = {};
+LPG.forEach(function (g) { g.fields.forEach(function (f) { f.group = g.title; LPF[f.k] = f; }); });
+var LP_KEYS = Object.keys(LPF);
+var MODEL_KEYS = ['rel', 'a', 'b', 'k', 'pcsTeste'];
+var MODEL_DEC = { rel: 10, a: 7, b: 7, k: 10, pcsTeste: 2 };
+// cálculo do teste de performance — reproduz a aba "Teste 96h - Load Points" e as células D9 e D19–D21 da aba de vazão
+function lpCalc(f, pRef) {
+  var v = function (k) { return numCfg(f[k]); };
+  var errs = [];
+  var t0 = parseDT(f.lpIni), t1 = parseDT(f.lpFim);
+  var dur = (t1 - t0) / 3600000;
+  if (!isFinite(t0) || !isFinite(t1)) errs.push('informe início e fim do teste');
+  else if (!(dur > 0)) errs.push('o fim do teste precisa ser depois do início');
+  var P = [v('lpP11'), v('lpP12')].map(function (x) { return isFinite(x) && x > 0 ? x : 0; });
+  var n = (P[0] > 0 ? 1 : 0) + (P[1] > 0 ? 1 : 0);
+  if (!n) errs.push('informe a potência de pelo menos uma GT');
+  var Pt = P[0] + P[1], Pliq = v('lpPliq');
+  if (!(Pliq > 0)) errs.push('informe a potência líquida');
+  var vol = (v('lpTot1') - v('lpTot0')) * 1000;
+  if (!(vol > 0)) errs.push('o totalizador do fim precisa ser maior que o do início');
+  var pci = v('lpPci'), pcs = v('lpPcs'), pciM = v('lpPciM');
+  if (!(pci > 0) || !(pcs > 0) || !(pciM > 0)) errs.push('informe PCI, PCS e PCI mássico');
+  var p100 = v('hbP100'), q100 = v('hbQ100'), p50 = v('hbP50'), q50 = v('hbQ50');
+  if (!(p100 > 0 && q100 > 0 && p50 > 0 && q50 > 0) || p100 === p50) errs.push('confira os pontos 100% e 50% do heat balance');
+  if (errs.length) return { err: errs.join('; ') };
+  var Qt = vol / dur;                                   // vazão média do GRMS (m³/h)
+  var pciKJ = pci * 4.1868, pcsKJ = pcs * 4.1868, dens = pciKJ / pciM;
+  var b = (q100 - q50) / (p100 - p50), a = q100 - b * p100;
+  var k = Qt / (n * a + b * Pt), rel = Pt / Pliq;
+  var QmGT = [v('lpQ11'), v('lpQ12')];
+  var sd = [v('lpSd11'), v('lpSd12')], pg = [v('lpPg11'), v('lpPg12')];
+  function col(i) {
+    var tot = i === 2, on = tot ? n : (P[i] > 0 ? 1 : 0);
+    if (!on) return null;
+    var p = tot ? Pt : P[i], part = p / Pt;
+    var meas = !tot && isFinite(QmGT[i]) && QmGT[i] > 0;
+    var q = tot ? Qt : (meas ? QmGT[i] : part * Qt);
+    var pl = part * Pliq, thI = q * pciKJ / 3600 / 1000, thS = q * pcsKJ / 3600 / 1000;
+    var sdv = tot ? (isFinite(sd[0]) || isFinite(sd[1]) ? Math.sqrt((P[0] > 0 && isFinite(sd[0]) ? sd[0] * sd[0] : 0) + (P[1] > 0 && isFinite(sd[1]) ? sd[1] * sd[1] : 0)) : NaN) : sd[i];
+    var pgs = tot ? [0, 1].filter(function (j) { return P[j] > 0 && isFinite(pg[j]); }).map(function (j) { return pg[j]; }) : [pg[i]];
+    var pgv = pgs.length && pgs.every(isFinite) ? pgs.reduce(function (s, x) { return s + x; }, 0) / pgs.length : NaN;
+    var eI = p / thI, eS = p / thS, eL = pl / thI;
+    return {
+      n: on, carga: pRef > 0 ? p / (on * pRef) : NaN, pg: pgv, dur: dur,
+      p: p, sd: sdv, part: part, pl: pl, aux: p - pl, eb: p * dur, el: pl * dur,
+      q: q, qSrc: tot ? 'GRMS' : (meas ? 'medida' : 'rateio'), qs: q / 3600, mt: q * dens / 1000, vol: q * dur, ce: q / p,
+      thI: thI, thS: thS, eI: eI, eS: eS, eL: eL, hrI: 3600 / eI, hrS: 3600 / eS, hrL: 3600 / eL, ct: 3600 / eI / 4.1868,
+      k: q / (on * a + b * p)
+    };
+  }
+  var qi = v('lpQinst');
+  return {
+    err: '', dur: dur, n: n, Qt: Qt, Pt: Pt, pciKJ: pciKJ, dens: dens,
+    cols: [col(0), col(1), col(2)],
+    model: { rel: rel, a: a, b: b, k: k, pcsTeste: pcs },
+    qinstDev: isFinite(qi) && qi > 0 ? qi / Qt - 1 : NaN,
+    qSumDev: isFinite(QmGT[0]) && QmGT[0] > 0 && isFinite(QmGT[1]) && QmGT[1] > 0 ? (QmGT[0] + QmGT[1]) / Qt - 1 : NaN
+  };
+}
+function modelStr(k, x) { return Number(x).toFixed(MODEL_DEC[k]); }
+// o modelo publicado confere com o calculado pelos load points? (tolerância relativa 1e-6)
+function modelSame(x, y) { return isFinite(x) && isFinite(y) && Math.abs(x - y) <= 1e-6 * Math.max(Math.abs(x), Math.abs(y), 1e-9); }
 // ---- usuários centralizados (arquivo usuarios.json no GitHub) ----
 var GH_REPO = 'rairieltomaz/SIAG', GH_BRANCH = 'main', GH_FILE = 'usuarios.json';
 var GH_API = 'https://api.github.com/repos/' + GH_REPO;
@@ -1104,7 +1319,12 @@ function fetchUdb() {
 function parseCdb(obj) {
   if (!obj || !obj.ajustes || typeof obj.ajustes !== 'object') return null;
   var cfg = {};
-  Object.keys(DEFCFG).forEach(function (k) { if (obj.ajustes[k] !== undefined && obj.ajustes[k] !== null && String(obj.ajustes[k]).trim() !== '') cfg[k] = String(obj.ajustes[k]).trim(); });
+  Object.keys(DEFCFG).forEach(function (k) {
+    var x = obj.ajustes[k];
+    if (x === undefined || x === null) return;
+    // campos opcionais dos load points podem ser publicados em branco
+    if (String(x).trim() !== '' || (LPF[k] && LPF[k].opt)) cfg[k] = String(x).trim();
+  });
   return { at: obj.atualizado_em || '', by: obj.atualizado_por || '', cfg: cfg };
 }
 function cdbToFile(cfg, by) {
@@ -1118,7 +1338,7 @@ function readCdbCache() {
 }
 function writeCdbCache(cdb) { try { window.localStorage.setItem(CKEY, JSON.stringify({ cdb: cdb, got: Date.now() })); } catch (e) {} }
 function sameVal(a, b) {
-  var x = num(a), y = num(b);
+  var x = numCfg(a), y = numCfg(b);
   if (isFinite(x) && isFinite(y)) return Math.abs(x - y) < 1e-12;
   return String(a == null ? '' : a).trim() === String(b == null ? '' : b).trim();
 }
@@ -1129,8 +1349,23 @@ function cfgDiff(draft, central) {
 }
 var CFG_LABEL = {};
 BASIC.concat(DESS, ADV).forEach(function (f) { CFG_LABEL[f.k] = f.label; });
+LP_KEYS.forEach(function (k) { var f = LPF[k]; CFG_LABEL[k] = 'Load points · ' + (f.group === 'GT11' || f.group === 'GT12' ? f.group + ' · ' : '') + f.label; });
 function cfgCheck(k, v) {
-  var x = num(v);
+  var lf = LPF[k];
+  if (lf) {
+    if (lf.t === 'txt') return isBlank(v) ? 'não pode ficar em branco' : (String(v).length > 80 ? 'texto longo demais' : '');
+    if (lf.t === 'dt') return isFinite(parseDT(v)) ? '' : 'data e hora inválidas';
+    if (lf.t === 'sel') return lf.opts.indexOf(String(v)) >= 0 ? '' : 'opção inválida';
+    if (isBlank(v)) return lf.opt ? '' : 'não pode ficar em branco';
+    var y = numCfg(v);
+    if (!isFinite(y)) return 'não é um número';
+    if (lf.neg) return y < -50 || y > 60 ? 'fora da faixa −50 a 60' : '';
+    if (lf.pcs && (y < PCS_MIN || y > PCS_MAX)) return 'fora da faixa ' + PCS_MIN + '–' + PCS_MAX;
+    if (k === 'lpUR' && y > 100) return 'acima de 100%';
+    if (lf.z || lf.opt) return y < 0 ? 'não pode ser negativo' : '';
+    return y > 0 ? '' : 'precisa ser maior que zero';
+  }
+  var x = numCfg(v);
   if (!isFinite(x)) return 'não é um número';
   if (k === 'partida') return x >= 0 ? '' : 'não pode ser negativo';
   if (x <= 0) return 'precisa ser maior que zero';
@@ -1215,6 +1450,17 @@ function num(s) {
   var t = String(s).trim().replace(/\s/g, '');
   if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
   else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  if (!/^-?\d*\.?\d+$/.test(t)) return NaN;
+  var v = parseFloat(t);
+  return isFinite(v) ? v : NaN;
+}
+// valores de Ajustes (DEFCFG / ajustes.json) usam ponto decimal: "57.393" é 57,393 e não 57 393.
+// Aceita também vírgula decimal digitada no app ("57,393" ou "3.903,118").
+function numCfg(s) {
+  if (isBlank(s)) return NaN;
+  var t = String(s).trim().replace(/\s/g, '');
+  if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
+  else if ((t.match(/\./g) || []).length > 1) t = t.replace(/\./g, '');
   if (!/^-?\d*\.?\d+$/.test(t)) return NaN;
   var v = parseFloat(t);
   return isFinite(v) ? v : NaN;
@@ -1879,8 +2125,8 @@ class Component extends DCLogic {
     var cfgForm = Object.assign({}, cfgRaw, draftKeys.length ? st.cfgDraft : {});
     var c = {};
     Object.keys(DEFCFG).forEach(function (k) {
-      var v = num(cfgRaw[k]);
-      c[k] = isFinite(v) ? v : num(DEFCFG[k]);
+      var v = numCfg(cfgRaw[k]);
+      c[k] = isFinite(v) ? v : numCfg(DEFCFG[k]);
     });
     var nMax = Math.max(1, Math.round(c.nMax));
     var tol = c.tol / 100;
@@ -2137,6 +2383,118 @@ class Component extends DCLogic {
           }
         };
       });
+    }
+
+    // ---- teste de performance (load points) ----
+    var lpRes = lpCalc(cfgForm, numCfg(cfgForm.gmax1));
+    var lpPub = lpCalc(cfgRaw, numCfg(cfgRaw.gmax1));
+    // ao alterar um load point, o modelo (a, b, k, relação, PCS do teste) é recalculado no rascunho
+    function lpApply(cf) {
+      var r = lpCalc(cf, numCfg(cf.gmax1));
+      if (!r.err) MODEL_KEYS.forEach(function (k) { cf[k] = modelStr(k, r.model[k]); });
+      return cf;
+    }
+    function lpFieldVm(f) {
+      var chg = draftKeys.indexOf(f.k) >= 0, val = cfgForm[f.k] == null ? '' : String(cfgForm[f.k]);
+      var bad = cfgCheck(f.k, val);
+      return {
+        id: 'lp-' + f.k, label: f.label, unit: f.unit || '', hasUnit: !!f.unit, val: val,
+        cols: !f.t || f.t === 'num' ? 'minmax(0, 1fr) 150px' : 'minmax(0, 1fr)',
+        isNum: !f.t || f.t === 'num', isTxt: f.t === 'txt', isDt: f.t === 'dt', isSel: f.t === 'sel',
+        opts: (f.opts || []).map(function (o) { return { v: o, t: o }; }),
+        opt: !!f.opt, changed: chg, pubVal: String(cfgRaw[f.k] == null || cfgRaw[f.k] === '' ? '(vazio)' : cfgRaw[f.k]),
+        bad: !!bad, badMsg: bad,
+        bd: bad ? '#B42318' : (chg ? '#B54708' : '#C9D5E2'), bg: chg ? '#FFF8EE' : '#FFFFFF',
+        onChange: function (e) {
+          var cs = self.cur();
+          var cf = Object.assign({}, DEFCFG, cs.cdb ? cs.cdb.cfg : {}, cs.cfgDraft || {});
+          cf[f.k] = e.target.value;
+          self.setState({ cfgDraft: lpApply(cf), cfgMsg: '' });
+        }
+      };
+    }
+    var lpGroups = LPG.map(function (g) { return { title: g.title, hint: g.hint || '', hasHint: !!g.hint, fields: g.fields.map(lpFieldVm) }; });
+    function lpRowsOf(r) {
+      if (r.err) return [];
+      function row(label, unit, key, d, kind) {
+        var cells = r.cols.map(function (c) {
+          if (!c) return '—';
+          var x = c[key];
+          if (kind === 'pct') return isFinite(x) ? fmt(x * 100, d) + '%' : '—';
+          if (kind === 'txt') return x;
+          return fmt(x, d);
+        });
+        return { sec: false, notSec: true, label: label, unit: unit, c0: cells[0], c1: cells[1], c2: cells[2] };
+      }
+      function same(label, unit, x, d) { var s = fmt(x, d); return { sec: false, notSec: true, label: label, unit: unit, c0: r.cols[0] ? s : '—', c1: r.cols[1] ? s : '—', c2: s }; }
+      function sec(t) { return { sec: true, notSec: false, label: t }; }
+      var pcsF = numCfg(cfgForm.lpPcs), pciF = numCfg(cfgForm.lpPci), pciM = numCfg(cfgForm.lpPciM);
+      return [
+        sec('Condições de contorno'),
+        same('Temperatura ambiente média', '°C', numCfg(cfgForm.lpTamb), 1),
+        same('Umidade relativa média', '%', numCfg(cfgForm.lpUR), 1),
+        row('GTs em operação', '–', 'n', 0),
+        row('Carga da GT (ref. ' + fmtMw(numCfg(cfgForm.gmax1)) + ' MW)', '%', 'carga', 1, 'pct'),
+        row('Pressão de gás na entrada da GT', 'bar', 'pg', 2),
+        row('Duração do ponto de carga', 'h', 'dur', 2),
+        sec('Combustível'),
+        same('PCI (LHV)', 'kcal/m³', pciF, 0),
+        same('PCS (HHV)', 'kcal/m³', pcsF, 2),
+        same('PCI (LHV)', 'kJ/m³', r.pciKJ, 0),
+        same('PCI mássico adotado', 'kJ/kg', pciM, 1),
+        same('Densidade implícita do gás', 'kg/m³', r.dens, 4),
+        sec('Potência e energia'),
+        row('Potência bruta média', 'MW', 'p', 3),
+        row('Desvio-padrão da potência', 'MW', 'sd', 3),
+        row('Participação na geração bruta', '%', 'part', 1, 'pct'),
+        row('Potência líquida (rateada)', 'MW', 'pl', 3),
+        row('Consumo interno + perdas', 'MW', 'aux', 3),
+        row('Energia bruta gerada', 'MWh', 'eb', 1),
+        row('Energia líquida entregue', 'MWh', 'el', 1),
+        sec('Consumo de gás'),
+        row('Origem da vazão', '–', 'qSrc', 0, 'txt'),
+        row('Vazão volumétrica de gás', 'm³/h', 'q', 1),
+        row('Vazão volumétrica de gás', 'm³/s', 'qs', 4),
+        row('Vazão mássica de gás', 't/h', 'mt', 3),
+        row('Volume total de gás', 'm³', 'vol', 0),
+        row('Consumo específico de gás', 'm³/MWh', 'ce', 2),
+        row('Potência térmica do combustível (PCI)', 'MW', 'thI', 3),
+        row('Potência térmica do combustível (PCS)', 'MW', 'thS', 3),
+        sec('Desempenho'),
+        row('Eficiência elétrica bruta (PCI)', '%', 'eI', 2, 'pct'),
+        row('Eficiência elétrica bruta (PCS)', '%', 'eS', 2, 'pct'),
+        row('Eficiência líquida da planta (PCI)', '%', 'eL', 2, 'pct'),
+        row('Heat rate bruto (PCI)', 'kJ/kWh', 'hrI', 0),
+        row('Heat rate bruto (PCS)', 'kJ/kWh', 'hrS', 0),
+        row('Heat rate líquido da planta (PCI)', 'kJ/kWh', 'hrL', 0),
+        row('Consumo térmico específico', 'kcal/kWh', 'ct', 1),
+        sec('Calibração do modelo'),
+        row('Fator k do ponto (vazão ÷ reta de Willans)', '–', 'k', 4)
+      ];
+    }
+    var MODEL_LBL = { rel: 'Relação potência bruta / líquida', a: 'Consumo em vazio por GT (a)', b: 'Coeficiente marginal (b)', k: 'Fator de calibração (k)', pcsTeste: 'PCS do gás do modelo' };
+    var MODEL_UNIT = { rel: '–', a: 'm³/h', b: 'm³/MWh', k: '–', pcsTeste: 'kcal/m³' };
+    var lpModelRows = MODEL_KEYS.map(function (k) {
+      var calc = lpRes.err ? NaN : lpRes.model[k], used = numCfg(cfgForm[k]), pub = numCfg(cfgRaw[k]);
+      var ok = modelSame(calc, used);
+      return {
+        label: MODEL_LBL[k], unit: MODEL_UNIT[k],
+        calc: isFinite(calc) ? fmt(calc, MODEL_DEC[k] > 4 ? (k === 'a' || k === 'b' ? 3 : 6) : 2) : '—',
+        used: isFinite(used) ? fmt(used, k === 'a' || k === 'b' ? 3 : (k === 'pcsTeste' ? 2 : 6)) : '—',
+        ok: ok, okTxt: ok ? '✓' : '≠', color: ok ? '#075C2E' : '#B42318'
+      };
+    });
+    var lpModelOk = !lpRes.err && lpModelRows.every(function (r) { return r.ok; });
+    var lpPubOk = !lpPub.err && MODEL_KEYS.every(function (k) { return modelSame(lpPub.model[k], numCfg(cfgRaw[k])); });
+    var lpPeriod = (function () { var t0 = parseDT(cfgForm.lpIni), t1 = parseDT(cfgForm.lpFim); function full(t) { var d = new Date(t); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); } return isFinite(t0) && isFinite(t1) ? full(t0) + ' a ' + full(t1) : '—'; })();
+    var lpPubPeriod = (function () { var t0 = parseDT(cfgRaw.lpIni), t1 = parseDT(cfgRaw.lpFim); return isFinite(t0) && isFinite(t1) ? pad(new Date(t0).getDate()) + '/' + pad(new Date(t0).getMonth() + 1) + ' a ' + pad(new Date(t1).getDate()) + '/' + pad(new Date(t1).getMonth() + 1) + '/' + new Date(t1).getFullYear() : ''; })();
+    var lpChecks = [];
+    if (!lpRes.err) {
+      lpChecks.push('Vazão média do GRMS no teste: ' + fmt(lpRes.Qt, 1) + ' m³/h (totalizador ÷ ' + fmt(lpRes.dur, 2) + ' h). O modelo reproduz exatamente essa vazão no ponto do teste.');
+      if (isFinite(lpRes.qinstDev)) lpChecks.push('Vazão instantânea média registrada × totalizador: ' + pct(lpRes.qinstDev, 2) + (Math.abs(lpRes.qinstDev) > 0.01 ? ' — diferença acima de 1%, confira os dados.' : '.'));
+      if (isFinite(lpRes.qSumDev)) lpChecks.push('Soma das vazões medidas nas GTs × GRMS: ' + pct(lpRes.qSumDev, 2) + '.');
+      if (lpRes.cols[0] && lpRes.cols[1] && !isFinite(lpRes.qSumDev)) lpChecks.push('O gás de cada GT foi rateado pela potência (medição única no GRMS). Para separar o desempenho das máquinas, preencha a vazão medida em cada GT.');
+      if (String(cfgForm.lpModo) !== 'Ciclo simples / bypass') lpChecks.push('Atenção: a reta do modelo vale para ciclo simples / bypass. Um teste em ciclo combinado mistura a turbina a vapor na potência.');
     }
 
     var dParts = String(st.date || '').split('-');
@@ -2590,6 +2948,28 @@ class Component extends DCLogic {
       cfgBasic: cfgList(BASIC),
       cfgDess: cfgList(DESS),
       cfgAdv: cfgList(ADV),
+      // teste de performance (load points)
+      lpGroups: lpGroups,
+      lpOpen: !!st.lpOpen, lpClosed: !st.lpOpen, lpBtnBg: st.lpOpen ? '#E8F1FA' : '#FFFFFF', lpTabOpen: !!st.lpTab && !lpRes.err, lpTabClosed: !st.lpTab && !lpRes.err,
+      toggleLp: function () { self.setState({ lpOpen: !self.cur().lpOpen }); },
+      toggleLpTab: function () { self.setState({ lpTab: !self.cur().lpTab }); },
+      lpRows: lpRowsOf(lpRes),
+      lpHasErr: !!lpRes.err, lpErr: lpRes.err ? 'Não foi possível calcular o teste: ' + lpRes.err + '.' : '',
+      lpNomeStr: String(cfgForm.lpNome || 'Teste de performance'), lpPeriodStr: lpPeriod,
+      lpModoStr: String(cfgForm.lpModo || '') + ' · EVAP ' + String(cfgForm.lpEvap || '').toLowerCase(),
+      lpKStr: lpRes.err ? '—' : fmt(lpRes.model.k, 4), lpQtStr: lpRes.err ? '—' : fmt(lpRes.Qt, 0), lpPtStr: lpRes.err ? '—' : fmt(lpRes.Pt, 3),
+      lpHrStr: lpRes.err || !lpRes.cols[2] ? '—' : fmt(lpRes.cols[2].hrI, 0),
+      lpModelRows: lpModelRows,
+      lpModelOk: lpModelOk && !lpRes.err, lpModelDiff: !lpModelOk && !lpRes.err,
+      lpChecks: lpChecks.map(function (t) { return { t: t }; }),
+      lpApplyNow: function () {
+        var cs = self.cur();
+        var cf = Object.assign({}, DEFCFG, cs.cdb ? cs.cdb.cfg : {}, cs.cfgDraft || {});
+        var r = lpCalc(cf, numCfg(cf.gmax1));
+        if (r.err) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Corrija os load points antes de aplicar: ' + r.err + '.' }); return; }
+        self.setState({ cfgDraft: lpApply(cf), cfgMsg: '' });
+      },
+      lpInUse: (String(cfgRaw.lpNome || 'Teste de performance') + (lpPubPeriod ? ' (' + lpPubPeriod + ')' : '')) + (lpPubOk ? '' : ' — atenção: o modelo publicado não confere com esses load points'),
       resetCfg: function () { self.setState({ cfgDraft: Object.assign({}, DEFCFG), draftOld: false, cfgMsg: '' }); },
       cfgPending: draftKeys.length > 0, cfgClean: draftKeys.length === 0,
       cfgPendingTxt: draftKeys.length === 1 ? '1 alteração ainda não publicada' : draftKeys.length + ' alterações ainda não publicadas',
@@ -2611,6 +2991,10 @@ class Component extends DCLogic {
         if (!keys.length) { self.setState({ cfgMsgKind: 'ok', cfgMsg: 'Nada para publicar.' }); return; }
         var bad = keys.map(function (k) { var m = cfgCheck(k, cs.cfgDraft[k]); return m ? (CFG_LABEL[k] || k) + ': ' + m : ''; }).filter(Boolean);
         if (bad.length) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Corrija antes de publicar — ' + bad.join('; ') + '.' }); return; }
+        if (keys.some(function (k) { return !!LPF[k]; })) {
+          var lpChk = lpCalc(Object.assign({}, central, cs.cfgDraft), numCfg(Object.assign({}, central, cs.cfgDraft).gmax1));
+          if (lpChk.err) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Corrija os load points antes de publicar — ' + lpChk.err + '.' }); return; }
+        }
         var tok = getToken();
         if (!tok) { self.setState({ cfgMsgKind: 'err', cfgMsg: 'Configure o token do GitHub (card "Publicação no GitHub", no topo de Ajustes) para publicar.' }); return; }
         var changes = {};
