@@ -104,7 +104,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.5</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.5.1</div>
       </main>
     </div>
   </sc-if>
@@ -917,7 +917,13 @@ button:disabled{cursor:not-allowed}
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4"></path><path d="M15.4 6.5l-6.8 4"></path></svg>
             Enviar pelo WhatsApp
           </button>
-          <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">Abre o menu de compartilhar do celular: escolha <b>WhatsApp</b> e depois o contato ou grupo. O PDF vai como documento, com um resumo da leitura.</div>
+          <div style="font-size: 12px; color: #4A5B6E; line-height: 1.4">Abre o menu de compartilhar do celular: escolha <b>WhatsApp</b> e depois o contato ou grupo. O PDF vai como documento.</div>
+        </sc-if>
+        <sc-if value="{{ shareReady }}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{ shareCopy }}" style="height: 44px; border: 1px solid #128C7E; border-radius: 2px; background: #FFFFFF; color: #0B6E62; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="1"></rect><path d="M4 16V4h12"></path></svg>
+            Copiar resumo da leitura (para colar na conversa)
+          </button>
         </sc-if>
         <sc-if value="{{ shareNoSend }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 13px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 10px 12px; line-height: 1.4">Este navegador não envia arquivos direto para outros apps. Toque em <b>Baixar PDF</b> e, no WhatsApp, toque no clipe › <b>Documento</b>.</div>
@@ -926,7 +932,7 @@ button:disabled{cursor:not-allowed}
           <div role="status" style="font-size: 13px; color: #075C2E; background: #E5F4EA; padding: 8px 10px; line-height: 1.4">{{ shareMsg }}</div>
         </sc-if>
         <sc-if value="{{ shareMsgInfo }}" hint-placeholder-val="{{ false }}">
-          <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; padding: 8px 10px; line-height: 1.4; word-break: break-word">{{ shareMsg }}</div>
+          <div role="status" style="font-size: 13px; color: #0B4A80; background: #E8F1FA; padding: 8px 10px; line-height: 1.4; word-break: break-word; white-space: pre-line; user-select: text; -webkit-user-select: text">{{ shareMsg }}</div>
         </sc-if>
         <sc-if value="{{ shareMsgErr }}" hint-placeholder-val="{{ false }}">
           <div role="alert" style="font-size: 13px; color: #6E140E; background: #FDECEA; padding: 8px 10px; line-height: 1.4">{{ shareMsg }}</div>
@@ -1719,7 +1725,7 @@ class Component extends DCLogic {
   // ---- compartilhamento do comprovante em PDF ----
   openShare(rec) {
     var self = this, seq = (this._shareSeq = (this._shareSeq || 0) + 1);
-    this._shareRec = rec; this._shareOut = null;
+    this._shareRec = rec; this._shareOut = null; this._sharing = false;
     this.setState({ share: { status: 'gen', rec: { code: codeOf(rec), horaMao: rec.horaMao, hora: rec.hora, ok: !!rec.ok, dev: pct(rec.dev) }, msg: '', msgKind: '' } });
     makeReceiptFile(rec).then(function (out) {
       if (seq !== self._shareSeq) return;
@@ -2160,15 +2166,34 @@ class Component extends DCLogic {
       shareMsg: st.share ? st.share.msg : '',
       sendShare: function () {
         var out = self._shareOut;
-        if (!out || !out.file) return;
+        if (!out || !out.file || self._sharing) return;   // evita dois menus ao tocar duas vezes
+        self._sharing = true;
+        var done = function () { self._sharing = false; };
         var fail = function (e) {
+          done();
           if (e && e.name === 'AbortError') return;   // a pessoa fechou o menu
-          self.shareMsg('err', 'O aparelho não abriu o compartilhamento' + (e && e.name ? ' (' + e.name + ')' : '') + '. Toque em "Baixar PDF" e anexe no WhatsApp pelo clipe › Documento.');
+          self.shareMsg('err', 'O celular não conseguiu compartilhar o PDF' + (e && (e.name || e.message) ? ' (' + [e.name, e.message].filter(Boolean).join(': ') + ')' : '') + '. Toque em "Baixar PDF" e, no WhatsApp, use o clipe › Documento.');
         };
         try {
-          navigator.share({ files: [out.file], title: 'Comprovante SIAG', text: out.text })
-            .then(function () { self.shareMsg('ok', 'Comprovante enviado para o app escolhido.'); }, fail);
+          // só o arquivo: com texto junto, o WhatsApp (principalmente no iPhone) falha ou envia só o texto.
+          // O resumo da leitura fica no botão "Copiar resumo".
+          navigator.share({ files: [out.file] })
+            .then(function () { done(); self.shareMsg('ok', 'PDF enviado para o app escolhido. Se quiser, toque em "Copiar resumo" e cole na conversa.'); }, fail);
         } catch (e) { fail(e); }
+      },
+      shareCopy: function () {
+        var out = self._shareOut;
+        if (!out) return;
+        var okF = function () { self.shareMsg('ok', 'Resumo copiado. No WhatsApp, segure no campo de mensagem › Colar.'); };
+        var failF = function () { self.shareMsg('info', out.text); };
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(out.text).then(okF, failF);
+          else {
+            var ta = document.createElement('textarea'); ta.value = out.text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select(); var ok = document.execCommand && document.execCommand('copy'); ta.remove();
+            if (ok) okF(); else failF();
+          }
+        } catch (e) { failF(); }
       },
       shareDownload: function () {
         var out = self._shareOut;

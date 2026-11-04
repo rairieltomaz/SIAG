@@ -6,4 +6,4 @@ Acesse: https://rairieltomaz.github.io/SIAG/
 
 No celular, abra o link e use "Adicionar à tela inicial" para instalar como app.
 
-Versão atual: **1.5** (04/11/2026) – comprovante em PDF enviado direto pelo WhatsApp (menu de compartilhar do celular).
+Versão atual: **1.5.1** (04/11/2026) – comprovante em PDF enviado direto pelo WhatsApp (menu de compartilhar do celular).
