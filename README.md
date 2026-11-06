@@ -6,4 +6,4 @@ Acesse: https://rairieltomaz.github.io/SIAG/
 
 No celular, abra o link e use "Adicionar à tela inicial" para instalar como app.
 
-Versão atual: **1.7** (04/11/2026) – prévia automática das GTs ao lançar a carga e tela de conferência da programação em formato de comprovante (libera o Verificar).
+Versão atual: **1.7.1** (06/11/2026) – aba Programa no formato de intervalos do PDPW (00:00 - 00:30 … 23:30 - 23:59) e colagem da tabela do PDPW com os intervalos.

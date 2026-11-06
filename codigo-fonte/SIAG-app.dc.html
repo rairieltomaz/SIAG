@@ -105,7 +105,7 @@ button:disabled{cursor:not-allowed}
         <sc-if value="{{ udbWarn }}" hint-placeholder-val="{{ false }}">
           <div role="status" style="font-size: 12px; color: #6B3A00; background: #FFF4E5; border-left: 4px solid #B54708; padding: 8px 10px; line-height: 1.4">{{ udbInfo }}</div>
         </sc-if>
-        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.7</div>
+        <div style="margin-top: auto; text-align: center; font-size: 11px; color: #5A6B7E">Acesso restrito · CEA · versão 1.7.1</div>
       </main>
     </div>
   </sc-if>
@@ -238,15 +238,15 @@ button:disabled{cursor:not-allowed}
 
         <div style="background: #FFFFFF; border-radius: 0px; padding: 14px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #C9D5E2">
           <div style="font-size: 15px; font-weight: 700">Lançar faixa</div>
-          <div class="faixa-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+          <div class="faixa-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 6px">
             <div style="display: flex; flex-direction: column; gap: 4px">
-              <label for="f-de" style="font-size: 12px; color: #4A5B6E">De</label>
+              <label for="f-de" style="font-size: 12px; color: #4A5B6E">De (intervalo inicial)</label>
               <select id="f-de" value="{{ fillDeStr }}" onChange="{{ onFillDe }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums; font-size: 15px">
                 <sc-for list="{{ startOpts }}" as="o" hint-placeholder-count="48"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
               </select>
             </div>
             <div style="display: flex; flex-direction: column; gap: 4px">
-              <label for="f-ate" style="font-size: 12px; color: #4A5B6E">Até</label>
+              <label for="f-ate" style="font-size: 12px; color: #4A5B6E">Até (intervalo final)</label>
               <select id="f-ate" value="{{ fillAteStr }}" onChange="{{ onFillAte }}" style="height: 46px; width: 100%; border: 1px solid #C9D5E2; border-radius: 2px; padding: 0 4px; background: #FFFFFF; color: #0C2340; font-variant-numeric: tabular-nums; font-size: 15px">
                 <sc-for list="{{ endOpts }}" as="o" hint-placeholder-count="48"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
               </select>
@@ -264,7 +264,7 @@ button:disabled{cursor:not-allowed}
           </div>
           <button type="button" onClick="{{ applyFill }}" style="height: 50px; border: 0; border-radius: 0px; background: {{ accent }}; color: #FFFFFF; font-weight: 700; letter-spacing: 0.5px; cursor: pointer">APLICAR</button>
           <div style="display: flex; justify-content: space-between; gap: 8px">
-            <button type="button" onClick="{{ togglePaste }}" style="height: 44px; border: 0; background: transparent; color: #1061A6; font-weight: 600; padding: 0 4px; cursor: pointer">Colar coluna do PDPW</button>
+            <button type="button" onClick="{{ togglePaste }}" style="height: 44px; border: 0; background: transparent; color: #1061A6; font-weight: 600; padding: 0 4px; cursor: pointer">Colar tabela do PDPW</button>
             <button type="button" onClick="{{ askClear }}" style="height: 44px; border: 0; background: transparent; color: #B42318; font-weight: 600; padding: 0 4px; cursor: pointer">Zerar</button>
           </div>
           <sc-if value="{{ confirmClear }}" hint-placeholder-val="{{ false }}">
@@ -278,8 +278,8 @@ button:disabled{cursor:not-allowed}
           </sc-if>
           <sc-if value="{{ showPaste }}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <label for="f-paste" style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Cole os 48 valores de MW (00:00 a 24:00). As GTs entram pela prévia automática; altere na tabela se precisar.</label>
-              <textarea id="f-paste" rows="4" value="{{ paste }}" onChange="{{ onPaste }}" placeholder="91&#10;91&#10;45&#10;…" style="border: 1px solid #C9D5E2; border-radius: 2px; padding: 10px; font-variant-numeric: tabular-nums; color: #0C2340; resize: vertical"></textarea>
+              <label for="f-paste" style="font-size: 13px; color: #4A5B6E; line-height: 1.4">Cole a tabela do PDPW como aparece na tela (Intervalo e Total, de 00:00 - 00:30 a 23:30 - 23:59) ou só os 48 valores de MW. As GTs entram pela prévia automática; altere na tabela se precisar.</label>
+              <textarea id="f-paste" rows="4" value="{{ paste }}" onChange="{{ onPaste }}" placeholder="00:00 - 00:30  115&#10;00:30 - 01:00  115&#10;…&#10;23:30 - 23:59  115" style="border: 1px solid #C9D5E2; border-radius: 2px; padding: 10px; font-variant-numeric: tabular-nums; color: #0C2340; resize: vertical"></textarea>
               <button type="button" onClick="{{ applyPaste }}" style="height: 46px; border: 0; border-radius: 2px; background: #0B4A80; color: #FFFFFF; font-weight: 600; cursor: pointer">Aplicar colagem</button>
             </div>
           </sc-if>
@@ -298,15 +298,15 @@ button:disabled{cursor:not-allowed}
           </sc-if>
         </div>
         <div class="prog-table" style="background: #FFFFFF; border-radius: 0px; overflow: hidden; border: 1px solid #C9D5E2">
-          <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: end; padding: 10px 8px; font-size: 12px; font-weight: 600; color: #4A5B6E; background: #EEF3F8">
-            <span>Até<br><span style="font-size: 10px; font-weight: 500">BSB</span></span><span>MW *</span><span>GTs</span>
+          <div style="display: grid; grid-template-columns: 86px 54px 60px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: end; padding: 10px 8px; font-size: 12px; font-weight: 600; color: #4A5B6E; background: #EEF3F8">
+            <span>Intervalo<br><span style="font-size: 10px; font-weight: 500">BSB</span></span><span>MW *</span><span>GTs</span>
             <span style="text-align: right; display: flex; flex-direction: column; gap: 1px"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">PCS {{ pcsHdr }}</span></span>
             <span style="text-align: right; display: flex; flex-direction: column; gap: 1px; color: #0B4A80"><span>Acum. m³</span><span style="font-size: 10px; font-weight: 500">contrato {{ pcsRefStr }}</span></span>
           </div>
           <sc-for list="{{ rows }}" as="r" hint-placeholder-count="48">
             <div style="display: flex; flex-direction: column; border-top: 1px solid #EDF2F7; background: {{ r.bg }}">
-              <div style="display: grid; grid-template-columns: 42px 62px 68px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: center; padding: 6px 8px">
-                <span style="font-variant-numeric: tabular-nums; font-size: 14px; color: #33475E">{{ r.end }}</span>
+              <div style="display: grid; grid-template-columns: 86px 54px 60px minmax(0, 1fr) minmax(0, 1fr); gap: 4px; align-items: center; padding: 6px 8px">
+                <span style="font-variant-numeric: tabular-nums; font-size: 12px; white-space: nowrap; color: #33475E">{{ r.iv }}</span>
                 <input type="text" inputMode="decimal" aria-label="{{ r.ariaMw }}" placeholder="MW" value="{{ r.mwStr }}" onChange="{{ r.onMw }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px solid {{ r.mwBorder }}; border-radius: 2px; padding: 0 8px; font-variant-numeric: tabular-nums; font-size: 16px; color: #0C2340; background: #FFFFFF">
                 <select aria-label="{{ r.ariaGt }}" value="{{ r.gtVal }}" onChange="{{ r.onGt }}" style="height: 40px; box-sizing: border-box; width: 100%; border: 1px {{ r.gtStyle }} {{ r.gtBorder }}; border-radius: 2px; padding: 0 4px; font-size: 15px; color: #0C2340; background: {{ r.gtBg }}">
                   <sc-for list="{{ gtRowOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
@@ -315,7 +315,7 @@ button:disabled{cursor:not-allowed}
                 <span style="font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 600; text-align: right; color: #0B4A80">{{ r.acc94Str }}</span>
               </div>
               <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}">
-                <div style="padding: 0 8px 8px 54px; font-size: 12px; font-weight: 500; color: {{ r.noteColor }}">{{ r.note }}</div>
+                <div style="padding: 0 8px 8px 98px; font-size: 12px; font-weight: 500; color: {{ r.noteColor }}">{{ r.note }}</div>
               </sc-if>
             </div>
           </sc-for>
@@ -1568,6 +1568,32 @@ function brOfIso(iso) {
 
 function pad(n) { return (n < 10 ? '0' : '') + n; }
 function hhmm(m) { return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+// fim de intervalo no formato do PDPW: 24:00 aparece como 23:59
+function hhmmFim(m) { return m >= 1440 ? '23:59' : hhmm(m); }
+// intervalo de meia hora no formato do PDPW: "00:00 - 00:30" … "23:30 - 23:59"
+function slotLbl(i) { return hhmm(i * 30) + ' - ' + hhmmFim((i + 1) * 30); }
+// lê a tabela colada do PDPW (Intervalo | Total | …). Retorna null se o texto não tem intervalos.
+function parsePdpwTable(txt) {
+  var re = /(\d{1,2})\s*[:hH]\s*(\d{2})\s*(?:-|–|—|a|às|as)\s*(\d{1,2})\s*[:hH]\s*(\d{2})/g;
+  var hits = [], m;
+  while ((m = re.exec(txt)) !== null) hits.push({ h: +m[1], mi: +m[2], from: m.index, to: re.lastIndex, txt: m[0] });
+  if (!hits.length) return null;
+  var vals = blank48(), seen = 0, bad = [];
+  for (var k = 0; k < hits.length; k++) {
+    var x = hits[k], st = x.h * 60 + x.mi;
+    if (st % 30 !== 0 || st < 0 || st >= 1440) { bad.push(x.txt.replace(/\s+/g, ' ') + ' (horário fora da meia hora)'); continue; }
+    var idx = st / 30;
+    var seg = txt.slice(x.to, k + 1 < hits.length ? hits[k + 1].from : txt.length);
+    var nm = seg.match(/\d+(?:[.,]\d+)?/);
+    var v = nm ? num(nm[0]) : NaN;
+    if (!(isFinite(v) && v >= 0)) { bad.push(slotLbl(idx) + ' (sem valor de MW)'); continue; }
+    if (vals[idx] === '') seen++;
+    vals[idx] = String(v).replace('.', ',');
+  }
+  var falta = [];
+  for (var j = 0; j < 48; j++) if (vals[j] === '') falta.push(slotLbl(j));
+  return { vals: vals, count: seen, bad: bad, falta: falta };
+}
 function blank48() { var a = []; for (var i = 0; i < 48; i++) a.push(''); return a; }
 function auto48() { var a = []; for (var i = 0; i < 48; i++) a.push(true); return a; }
 function isBlank(s) { return s === null || s === undefined || String(s).trim() === ''; }
@@ -2597,6 +2623,7 @@ class Component extends DCLogic {
       (function (idx, chk, mwOk, gOk) {
         rows.push({
           end: hhmm((idx + 1) * 30),
+          iv: slotLbl(idx),
           ariaMw: 'Potência ONS de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30) + ' em MW',
           ariaGt: 'Quantidade de GTs de ' + hhmm(idx * 30) + ' a ' + hhmm((idx + 1) * 30),
           mwStr: isBlank(st.prog[idx]) ? '' : String(st.prog[idx]),
@@ -2657,8 +2684,8 @@ class Component extends DCLogic {
     // ---- opções de horário ----
     var startOpts = [], endOpts = [];
     for (var q = 0; q < 48; q++) {
-      startOpts.push({ v: String(q), t: hhmm(q * 30) });
-      endOpts.push({ v: String(q + 1), vSel: String(q), t: hhmm((q + 1) * 30) });
+      startOpts.push({ v: String(q), t: slotLbl(q) });
+      endOpts.push({ v: String(q + 1), vSel: String(q), t: slotLbl(q) });
     }
 
     // ---- verificação ----
@@ -3314,7 +3341,7 @@ class Component extends DCLogic {
       applyFill: function () {
         var s = self.cur();
         var a = s.fillDe, b = s.fillAte;
-        if (b <= a) { setMsg('err', 'O horário "Até" precisa ser depois do "De".'); return; }
+        if (b <= a) { setMsg('err', 'O intervalo "Até" precisa ser o mesmo ou depois do "De".'); return; }
         var isAutoF = isBlank(s.fillGt) || s.fillGt === 'auto';
         var nn = isAutoF ? NaN : parseInt(s.fillGt, 10);
         var mwBlank = isBlank(s.fillMw);
@@ -3323,21 +3350,21 @@ class Component extends DCLogic {
         var x;
         if (mwBlank) {
           for (x = a; x < b; x++) {
-            if (!(isFinite(num(s.prog[x])) && num(s.prog[x]) >= 0)) { setMsg('err', 'Há intervalos sem potência nessa faixa (' + hhmm(x * 30) + '). Digite a potência em MW.'); return; }
+            if (!(isFinite(num(s.prog[x])) && num(s.prog[x]) >= 0)) { setMsg('err', 'Há intervalos sem potência nessa faixa (' + slotLbl(x) + '). Digite a potência em MW.'); return; }
           }
         }
         if (!isAutoF) {
           for (x = a; x < b; x++) {
             var mwx = mwBlank ? num(s.prog[x]) : v;
             var r = checkRow(true, mwx, true, nn);
-            if (r.err) { setMsg('err', 'Não aplicado — ' + hhmm(x * 30) + ': ' + r.err + '.'); return; }
+            if (r.err) { setMsg('err', 'Não aplicado — ' + slotLbl(x) + ': ' + r.err + '.'); return; }
           }
         }
         var p = s.prog.slice(), gg = s.gts.slice(), aa = gtsAuto.slice();
         for (x = a; x < b; x++) { if (!mwBlank) p[x] = String(s.fillMw).trim(); if (isAutoF) aa[x] = true; else { gg[x] = String(nn); aa[x] = false; } }
         self.setState({
           prog: p, gts: gg, gtsAuto: aa, msgKind: 'ok',
-          msg: 'Aplicado: ' + hhmm(a * 30) + ' às ' + hhmm(b * 30) + (mwBlank ? '' : ' = ' + String(s.fillMw).trim() + ' MW') + (isAutoF ? ', GTs pela prévia automática (pode alterar na tabela).' : ' com ' + nn + ' GT' + (nn === 1 ? '' : 's') + '.'),
+          msg: 'Aplicado: ' + hhmm(a * 30) + ' às ' + hhmmFim(b * 30) + (mwBlank ? '' : ' = ' + String(s.fillMw).trim() + ' MW') + (isAutoF ? ', GTs pela prévia automática (pode alterar na tabela).' : ' com ' + nn + ' GT' + (nn === 1 ? '' : 's') + '.'),
           fillDe: b < 48 ? b : a, fillAte: 48, fillMw: '', fillGt: 'auto'
         });
       },
@@ -3346,7 +3373,16 @@ class Component extends DCLogic {
       paste: st.paste,
       onPaste: function (e) { self.setState({ paste: e.target.value }); },
       applyPaste: function () {
-        var toks = String(self.cur().paste || '').split(/[\s;]+/).filter(function (t) { return t !== ''; });
+        var raw = String(self.cur().paste || '');
+        // tabela do PDPW com os intervalos ("00:00 - 00:30  115  115" … "23:30 - 23:59", Total, Média)
+        var tb = parsePdpwTable(raw);
+        if (tb) {
+          if (tb.bad.length) { setMsg('err', 'Não aplicado — ' + tb.bad.slice(0, 3).join('; ') + (tb.bad.length > 3 ? ' e mais ' + (tb.bad.length - 3) : '') + '.'); return; }
+          if (tb.falta.length) { setMsg('err', 'Encontrei ' + tb.count + ' de 48 intervalos na tabela colada. Faltam: ' + tb.falta.slice(0, 4).join(', ') + (tb.falta.length > 4 ? ' e mais ' + (tb.falta.length - 4) : '') + '.'); return; }
+          self.setState({ prog: tb.vals, gtsAuto: auto48(), paste: '', showPaste: false, msgKind: 'ok', msg: 'Tabela do PDPW colada: 48 intervalos (00:00 - 00:30 a 23:30 - 23:59), MW da coluna Total. As GTs entraram pela prévia automática (em azul): confira e altere se precisar.' });
+          return;
+        }
+        var toks = raw.split(/[\s;]+/).filter(function (t) { return t !== ''; });
         var vals = toks.map(function (t) { var v = num(t); return isFinite(v) && v >= 0 ? String(v).replace('.', ',') : null; });
         if (vals.some(function (v) { return v === null; })) { setMsg('err', 'Há algo que não é número no texto colado. Cole só a coluna de MW.'); return; }
         var p;
