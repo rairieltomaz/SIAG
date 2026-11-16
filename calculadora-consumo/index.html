@@ -6,74 +6,77 @@
 <title>Calculadora de Consumo de Gás</title>
 <meta name="description" content="Calcula o consumo diário de gás em m³ a partir do CSV do historiador. Roda no navegador, sem enviar dados.">
 <style>
-/* Layout: coluna única. 1) dados  2) ajustes  3) resultado (resumo, avisos, gráfico, tabela) */
-:root{
-  --bg:#f4f6f6; --card:#ffffff; --fg:#1b2428; --muted:#5b6a70; --line:#d5dddf;
-  --accent:#0b6e75; --accent-fg:#ffffff; --accent-soft:#dcedee; --warn:#9a5b00; --warn-bg:#fbefd9; --bad:#a8271d; --partial:#b7c9cb;
-  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#101619; --card:#182125; --fg:#e3eaec; --muted:#93a3a9; --line:#2e3c41;
-  --accent:#4fbcc4; --accent-fg:#06282b; --accent-soft:#17353a; --warn:#f0b05a; --warn-bg:#33270f; --bad:#ff8a80; --partial:#3a5256; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#101619; --card:#182125; --fg:#e3eaec; --muted:#93a3a9; --line:#2e3c41;
-  --accent:#4fbcc4; --accent-fg:#06282b; --accent-soft:#17353a; --warn:#f0b05a; --warn-bg:#33270f; --bad:#ff8a80; --partial:#3a5256; color-scheme:dark}
+/* Visual alinhado ao SIAG: cabeçalho branco com logo, faixa azul, cantos retos, Roboto */
+:root{--bg:#EEF1F5;--card:#fff;--fg:#0C2340;--muted:#4A5B6E;--line:#C9D5E2;--accent:#1061A6;--accent-d:#0B4A80;--accent-soft:#E8F1FA;--accent-t:#D6E7F7;--warn:#6B3A00;--warn-bg:#FFF4E5;--warn-b:#B54708;--bad:#B42318;--bad-bg:#FDECEA;--partial:#9CC8EC;
+ --font:Roboto,'Segoe UI','Helvetica Neue',Arial,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font);
-  padding:24px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
-main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-h1{font-size:1.55rem;line-height:1.2;margin:0;font-weight:650;text-wrap:balance}
-h2{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:650}
-.lead{color:var(--muted);margin:6px 0 0;max-width:68ch}
-section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 14px;border-radius:8px;cursor:pointer}
-button:hover,.btn:hover{border-color:var(--accent)}
-button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-#drop{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);transition:border-color .15s,background .15s}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font)}
+a{color:var(--accent)}
+.top{background:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line)}
+.top img{height:28px;width:auto;display:block}
+.top .tz{font-size:10px;font-weight:700;color:#fff;background:var(--warn-b);padding:1px 6px;letter-spacing:.4px}
+.bar{background:var(--accent);color:#fff;padding:6px 14px;min-height:44px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.bar b{font-size:14px;letter-spacing:1px}
+.bar span{font-size:11px;color:var(--accent-t)}
+main{max-width:1000px;margin:0 auto;padding:20px max(14px,env(safe-area-inset-right)) 48px max(14px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:14px}
+h1{font-size:1.25rem;margin:0;font-weight:600}
+.lead{color:var(--muted);margin:4px 0 0;max-width:70ch;font-size:.92rem}
+section{background:var(--card);border:1px solid var(--line);padding:16px}
+h2{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-d);margin:0 0 12px;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-size:14px;font-weight:600;letter-spacing:.3px;border:1px solid var(--accent);background:#fff;color:var(--accent);padding:0 16px;height:44px;border-radius:0;cursor:pointer}
+button:hover{background:var(--accent-soft)}
+button.primary{background:var(--accent);color:#fff}
+button.primary:hover{background:var(--accent-d)}
+button.dl{background:var(--accent-d);color:#fff;border-color:var(--accent-d)}
+button.dl:hover{background:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #9CC8EC;outline-offset:1px}
+#drop{border:2px dashed var(--line);padding:18px;text-align:center;color:var(--muted);transition:border-color .15s,background .15s}
 #drop.over{border-color:var(--accent);background:var(--accent-soft)}
 #files{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
-#files li{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--accent-soft);border-radius:8px;padding:6px 10px;font-size:.9rem;min-width:0}
+#files li{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--accent-soft);padding:4px 4px 4px 10px;font-size:.9rem;min-width:0}
 #files li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-#files button{padding:2px 8px;font-size:.85rem}
-textarea{width:100%;min-height:84px;margin-top:12px;font:12px/1.4 var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
-details summary{cursor:pointer;font-weight:600}
+#files button{height:32px;padding:0 10px;font-size:13px}
+textarea{width:100%;min-height:84px;margin-top:12px;font:12px/1.4 var(--mono);background:#fff;color:var(--fg);border:1px solid var(--line);padding:8px;resize:vertical;border-radius:0}
+details summary{cursor:pointer;font-weight:600;color:var(--accent-d)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
-input[type=text],input[type=number],select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;width:100%}
+input[type=text],input[type=number],select{font:inherit;color:var(--fg);background:#fff;border:1px solid var(--line);border-radius:0;padding:9px 10px;min-width:0;width:100%}
 .check{flex-direction:row;align-items:flex-start;gap:8px;color:var(--fg);grid-column:1/-1}
 .check input{margin-top:4px}
 .help{color:var(--muted);font-size:.82rem;display:block}
 #out[hidden]{display:none}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg)}
-.card b{display:block;font-size:1.45rem;line-height:1.2;font-variant-numeric:tabular-nums}
-.card.main{background:var(--accent-soft);border-color:var(--accent)}
-.card small{color:var(--muted)}
-.notes{display:flex;flex-direction:column;gap:8px;margin:14px 0 0;padding:0;list-style:none}
-.notes li{border-radius:8px;padding:8px 12px;background:var(--bg);border-left:4px solid var(--line);font-size:.9rem}
-.notes li.warn{background:var(--warn-bg);border-left-color:var(--warn)}
-.notes li.bad{border-left-color:var(--bad)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.card{border:1px solid var(--line);padding:14px;background:#fff;display:flex;flex-direction:column;gap:4px}
+.card b{font-size:1.4rem;line-height:1.2;font-variant-numeric:tabular-nums;font-weight:600}
+.card small{font-size:13px;color:var(--muted)}
+.card.main{background:var(--accent);border-color:var(--accent);color:#fff;grid-column:1/-1}
+.card.main small{color:var(--accent-t)}
+.card.main b{font-size:1.75rem}
+.notes{display:flex;flex-direction:column;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.notes li{padding:10px 12px;background:var(--accent-soft);border-left:4px solid var(--accent);font-size:.9rem}
+.notes li.warn{background:var(--warn-bg);border-left-color:var(--warn-b);color:var(--warn)}
+.notes li.bad{background:var(--bad-bg);border-left-color:var(--bad);color:var(--bad)}
 .chart{margin-top:16px;overflow-x:auto}
 .chart svg{display:block;min-width:620px;width:100%;height:auto}
-.tablewrap{overflow-x:auto;margin-top:16px}
+.tablewrap{overflow-x:auto;margin-top:14px}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.92rem}
-th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 th:first-child,td:first-child,th:last-child,td:last-child{text-align:left}
-th{font-size:.78rem;color:var(--muted);font-weight:650;position:sticky;top:0;background:var(--card)}
-tfoot td{font-weight:700;border-top:2px solid var(--fg);border-bottom:none}
+th{font-size:.75rem;color:#fff;background:var(--accent);font-weight:600;position:sticky;top:0}
+tfoot td{font-weight:700;background:var(--accent-soft);border-top:2px solid var(--accent)}
 tr.parcial td{color:var(--muted)}
-.tag{font-size:.75rem;background:var(--warn-bg);color:var(--warn);border-radius:99px;padding:1px 8px}
+.tag{font-size:.72rem;background:var(--warn-bg);color:var(--warn);padding:1px 8px;border:1px solid var(--warn-b)}
 .foot{color:var(--muted);font-size:.82rem}
 .sr{position:absolute;left:-9999px}
 </style>
 </head>
 <body>
+<div class="top"><img src="logo.png" alt="CEA – Companhia Energética Amazonense"><span class="tz">HORÁRIO DE BRASÍLIA</span></div>
+<div class="bar"><b>CALCULADORA DE GÁS</b><span>Consumo diário em m³ a partir do CSV do historiador</span></div>
 <main>
   <header>
-    <h1>Calculadora de consumo de gás</h1>
+    <h1>Consumo diário de gás</h1>
     <p class="lead">Carregue o CSV do historiador (contador acumulado dos tramos A e B, PCI e PCS) e veja o consumo de cada dia em m³. O cálculo é feito aqui no navegador e nenhum dado é enviado a lugar nenhum.</p>
   </header>
 
@@ -135,9 +138,9 @@ tr.parcial td{color:var(--muted)}
     <ul class="notes" id="notes"></ul>
     <div class="chart" id="chart"></div>
     <div class="row" style="margin-top:16px">
-      <button type="button" id="copy">Copiar tabela</button>
-      <button type="button" id="csvDia">Baixar CSV por dia</button>
-      <button type="button" id="csvHora">Baixar CSV hora a hora</button>
+      <button type="button" id="copy" class="primary">Copiar tabela</button>
+      <button type="button" id="csvDia" class="dl">Baixar CSV por dia</button>
+      <button type="button" id="csvHora" class="dl">Baixar CSV hora a hora</button>
       <span class="help" id="msg" role="status"></span>
     </div>
     <div class="tablewrap"><table id="tab"></table></div>
@@ -283,9 +286,19 @@ tr.parcial td{color:var(--muted)}
     return o.join('\r\n');
   }
   function baixar(nome,texto){
-    var b=new Blob(['﻿'+texto],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
-    a.href=URL.createObjectURL(b); a.download=nome; document.body.appendChild(a); a.click();
-    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+    var dados='\uFEFF'+texto;
+    function direto(){
+      var bl=new Blob([dados],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
+      a.href=URL.createObjectURL(bl); a.download=nome; document.body.appendChild(a); a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+    }
+    // dentro do Claude o download passa pela capacidade "downloads"; no GitHub Pages é direto
+    if(window.claude&&claude.use){
+      claude.use('downloads').then(function(d){
+        if(!d){direto();return}
+        d.save({filename:nome,data:dados}).then(function(){aviso('Arquivo salvo.')},function(e){if(!e||e.code!=='declined')aviso('Não foi possível salvar o arquivo.')});
+      },direto);
+    } else direto();
   }
   function aviso(t){$('msg').textContent=t;setTimeout(function(){$('msg').textContent=''},3500)}
   $('copy').onclick=function(){
