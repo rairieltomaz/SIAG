@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de Consumo de Gás</title>
+<meta name="description" content="Calcula o consumo diário de gás em m³ a partir do CSV do historiador. Roda no navegador, sem enviar dados.">
+<style>
+/* Layout: coluna única. 1) dados  2) ajustes  3) resultado (resumo, avisos, gráfico, tabela) */
+:root{
+  --bg:#f4f6f6; --card:#ffffff; --fg:#1b2428; --muted:#5b6a70; --line:#d5dddf;
+  --accent:#0b6e75; --accent-fg:#ffffff; --accent-soft:#dcedee; --warn:#9a5b00; --warn-bg:#fbefd9; --bad:#a8271d; --partial:#b7c9cb;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101619; --card:#182125; --fg:#e3eaec; --muted:#93a3a9; --line:#2e3c41;
+  --accent:#4fbcc4; --accent-fg:#06282b; --accent-soft:#17353a; --warn:#f0b05a; --warn-bg:#33270f; --bad:#ff8a80; --partial:#3a5256; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101619; --card:#182125; --fg:#e3eaec; --muted:#93a3a9; --line:#2e3c41;
+  --accent:#4fbcc4; --accent-fg:#06282b; --accent-soft:#17353a; --warn:#f0b05a; --warn-bg:#33270f; --bad:#ff8a80; --partial:#3a5256; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font);
+  padding:24px max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-size:1.55rem;line-height:1.2;margin:0;font-weight:650;text-wrap:balance}
+h2{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:650}
+.lead{color:var(--muted);margin:6px 0 0;max-width:68ch}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:8px 14px;border-radius:8px;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:600}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#drop{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;color:var(--muted);transition:border-color .15s,background .15s}
+#drop.over{border-color:var(--accent);background:var(--accent-soft)}
+#files{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+#files li{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--accent-soft);border-radius:8px;padding:6px 10px;font-size:.9rem;min-width:0}
+#files li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#files button{padding:2px 8px;font-size:.85rem}
+textarea{width:100%;min-height:84px;margin-top:12px;font:12px/1.4 var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+details summary{cursor:pointer;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);min-width:0}
+input[type=text],input[type=number],select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;width:100%}
+.check{flex-direction:row;align-items:flex-start;gap:8px;color:var(--fg);grid-column:1/-1}
+.check input{margin-top:4px}
+.help{color:var(--muted);font-size:.82rem;display:block}
+#out[hidden]{display:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg)}
+.card b{display:block;font-size:1.45rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.card.main{background:var(--accent-soft);border-color:var(--accent)}
+.card small{color:var(--muted)}
+.notes{display:flex;flex-direction:column;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+.notes li{border-radius:8px;padding:8px 12px;background:var(--bg);border-left:4px solid var(--line);font-size:.9rem}
+.notes li.warn{background:var(--warn-bg);border-left-color:var(--warn)}
+.notes li.bad{border-left-color:var(--bad)}
+.chart{margin-top:16px;overflow-x:auto}
+.chart svg{display:block;min-width:620px;width:100%;height:auto}
+.tablewrap{overflow-x:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.92rem}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,th:last-child,td:last-child{text-align:left}
+th{font-size:.78rem;color:var(--muted);font-weight:650;position:sticky;top:0;background:var(--card)}
+tfoot td{font-weight:700;border-top:2px solid var(--fg);border-bottom:none}
+tr.parcial td{color:var(--muted)}
+.tag{font-size:.75rem;background:var(--warn-bg);color:var(--warn);border-radius:99px;padding:1px 8px}
+.foot{color:var(--muted);font-size:.82rem}
+.sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Calculadora de consumo de gás</h1>
+    <p class="lead">Carregue o CSV do historiador (contador acumulado dos tramos A e B, PCI e PCS) e veja o consumo de cada dia em m³. O cálculo é feito aqui no navegador e nenhum dado é enviado a lugar nenhum.</p>
+  </header>
+
+  <section aria-labelledby="h-dados">
+    <h2 id="h-dados">1. Dados</h2>
+    <div id="drop">
+      <p style="margin:0 0 10px">Arraste o CSV para cá ou escolha o arquivo. Pode ser mais de um.</p>
+      <button type="button" class="primary" id="pick">Escolher CSV</button>
+      <input id="file" type="file" accept=".csv,.txt,text/csv,text/plain" multiple class="sr" aria-label="Escolher arquivos CSV">
+    </div>
+    <ul id="files"></ul>
+    <details style="margin-top:12px">
+      <summary>Ou colar o conteúdo do CSV</summary>
+      <textarea id="paste" placeholder='"Date Time","FIT-00EKU10CF902.UNIT1@NET0", ...' spellcheck="false"></textarea>
+    </details>
+  </section>
+
+  <section aria-labelledby="h-aj">
+    <h2 id="h-aj">2. Ajustes</h2>
+    <details>
+      <summary>Mês, fuso, PCS de referência e tags</summary>
+      <div class="grid">
+        <label>Mês
+          <select id="mes"><option value="auto">Automático (mês da 1ª leitura)</option></select>
+        </label>
+        <label>Ajuste de fuso (h)
+          <input id="fuso" type="number" step="1" value="1">
+        </label>
+        <label>PCS de referência (kcal/m³)
+          <input id="pcsRef" type="number" step="1" value="9400">
+        </label>
+        <label>Km³ para m³
+          <input id="conv" type="number" step="1" value="1000">
+        </label>
+        <label>Tag da vazão do Tramo A
+          <input id="tagA" type="text" value="CF902">
+        </label>
+        <label>Tag da vazão do Tramo B
+          <input id="tagB" type="text" value="CF904; CF903">
+        </label>
+        <label>Tag do PCI
+          <input id="tagPCI" type="text" value="EN02">
+        </label>
+        <label>Tag do PCS
+          <input id="tagPCS" type="text" value="EN01">
+        </label>
+        <label class="check"><input id="estimar" type="checkbox">
+          <span>Estimar o consumo perdido no zeramento do contador
+            <span class="help">Deixe desmarcado para contador mensal: na virada do mês o zero é real e a estimativa soma um valor que não foi consumido. Marque só se o contador zera todo dia.</span></span>
+        </label>
+      </div>
+      <p class="help" style="margin-top:12px">Com ajuste de +1 h o dia vai da 00:00 às 24:00 de Brasília, quando o CSV vem em UTC-4. Várias tags separadas por ponto e vírgula funcionam como lista de tentativa.</p>
+    </details>
+  </section>
+
+  <section id="out" hidden aria-labelledby="h-res" aria-live="polite">
+    <h2 id="h-res">3. Consumo diário</h2>
+    <div class="cards" id="cards"></div>
+    <ul class="notes" id="notes"></ul>
+    <div class="chart" id="chart"></div>
+    <div class="row" style="margin-top:16px">
+      <button type="button" id="copy">Copiar tabela</button>
+      <button type="button" id="csvDia">Baixar CSV por dia</button>
+      <button type="button" id="csvHora">Baixar CSV hora a hora</button>
+      <span class="help" id="msg" role="status"></span>
+    </div>
+    <div class="tablewrap"><table id="tab"></table></div>
+    <details style="margin-top:16px">
+      <summary>Como o cálculo é feito</summary>
+      <ol class="help" style="font-size:.9rem;line-height:1.6">
+        <li>Lê só as linhas com data e hora, descarta as marcadas com qualidade ruim (valor com "B" no fim) e as leituras de acumulado zeradas.</li>
+        <li>Soma ao horário o ajuste de fuso e calcula o consumo de cada leitura pela diferença do contador. Queda de mais de 50% conta como zeramento e a leitura nova entra como consumo. Queda menor é ruído e vale zero.</li>
+        <li>Agrupa em horas (a leitura das 14:00:00 pertence à hora 13:00 a 14:00) e soma os tramos A e B.</li>
+        <li>O dia é a soma das 24 horas. PCI e PCS do dia são médias ponderadas pelo volume. O consumo na referência é m³ × PCS ÷ PCS de referência.</li>
+      </ol>
+    </details>
+  </section>
+  <p class="foot">Dados processados localmente. A precisão do dia depende do intervalo entre leituras do CSV: o contador atualiza de hora em hora, então a virada do dia tem tolerância de cerca de 1 hora de consumo.</p>
+</main>
+<script src="calc.js"></script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var arquivos=[];       // {nome, texto, bytes}
+  var ultimo=null, timer=null;
+  var fmt0=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
+  var fmt1=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+  function f0(x){return x==null?'—':fmt0.format(Math.round(x))}
+  function f1(x){return x==null?'—':fmt1.format(x)}
+  function nbr(x,d){return x==null?'':x.toFixed(d).replace('.',',')}
+  function dbr(s){return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4)}
+
+  function cfg(){
+    return {tagA:$('tagA').value,tagB:$('tagB').value,tagPCI:$('tagPCI').value,tagPCS:$('tagPCS').value,
+      fuso:parseFloat($('fuso').value)||0,conv:parseFloat($('conv').value)||1000,pcsRef:parseFloat($('pcsRef').value)||9400,
+      estimar:$('estimar').checked,mes:$('mes').value};
+  }
+  function lista(){
+    var l=$('files'); l.innerHTML='';
+    arquivos.forEach(function(a,i){
+      var li=document.createElement('li'), s=document.createElement('span'), b=document.createElement('button');
+      s.textContent=a.nome+' ('+fmt0.format(Math.round(a.bytes/1024))+' KB)';
+      b.type='button'; b.textContent='Remover'; b.onclick=function(){arquivos.splice(i,1);lista();agendar()};
+      li.appendChild(s); li.appendChild(b); l.appendChild(li);
+    });
+  }
+  function ler(files){
+    var pend=files.length; if(!pend) return;
+    Array.prototype.forEach.call(files,function(f){
+      var r=new FileReader();
+      r.onload=function(){arquivos.push({nome:f.name,texto:String(r.result),bytes:f.size});if(--pend===0){lista();agendar()}};
+      r.onerror=function(){if(--pend===0){lista();agendar()}};
+      r.readAsText(f);
+    });
+  }
+  $('pick').onclick=function(){$('file').click()};
+  $('file').onchange=function(e){ler(e.target.files);e.target.value=''};
+  var drop=$('drop');
+  ['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over')})});
+  drop.addEventListener('drop',function(e){ler(e.dataTransfer.files)});
+  ['paste','tagA','tagB','tagPCI','tagPCS','fuso','conv','pcsRef','estimar','mes'].forEach(function(id){
+    $(id).addEventListener(id==='estimar'||id==='mes'?'change':'input',agendar);
+  });
+  function agendar(){clearTimeout(timer);timer=setTimeout(calcular,250)}
+
+  function nota(ul,txt,cls){var li=document.createElement('li');li.textContent=txt;if(cls)li.className=cls;ul.appendChild(li)}
+
+  function calcular(){
+    var ins=arquivos.map(function(a){return {nome:a.nome,texto:a.texto}});
+    var p=$('paste').value; if(p.trim()) ins.push({nome:'texto colado',texto:p});
+    var out=$('out'), notes=$('notes'); notes.innerHTML='';
+    if(!ins.length){out.hidden=true;return}
+    var r; try{ r=GasCalc.compute(ins,cfg()) }catch(e){ r={erro:'Não consegui ler os dados: '+e.message} }
+    out.hidden=false;
+    if(r.meses){ // seletor de mês
+      var sel=$('mes'), atual=sel.value; sel.innerHTML='<option value="auto">Automático (mês da 1ª leitura)</option>';
+      r.meses.forEach(function(m){var o=document.createElement('option');o.value=m;o.textContent=m.slice(5)+'/'+m.slice(0,4);sel.appendChild(o)});
+      sel.value=Array.prototype.some.call(sel.options,function(o){return o.value===atual})?atual:'auto';
+    }
+    if(r.erro){ $('cards').innerHTML=''; $('chart').innerHTML=''; $('tab').innerHTML=''; nota(notes,r.erro,'bad warn'); ultimo=null; return }
+    ultimo=r; desenhar(r);
+  }
+
+  function desenhar(r){
+    var t=r.total, q=r.qual, cards=$('cards'), notes=$('notes');
+    cards.innerHTML='';
+    [['main','Consumo no mês (m³)',f0(t.m3),'Mês '+r.mes.slice(5)+'/'+r.mes.slice(0,4)],
+     ['','Na referência de PCS (m³)',f0(t.ref),'a '+f0(cfg().pcsRef)+' kcal/m³'],
+     ['','PCS médio (kcal/m³)',f1(t.pcs),'PCI '+f1(t.pci)],
+     ['','Horas com consumo',f0(t.horas),'de '+r.dias.length+' dias']].forEach(function(c){
+      var d=document.createElement('div');d.className='card '+c[0];
+      d.innerHTML='<small></small><b></b><small></small>';
+      d.children[0].textContent=c[1];d.children[1].textContent=c[2];d.children[2].textContent=c[3];cards.appendChild(d);
+    });
+    // avisos
+    var passo=Math.max(q.passoMin[0]||0,q.passoMin[1]||0);
+    if(passo>5) nota(notes,'As leituras estão espaçadas em cerca de '+f0(passo)+' min. O consumo de cada hora e a virada do dia ficam imprecisos: até 1 hora de consumo pode trocar de dia. Para o dia, use a exportação com mais pontos (por exemplo 36.000 pontos, uma leitura a cada ~75 s).','warn');
+    var parc=r.dias.filter(function(d){return !d.completo});
+    if(parc.length) nota(notes,'Dias com dados incompletos: '+parc.map(function(d){return d.data.slice(8,10)+'/'+d.data.slice(5,7)}).join(', ')+'. O arquivo vai de '+GasCalc.tstr(q.primeira)+' a '+GasCalc.tstr(q.ultima)+' (horário já com o ajuste de fuso).','warn');
+    if(r.conferencia){
+      var df=r.conferencia.soma-r.conferencia.contador, pc=df/r.conferencia.contador*100;
+      nota(notes,'Conferência: o contador mensal (A+B) marca '+f0(r.conferencia.contador)+' m³ e a soma dos dias dá '+f0(r.conferencia.soma)+' m³ (diferença de '+f0(df)+' m³, '+nbr(pc,2)+'%).',Math.abs(pc)>0.5?'warn':'');
+    }
+    if(q.estimativa>0) nota(notes,'Inclui '+f0(q.estimativa)+' m³ de estimativa de zeramento. Para contador mensal, desmarque essa opção nos ajustes.','warn');
+    if(!q.leituras[0]) nota(notes,'Nenhuma leitura encontrada para o Tramo A (tag "'+$('tagA').value+'").','warn');
+    if(!q.leituras[1]) nota(notes,'Nenhuma leitura encontrada para o Tramo B (tag "'+$('tagB').value+'").','warn');
+    if(q.descartadas) nota(notes,q.descartadas+' linhas com valor de qualidade ruim ou vazio foram ignoradas.');
+    nota(notes,'Leituras usadas: Tramo A '+f0(q.leituras[0])+', Tramo B '+f0(q.leituras[1])+'.');
+    grafico(r); tabela(r);
+  }
+
+  function grafico(r){
+    var W=900,Hh=280,L=64,R=12,T=14,B=44, n=r.dias.length, mx=0;
+    r.dias.forEach(function(d){if(d.m3>mx)mx=d.m3});
+    var passo=[1,2,2.5,5,10], mag=Math.pow(10,Math.floor(Math.log10(mx||1))), top=mx||1;
+    for(var i=0;i<passo.length;i++){ if(passo[i]*mag>=mx/4){ top=Math.ceil(mx/(passo[i]*mag))*passo[i]*mag; var step=passo[i]*mag; break } }
+    step=step||top/4;
+    var bw=(W-L-R)/n, s='<svg viewBox="0 0 '+W+' '+Hh+'" role="img" aria-label="Consumo de gás por dia em m³">';
+    for(var v=0;v<=top+1e-6;v+=step){
+      var y=T+(Hh-T-B)*(1-v/top);
+      s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="var(--muted)">'+fmt0.format(v)+'</text>';
+    }
+    r.dias.forEach(function(d,k){
+      var h=(Hh-T-B)*(d.m3/top), x=L+k*bw+bw*0.15, y=Hh-B-h;
+      s+='<rect x="'+x+'" y="'+y+'" width="'+(bw*0.7)+'" height="'+Math.max(h,0)+'" fill="'+(d.completo?'var(--accent)':'var(--partial)')+'"><title>'+dbr(d.data)+': '+f0(d.m3)+' m³'+(d.completo?'':' (dia incompleto)')+'</title></rect>';
+      if(n<=31||k%2===0) s+='<text x="'+(x+bw*0.35)+'" y="'+(Hh-26)+'" text-anchor="middle" font-size="10.5" fill="var(--muted)">'+d.data.slice(8,10)+'</text>';
+    });
+    s+='<text x="'+L+'" y="'+(Hh-1)+'" font-size="10" fill="var(--muted)">dia do mês · m³ por dia · barras claras são dias incompletos</text></svg>';
+    $('chart').innerHTML=s;
+  }
+
+  function tabela(r){
+    var h='<thead><tr><th>Dia</th><th>Consumo (m³)</th><th>PCI (kcal/m³)</th><th>PCS (kcal/m³)</th><th>Consumo na ref. PCS (m³)</th><th>Horas com consumo</th><th></th></tr></thead><tbody>';
+    r.dias.forEach(function(d){
+      h+='<tr'+(d.completo?'':' class="parcial"')+'><td>'+dbr(d.data)+'</td><td>'+f0(d.m3)+'</td><td>'+f1(d.pci)+'</td><td>'+f1(d.pcs)+'</td><td>'+f0(d.ref)+'</td><td>'+d.horas+'</td><td>'+(d.completo?'':'<span class="tag">incompleto</span>')+'</td></tr>';
+    });
+    var t=r.total;
+    h+='</tbody><tfoot><tr><td>Total</td><td>'+f0(t.m3)+'</td><td>'+f1(t.pci)+'</td><td>'+f1(t.pcs)+'</td><td>'+f0(t.ref)+'</td><td>'+t.horas+'</td><td></td></tr></tfoot>';
+    $('tab').innerHTML=h;
+  }
+
+  function linhasDia(sep){
+    var o=[['Dia','Consumo (m3)','PCI (kcal/m3)','PCS (kcal/m3)','Consumo ref. PCS (m3)','Horas com consumo','Dia completo'].join(sep)];
+    ultimo.dias.forEach(function(d){o.push([dbr(d.data),nbr(d.m3,3),nbr(d.pci,1),nbr(d.pcs,1),nbr(d.ref,1),d.horas,d.completo?'sim':'nao'].join(sep))});
+    var t=ultimo.total; o.push(['Total',nbr(t.m3,3),nbr(t.pci,1),nbr(t.pcs,1),nbr(t.ref,1),t.horas,''].join(sep));
+    return o.join('\r\n');
+  }
+  function baixar(nome,texto){
+    var b=new Blob(['﻿'+texto],{type:'text/csv;charset=utf-8'}), a=document.createElement('a');
+    a.href=URL.createObjectURL(b); a.download=nome; document.body.appendChild(a); a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+  }
+  function aviso(t){$('msg').textContent=t;setTimeout(function(){$('msg').textContent=''},3500)}
+  $('copy').onclick=function(){
+    if(!ultimo) return; var tx=linhasDia('\t');
+    var ok=function(){aviso('Tabela copiada. Cole no Excel.')};
+    var falha=function(){var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){aviso('Não consegui copiar. Use o CSV.')}ta.remove()};
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(tx).then(ok,falha); else falha();
+  };
+  $('csvDia').onclick=function(){if(ultimo) baixar('consumo-diario-'+ultimo.mes+'.csv',linhasDia(';'))};
+  $('csvHora').onclick=function(){
+    if(!ultimo) return; var hh=ultimo.horas, o=['Inicio da hora;Tramo A (m3);Tramo B (m3);Total (m3)'];
+    for(var k=0;k<hh.m3.length;k++){
+      var t=hh.inicio+k*3600000, d=new Date(t), p=function(n){return (n<10?'0':'')+n};
+      o.push([p(d.getUTCDate())+'/'+p(d.getUTCMonth()+1)+'/'+d.getUTCFullYear()+' '+p(d.getUTCHours())+':00',nbr(hh.A[k],3),nbr(hh.B[k],3),nbr(hh.m3[k],3)].join(';'));
+    }
+    baixar('consumo-hora-a-hora-'+ultimo.mes+'.csv',o.join('\r\n'));
+  };
+})();
+</script>
+</body>
+</html>
